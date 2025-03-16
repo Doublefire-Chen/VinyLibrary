@@ -23,7 +23,7 @@ func main() {
 	router.POST("/register", Register) // Route for register
 
 	// Protected routes
-	protected := router.Group("/")
+	protected := router.Group("/api")
 	protected.Use(AuthMiddleware()) // Apply authorization middleware
 	{
 		protected.GET("/vinyls", GetVinylInfo)
