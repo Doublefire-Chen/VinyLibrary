@@ -226,6 +226,35 @@ func DeleteVinyl(c *gin.Context) {
 		return
 	}
 
+	// check if trash folder exists, if not, create it
+	if _, err := os.Stat("./album/trash"); os.IsNotExist(err) {
+		err = os.Mkdir("./album/trash", os.ModePerm)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Could not create trash directory"})
+			return
+		}
+	}
+
+	// delete the album picture, not real delete, just put it in the trash folder
+	// get the album picture url
+	var albumPictureURL string
+	err = db.QueryRow("SELECT album_picture_url FROM vinyls WHERE id = $1", id).Scan(&albumPictureURL)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get album picture url"})
+		fmt.Println(err)
+		return
+	}
+	filename := filepath.Base(albumPictureURL)
+	// unescape the filename
+	filename, err = url.PathUnescape(filename)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to unescape filename"})
+		fmt.Println(err)
+		return
+	}
+	// move the file to trash folder
+	os.Rename("./album/"+filename, "./album/trash/"+filename)
+
 	_, err = db.Exec("DELETE FROM vinyls WHERE id = $1", id)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete vinyl"})

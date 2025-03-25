@@ -15,10 +15,17 @@ export default function EditVinylModal({ vinyl, onClose, onSave }: EditVinylModa
     };
 
     return (
-        <div className="fixed inset-0 bg-transparent backdrop-blur-sm flex justify-center items-center z-50">
-            <div className="bg-white p-6 rounded shadow-xl w-[600px] max-h-[90vh] overflow-auto">
+        <div
+            className="fixed inset-0 bg-transparent backdrop-blur-sm flex justify-center items-center z-50"
+            onClick={onClose}   // 点击空白处关闭
+        >
+            <div
+                className="bg-white p-6 rounded shadow-xl w-[600px] max-h-[90vh] overflow-auto"
+                onClick={(e) => e.stopPropagation()} // 阻止点击内容区域冒泡
+            >
                 <h2 className="text-xl font-bold mb-4">Edit Vinyl Info</h2>
                 <div className="grid grid-cols-2 gap-4">
+                    <p className="col-span-2 text-sm text-gray-500">ID: {editedVinyl.id}</p>
                     <input type="text" value={editedVinyl.title} onChange={(e) => handleChange('title', e.target.value)} placeholder="Title" className="border p-2 rounded" />
                     <input type="text" value={editedVinyl.artist} onChange={(e) => handleChange('artist', e.target.value)} placeholder="Artist" className="border p-2 rounded" />
                     <input type="number" value={editedVinyl.year} onChange={(e) => handleChange('year', parseInt(e.target.value) || 0)} placeholder="Year" className="border p-2 rounded" />
