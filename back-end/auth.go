@@ -56,18 +56,15 @@ func ParseToken(tokenString string) (int, error) {
 
 func AuthMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		tokenString := c.GetHeader("Authorization")
-		if tokenString == "" {
+		// 1. Get token from cookie
+		tokenString, err := c.Cookie("bearer-token")
+		if err != nil || tokenString == "" {
 			c.JSON(http.StatusUnauthorized, gin.H{"error": "Authorization token is missing"})
 			c.Abort()
 			return
 		}
 
-		if len(tokenString) > 7 && tokenString[:7] == "Bearer " {
-			tokenString = tokenString[7:]
-		}
-
-		// Parse token
+		// 2. Parse token
 		userID, err := ParseToken(tokenString)
 		if err != nil {
 			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid or expired token"})
@@ -75,17 +72,17 @@ func AuthMiddleware() gin.HandlerFunc {
 			return
 		}
 
-		// Generate a new token and return it in the response header unless user logs out
-		if c.Request.URL.Path != "/logout" {
+		// 3. Optionally refresh the token
+		if c.Request.URL.Path != "/api/logout" {
 			newToken, _ := GenerateToken(userID)
-			c.Header("Authorization", "Bearer "+newToken)
+			c.SetCookie("bearer-token", newToken, 86400, "/", "", false, true)
 		} else {
-			// send empty token to logout
-			c.Header("Authorization", "Bearer ")
-			//for debug
-			fmt.Println("Logged out")
+			// Clear the cookie on logout
+			c.SetCookie("bearer-token", "", -1, "/", "", false, true)
+			c.JSON(http.StatusOK, gin.H{"message": "Logged out successfully"})
 		}
-		// Set userID in context
+
+		// 4. Store userID in context
 		c.Set("user_id", userID)
 		c.Next()
 	}
@@ -257,8 +254,8 @@ func Login(c *gin.Context) {
 		return
 	}
 
-	// Return token in header and success message
-	c.Header("Authorization", "Bearer "+token)
+	// Set the session token as a cookie (use your custom token name here)
+	c.SetCookie("bearer-token", token, 86400, "/", "", false, true) // Adjust parameters as needed
 	c.JSON(http.StatusOK, gin.H{"message": loginReq.Username + " logged in successfully"})
 }
 
@@ -344,5 +341,6 @@ func DeleteAccount(c *gin.Context) {
 }
 
 func Logout(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{"message": "Logged out successfully"})
+	//c.Header("Authorization", "Bearer ")
+
 }

@@ -8,7 +8,7 @@ CREATE TABLE vinyls (
     tracklist JSON,
     album_picture_url TEXT,
     play_num integer,
-    timebuyed timestamp without time zone,
+    timebought timestamp without time zone,
     price DECIMAL(10, 2),
     description TEXT,
     currency VARCHAR(10)

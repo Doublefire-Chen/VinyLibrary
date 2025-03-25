@@ -9,6 +9,7 @@ import (
 	"net/url"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
@@ -32,7 +33,7 @@ type Vinyl struct {
 	Tracklist       []Track `json:"tracklist"`
 	AlbumPictureURL string  `json:"album_picture_url"`
 	PlayNum         int     `json:"play_num"`
-	Timebuyed       string  `json:"timebuyed"`
+	Timebought      string  `json:"timebought"`
 	Price           float64 `json:"price"`
 	Currency        string  `json:"currency"`
 	Description     string  `json:"description"`
@@ -77,7 +78,7 @@ func GetVinylInfo(c *gin.Context) {
 	}
 	defer db.Close()
 
-	rows, err := db.Query("SELECT id, title, artist, year, vinyl_type, vinyl_number, tracklist, album_picture_url, play_num, timebuyed, price, currency, description FROM vinyls")
+	rows, err := db.Query("SELECT id, title, artist, year, vinyl_type, vinyl_number, tracklist, album_picture_url, play_num, timebought, price, currency, description FROM vinyls")
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve data"})
 		return
@@ -90,7 +91,7 @@ func GetVinylInfo(c *gin.Context) {
 		var tracklistJSON []byte // temporary variable to hold the raw JSON data
 
 		// Scan the row data; tracklist is retrieved as []byte
-		if err := rows.Scan(&v.ID, &v.Title, &v.Artist, &v.Year, &v.VinylType, &v.VinylNumber, &tracklistJSON, &v.AlbumPictureURL, &v.PlayNum, &v.Timebuyed, &v.Price, &v.Currency, &v.Description); err != nil {
+		if err := rows.Scan(&v.ID, &v.Title, &v.Artist, &v.Year, &v.VinylType, &v.VinylNumber, &tracklistJSON, &v.AlbumPictureURL, &v.PlayNum, &v.Timebought, &v.Price, &v.Currency, &v.Description); err != nil {
 			fmt.Printf("Error scanning data: %v\n", err) // Print scan error details
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Error scanning data"})
 			return
@@ -135,10 +136,10 @@ func AddVinyl(c *gin.Context) {
 	}
 
 	// Insert data into the vinyls table
-	query := `INSERT INTO vinyls (title, artist, year, vinyl_type, vinyl_number, tracklist, album_picture_url, play_num, timebuyed, price, currency, description)
+	query := `INSERT INTO vinyls (title, artist, year, vinyl_type, vinyl_number, tracklist, album_picture_url, play_num, timebought, price, currency, description)
 		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12) RETURNING id`
 
-	err = db.QueryRow(query, vinyl.Title, vinyl.Artist, vinyl.Year, vinyl.VinylType, vinyl.VinylNumber, tracklistJSON, vinyl.AlbumPictureURL, vinyl.PlayNum, vinyl.Timebuyed, vinyl.Price, vinyl.Currency, vinyl.Description).Scan(&vinyl.ID)
+	err = db.QueryRow(query, vinyl.Title, vinyl.Artist, vinyl.Year, vinyl.VinylType, vinyl.VinylNumber, tracklistJSON, vinyl.AlbumPictureURL, vinyl.PlayNum, vinyl.Timebought, vinyl.Price, vinyl.Currency, vinyl.Description).Scan(&vinyl.ID)
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to insert vinyl"})
@@ -185,27 +186,28 @@ func UploadAlbumPicture(c *gin.Context) {
 		}
 	}
 
-	// Sanitize title and artist for file name to avoid invalid characters
-	// sanitizedTitle := url.QueryEscape(title)
-	// sanitizedArtist := url.QueryEscape(artist)
+	// Sanitize title and artist to avoid invalid file characters
+	safeTitle := sanitizeFilename(title)
+	safeArtist := sanitizeFilename(artist)
 
-	// Extract file extension from the uploaded file
+	// Extract file extension
 	extension := filepath.Ext(file.Filename)
 
-	// Generate the filename as {Title}_{Artist}({number}{type}).{extension}
-	filename := fmt.Sprintf("%s_%s(%s%s)%s", title, artist, vinylNumber, vinylType, extension)
+	// Generate safe filename
+	filename := fmt.Sprintf("%s_%s(%s%s)%s", safeTitle, safeArtist, vinylNumber, vinylType, extension)
 	filePath := filepath.Join(albumDir, filename)
 
-	// Save the file to the album directory
+	// Save file
 	if err := c.SaveUploadedFile(file, filePath); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to save file"})
 		return
 	}
 
-	// Return the URL for the uploaded file
-	fileURL := fmt.Sprintf("%s/album/%s", os.Getenv("DOMAIN"), filename)
-	sanitizedFileURL := url.PathEscape(fileURL)
-	c.JSON(http.StatusOK, gin.H{"message": "File uploaded successfully", "url": sanitizedFileURL})
+	// Escape filename for URL safety
+	escapedFilename := url.PathEscape(filename)
+	fileURL := fmt.Sprintf("http://localhost:1234/api/album/%s", escapedFilename)
+
+	c.JSON(http.StatusOK, gin.H{"message": "File uploaded successfully", "url": fileURL})
 }
 
 func DeleteVinyl(c *gin.Context) {
@@ -294,9 +296,9 @@ func UpdateVinyl(c *gin.Context) {
 	}
 
 	// Insert data into the vinyls table
-	query := `UPDATE vinyls SET title = $1, artist = $2, year = $3, vinyl_type = $4, vinyl_number = $5, tracklist = $6, album_picture_url = $7, play_num = $8, timebuyed = $9, price = $10, currency = $11, description = $12 WHERE id = $13`
+	query := `UPDATE vinyls SET title = $1, artist = $2, year = $3, vinyl_type = $4, vinyl_number = $5, tracklist = $6, album_picture_url = $7, play_num = $8, timebought = $9, price = $10, currency = $11, description = $12 WHERE id = $13`
 
-	_, err = db.Exec(query, vinyl.Title, vinyl.Artist, vinyl.Year, vinyl.VinylType, vinyl.VinylNumber, tracklistJSON, vinyl.AlbumPictureURL, vinyl.PlayNum, vinyl.Timebuyed, vinyl.Price, vinyl.Currency, vinyl.Description, id)
+	_, err = db.Exec(query, vinyl.Title, vinyl.Artist, vinyl.Year, vinyl.VinylType, vinyl.VinylNumber, tracklistJSON, vinyl.AlbumPictureURL, vinyl.PlayNum, vinyl.Timebought, vinyl.Price, vinyl.Currency, vinyl.Description, id)
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update vinyl"})
@@ -306,4 +308,62 @@ func UpdateVinyl(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"message": "Vinyl updated successfully", "id": id})
+}
+
+func ServeAlbumPicture(c *gin.Context) {
+	filename := c.Param("filename")
+	filePath := filepath.Join("./album", filename)
+
+	// 检查文件是否存在
+	if _, err := os.Stat(filePath); os.IsNotExist(err) {
+		c.JSON(http.StatusNotFound, gin.H{"error": "File not found"})
+		return
+	}
+
+	// 通过 Gin 发送文件
+	c.File(filePath)
+}
+
+// sanitizeFilename 移除或替换文件名中的非法字符
+func sanitizeFilename(name string) string {
+	// 过滤掉不安全字符，如 / \ : * ? " < > |
+	illegalChars := []string{"/", "\\", ":", "*", "?", "\"", "<", ">", "|"}
+	for _, char := range illegalChars {
+		name = strings.ReplaceAll(name, char, "_")
+	}
+	return name
+}
+
+func GetVinylByID(c *gin.Context) {
+	db, err := connectDB()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to connect to the database"})
+		return
+	}
+	defer db.Close()
+
+	id := c.Param("id")
+
+	if id == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Missing id"})
+		fmt.Println(id)
+		return
+	}
+
+	var v Vinyl
+	var tracklistJSON []byte
+
+	err = db.QueryRow("SELECT id, title, artist, year, vinyl_type, vinyl_number, tracklist, album_picture_url, play_num, timebought, price, currency, description FROM vinyls WHERE id = $1", id).Scan(&v.ID, &v.Title, &v.Artist, &v.Year, &v.VinylType, &v.VinylNumber, &tracklistJSON, &v.AlbumPictureURL, &v.PlayNum, &v.Timebought, &v.Price, &v.Currency, &v.Description)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve data"})
+		return
+	}
+
+	if err := json.Unmarshal(tracklistJSON, &v.Tracklist); err != nil {
+		fmt.Printf("Error unmarshaling tracklist JSON: %v\n", err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error decoding tracklist"})
+		return
+	}
+
+	c.JSON(http.StatusOK, v)
 }
