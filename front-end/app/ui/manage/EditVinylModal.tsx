@@ -1,5 +1,6 @@
 import { Vinyl } from '@/app/lib/definitions';
 import { useState, ChangeEvent } from 'react';
+import MacOSTrafficLights from '@/app/ui/MacOSTrafficLights';
 
 interface EditVinylModalProps {
     vinyl: Vinyl;
@@ -9,6 +10,7 @@ interface EditVinylModalProps {
 
 export default function EditVinylModal({ vinyl, onClose, onSave }: EditVinylModalProps) {
     const [editedVinyl, setEditedVinyl] = useState<Vinyl>({ ...vinyl });
+    const [isHovered, setIsHovered] = useState(false); // Shared hover state
 
     const handleChange = (field: keyof Vinyl, value: any) => {
         setEditedVinyl((prev) => ({ ...prev, [field]: value }));
@@ -39,6 +41,8 @@ export default function EditVinylModal({ vinyl, onClose, onSave }: EditVinylModa
         }
     };
 
+
+
     return (
         <div
             className="fixed inset-0 bg-transparent backdrop-blur-sm flex justify-center items-center z-50"
@@ -48,16 +52,19 @@ export default function EditVinylModal({ vinyl, onClose, onSave }: EditVinylModa
                 className="bg-white p-6 rounded-xl shadow-xl w-[600px] max-h-[90vh] relative"
                 onClick={(e) => e.stopPropagation()}
             >
+                {/* Tab bar */}
+                <div className="absolute top-0 left-0 right-0 h-10 bg-blue-100 rounded-t-xl flex items-center px-24">
+                    <div className="text-gray-700 font-medium truncate">Edit Vinyl: {editedVinyl.title}</div>
+                </div>
+
                 {/* macOS 红绿灯 */}
-                <div className="flex space-x-2 absolute top-4 left-4">
-                    <div
-                        className="w-3.5 h-3.5 bg-red-500 rounded-full shadow-inner flex items-center justify-center"
-                        onClick={onClose}
-                        onMouseEnter={(e) => (e.currentTarget.textContent = '×')}
-                        onMouseLeave={(e) => (e.currentTarget.textContent = '')}
-                    ></div>
-                    <div className="w-3.5 h-3.5 bg-yellow-400 rounded-full shadow-inner"></div>
-                    <div className="w-3.5 h-3.5 bg-green-500 rounded-full shadow-inner"></div>
+                <div className="flex space-x-2 absolute top-4 left-4"
+                    onMouseEnter={() => setIsHovered(true)}
+                    onMouseLeave={() => setIsHovered(false)}
+                >
+                    <MacOSTrafficLights type="close" isHovered={isHovered} onClick={onClose} />
+                    <MacOSTrafficLights type="minimize" isHovered={isHovered} />
+                    <MacOSTrafficLights type="maximize" isHovered={isHovered} />
                 </div>
 
                 <h2 className="text-xl font-bold mb-4 mt-4 text-center">Edit Vinyl Info</h2>
