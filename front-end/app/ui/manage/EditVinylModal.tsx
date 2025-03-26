@@ -29,13 +29,12 @@ export default function EditVinylModal({ vinyl, onClose, onSave }: EditVinylModa
                 const data = await res.json();
                 if (data.url) {
                     setEditedVinyl((prev) => ({ ...prev, album_picture_url: data.url }));
-                    alert('图片上传成功！');
                 } else {
-                    alert('图片上传失败');
+                    alert('Upload failed');
                 }
             } catch (err) {
                 console.error(err);
-                alert('上传出错');
+                alert('Upload failed');
             }
         }
     };
@@ -46,71 +45,85 @@ export default function EditVinylModal({ vinyl, onClose, onSave }: EditVinylModa
             onClick={onClose}
         >
             <div
-                className="bg-white p-6 rounded shadow-xl w-[600px] max-h-[90vh] overflow-auto relative"
+                className="bg-white p-6 rounded-xl shadow-xl w-[600px] max-h-[90vh] relative"
                 onClick={(e) => e.stopPropagation()}
             >
                 {/* macOS 红绿灯 */}
                 <div className="flex space-x-2 absolute top-4 left-4">
-                    <div className="w-3.5 h-3.5 bg-red-500 rounded-full shadow-inner"></div>
+                    <div
+                        className="w-3.5 h-3.5 bg-red-500 rounded-full shadow-inner flex items-center justify-center"
+                        onClick={onClose}
+                        onMouseEnter={(e) => (e.currentTarget.textContent = '×')}
+                        onMouseLeave={(e) => (e.currentTarget.textContent = '')}
+                    ></div>
                     <div className="w-3.5 h-3.5 bg-yellow-400 rounded-full shadow-inner"></div>
                     <div className="w-3.5 h-3.5 bg-green-500 rounded-full shadow-inner"></div>
                 </div>
 
                 <h2 className="text-xl font-bold mb-4 mt-4 text-center">Edit Vinyl Info</h2>
-                <div className="flex justify-center mb-4">
-                    <img src={editedVinyl.album_picture_url} alt="Album Cover" className="w-40 h-40 object-cover rounded shadow" />
-                </div>
-                <div className="flex justify-center mb-4">
-                    <label className="bg-blue-600 text-white px-4 py-2 rounded cursor-pointer hover:bg-blue-700">
-                        Choose File
-                        <input type="file" className="hidden" onChange={handleFileChange} />
-                    </label>
-                </div>
-                <div className="grid grid-cols-2 gap-4 text-sm">
-                    <div>
-                        <p className="mb-1 text-gray-500">Title</p>
-                        <input type="text" value={editedVinyl.title} onChange={(e) => handleChange('title', e.target.value)} className="border p-2 rounded w-full" />
-                    </div>
-                    <div>
-                        <p className="mb-1 text-gray-500">Artist</p>
-                        <input type="text" value={editedVinyl.artist} onChange={(e) => handleChange('artist', e.target.value)} className="border p-2 rounded w-full" />
-                    </div>
-                    <div>
-                        <p className="mb-1 text-gray-500">Year</p>
-                        <input type="number" value={editedVinyl.year} onChange={(e) => handleChange('year', parseInt(e.target.value) || 0)} className="border p-2 rounded w-full" />
-                    </div>
-                    <div>
-                        <p className="mb-1 text-gray-500">Vinyl Type</p>
-                        <input type="text" value={editedVinyl.vinyl_type} onChange={(e) => handleChange('vinyl_type', e.target.value)} className="border p-2 rounded w-full" />
-                    </div>
-                    <div>
-                        <p className="mb-1 text-gray-500">Vinyl Number</p>
-                        <input type="number" value={editedVinyl.vinyl_number} onChange={(e) => handleChange('vinyl_number', parseInt(e.target.value) || 0)} className="border p-2 rounded w-full" />
-                    </div>
-                    <div>
-                        <p className="mb-1 text-gray-500">Play Count</p>
-                        <input type="number" value={editedVinyl.play_num} onChange={(e) => handleChange('play_num', parseInt(e.target.value) || 0)} className="border p-2 rounded w-full" />
-                    </div>
-                    <div>
-                        <p className="mb-1 text-gray-500">Time Bought</p>
-                        <input type="text" value={editedVinyl.timebought} onChange={(e) => handleChange('timebought', e.target.value)} className="border p-2 rounded w-full" />
-                    </div>
-                    <div>
-                        <p className="mb-1 text-gray-500">Price</p>
-                        <input type="number" value={editedVinyl.price} onChange={(e) => handleChange('price', parseFloat(e.target.value) || 0)} className="border p-2 rounded w-full" />
-                    </div>
-                    <div>
-                        <p className="mb-1 text-gray-500">Currency</p>
-                        <input type="text" value={editedVinyl.currency} onChange={(e) => handleChange('currency', e.target.value)} className="border p-2 rounded w-full" />
-                    </div>
-                    <div className="col-span-2">
-                        <p className="mb-1 text-gray-500">Description</p>
-                        <textarea value={editedVinyl.description} onChange={(e) => handleChange('description', e.target.value)} className="border p-2 rounded w-full" rows={3} />
+                <div className="flex justify-center items-center mb-4 gap-4">
+                    <img
+                        src={editedVinyl.album_picture_url}
+                        alt="Album Cover"
+                        className="w-40 h-40 object-cover rounded-xl shadow"
+                    />
+                    <div className="flex items-end h-40">
+                        <label className="bg-blue-600 text-white px-4 py-2 rounded-lg cursor-pointer hover:bg-blue-700">
+                            Choose File
+                            <input type="file" className="hidden" onChange={handleFileChange} />
+                        </label>
                     </div>
                 </div>
-                <div className="flex gap-4 mt-6 justify-end">
-                    <button onClick={() => onSave(editedVinyl)} className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">Save</button>
-                    <button onClick={onClose} className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">Cancel</button>
+
+                {/* 这里是限制滚动区域的容器 */}
+                <div className="max-h-[50vh] overflow-auto mb-4">
+                    <div className="grid grid-cols-2 gap-4 text-sm">
+                        <div>
+                            <p className="mb-1 text-gray-500">Title</p>
+                            <input type="text" value={editedVinyl.title} onChange={(e) => handleChange('title', e.target.value)} className="border p-2 rounded-lg w-full" />
+                        </div>
+                        <div>
+                            <p className="mb-1 text-gray-500">Artist</p>
+                            <input type="text" value={editedVinyl.artist} onChange={(e) => handleChange('artist', e.target.value)} className="border p-2 rounded-lg w-full" />
+                        </div>
+                        <div>
+                            <p className="mb-1 text-gray-500">Year</p>
+                            <input type="number" value={editedVinyl.year} onChange={(e) => handleChange('year', parseInt(e.target.value) || 0)} className="border p-2 rounded-lg w-full" />
+                        </div>
+                        <div>
+                            <p className="mb-1 text-gray-500">Vinyl Type</p>
+                            <input type="text" value={editedVinyl.vinyl_type} onChange={(e) => handleChange('vinyl_type', e.target.value)} className="border p-2 rounded-lg w-full" />
+                        </div>
+                        <div>
+                            <p className="mb-1 text-gray-500">Vinyl Number</p>
+                            <input type="number" value={editedVinyl.vinyl_number} onChange={(e) => handleChange('vinyl_number', parseInt(e.target.value) || 0)} className="border p-2 rounded-lg w-full" />
+                        </div>
+                        <div>
+                            <p className="mb-1 text-gray-500">Play Count</p>
+                            <input type="number" value={editedVinyl.play_num} onChange={(e) => handleChange('play_num', parseInt(e.target.value) || 0)} className="border p-2 rounded-lg w-full" />
+                        </div>
+                        <div>
+                            <p className="mb-1 text-gray-500">Time Bought</p>
+                            <input type="text" value={editedVinyl.timebought} onChange={(e) => handleChange('timebought', e.target.value)} className="border p-2 rounded-lg w-full" />
+                        </div>
+                        <div>
+                            <p className="mb-1 text-gray-500">Price</p>
+                            <input type="number" value={editedVinyl.price} onChange={(e) => handleChange('price', parseFloat(e.target.value) || 0)} className="border p-2 rounded-lg w-full" />
+                        </div>
+                        <div>
+                            <p className="mb-1 text-gray-500">Currency</p>
+                            <input type="text" value={editedVinyl.currency} onChange={(e) => handleChange('currency', e.target.value)} className="border p-2 rounded-lg w-full" />
+                        </div>
+                        <div className="col-span-2">
+                            <p className="mb-1 text-gray-500">Description</p>
+                            <textarea value={editedVinyl.description} onChange={(e) => handleChange('description', e.target.value)} className="border p-2 rounded-lg w-full" rows={3} />
+                        </div>
+                    </div>
+                </div>
+
+                <div className="flex gap-4 mt-auto justify-end">
+                    <button onClick={() => onSave(editedVinyl)} className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700">Save</button>
+                    <button onClick={onClose} className="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600">Cancel</button>
                 </div>
             </div>
         </div>
