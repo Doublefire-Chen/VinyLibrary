@@ -78,7 +78,7 @@ func GetVinylInfo(c *gin.Context) {
 	}
 	defer db.Close()
 
-	rows, err := db.Query("SELECT id, title, artist, year, vinyl_type, vinyl_number, tracklist, album_picture_url, play_num, timebought, price, currency, description FROM vinyls")
+	rows, err := db.Query("SELECT id, title, artist, year, vinyl_type, vinyl_number, tracklist, album_picture_url, play_num, timebought, price, currency, description FROM vinyls where status = 'active' ORDER BY id ASC")
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve data"})
 		return
@@ -136,8 +136,8 @@ func AddVinyl(c *gin.Context) {
 	}
 
 	// Insert data into the vinyls table
-	query := `INSERT INTO vinyls (title, artist, year, vinyl_type, vinyl_number, tracklist, album_picture_url, play_num, timebought, price, currency, description)
-		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12) RETURNING id`
+	query := `INSERT INTO vinyls (title, artist, year, vinyl_type, vinyl_number, tracklist, album_picture_url, play_num, timebought, price, currency, description, status)
+		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, 'active') RETURNING id`
 
 	err = db.QueryRow(query, vinyl.Title, vinyl.Artist, vinyl.Year, vinyl.VinylType, vinyl.VinylNumber, tracklistJSON, vinyl.AlbumPictureURL, vinyl.PlayNum, vinyl.Timebought, vinyl.Price, vinyl.Currency, vinyl.Description).Scan(&vinyl.ID)
 
@@ -255,7 +255,7 @@ func DeleteVinyl(c *gin.Context) {
 	// move the file to trash folder
 	os.Rename("./album/"+filename, "./album/trash/"+filename)
 
-	_, err = db.Exec("DELETE FROM vinyls WHERE id = $1", id)
+	_, err = db.Exec("update vinyls set status = 'deleted' where id = $1", id)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete vinyl"})
 		fmt.Println(err)

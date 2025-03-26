@@ -11,7 +11,8 @@ CREATE TABLE vinyls (
     timebought timestamp without time zone,
     price DECIMAL(10, 2),
     description TEXT,
-    currency VARCHAR(10)
+    currency VARCHAR(10),
+    status VARCHAR(10)
 );
 
 CREATE TABLE users (
