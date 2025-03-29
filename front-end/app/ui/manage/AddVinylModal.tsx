@@ -204,12 +204,31 @@ export default function AddVinylModal({ onClose, onSave }: AddVinylModalProps) {
 
                                         // Extract time and timezone from the existing value
                                         const timePart = newVinyl.timebought.split('T')[1] || '';
-                                        const timeValue = timePart ? timePart.substring(0, 8) : '00:00:00'; // Extract HH:MM:SS
-                                        const timezone = timePart ? timePart.substring(8) : '+00:00'; // Extract timezone offset
+                                        const timeValue = timePart ? timePart.substring(0, 8) : ''; // Extract HH:MM:SS
+                                        const timezone = timePart ? timePart.substring(8) : ''; // Extract timezone offset
 
                                         // Combine all parts into a new timebought string
                                         const newDate = yearValue ? `${yearValue}-${month}-${day}` : '';
                                         handleChange('timebought', `${newDate}T${timeValue}${timezone}`.trim());
+
+                                        // make sure the year is between 0 and 9999
+                                        const validYearValue = parseInt(yearValue);
+                                        const constrainedYear = validYearValue < 0 ? '0' :
+                                            validYearValue > 9999 ? '9999' :
+                                                yearValue;
+
+                                        if (constrainedYear !== yearValue) {
+                                            e.target.value = constrainedYear;
+                                            const [prevDate] = newVinyl.timebought.split('T');
+                                            const parts = prevDate ? prevDate.split('-') : ['', '', ''];
+                                            const month = parts[1] || '';
+                                            const day = parts[2] || '';
+                                            const timePart = newVinyl.timebought.split('T')[1] || '';
+                                            const timeValue = timePart ? timePart.substring(0, 8) : '';
+                                            const timezone = timePart ? timePart.substring(8) : '';
+                                            const newDate = constrainedYear ? `${constrainedYear}-${month}-${day}` : '';
+                                            handleChange('timebought', `${newDate}T${timeValue}${timezone}`.trim());
+                                        }
 
                                         // Auto-focus to month when year has 4 digits
                                         if (yearValue.length === 4 && monthInputRef.current) {
@@ -240,6 +259,23 @@ export default function AddVinylModal({ onClose, onSave }: AddVinylModalProps) {
                                         const newDate = year ? `${year}-${monthValue}-${day}` : '';
                                         handleChange('timebought', `${newDate}T${timeValue}${timezone}`.trim());
 
+                                        // make sure the month is between 1 and 12
+                                        const validMonthValue = parseInt(monthValue);
+                                        const constrainedMonth = validMonthValue < 1 ? '1' :
+                                            validMonthValue > 12 ? '12' :
+                                                monthValue;
+                                        if (constrainedMonth !== monthValue) {
+                                            e.target.value = constrainedMonth;
+                                            const dateParts = newVinyl.timebought.split('T')[0].split('-');
+                                            const year = dateParts[0] || new Date().getFullYear().toString();
+                                            const day = dateParts[2] || '';
+                                            const timePart = newVinyl.timebought.split('T')[1] || '';
+                                            const timeValue = timePart ? timePart.substring(0, 8) : '';
+                                            const timezone = timePart ? timePart.substring(8) : '';
+                                            const newDate = year ? `${year}-${constrainedMonth}-${day}` : '';
+                                            handleChange('timebought', `${newDate}T${timeValue}${timezone}`.trim());
+                                        }
+
                                         if ((monthValue.length === 2) && dayInputRef.current) {
                                             dayInputRef.current.focus();
                                         }
@@ -257,8 +293,8 @@ export default function AddVinylModal({ onClose, onSave }: AddVinylModalProps) {
                                     onChange={(e) => {
                                         const dayValue = e.target.value;
                                         const dateParts = newVinyl.timebought.split('T')[0].split('-');
-                                        const year = dateParts[0] || '';
-                                        const month = dateParts[1] || '';
+                                        const year = dateParts[0] || new Date().getFullYear().toString();
+                                        const month = dateParts[1] || (new Date().getMonth() + 1).toString();
 
                                         // Extract time and timezone, example format: 2024-09-20T10:30:00+02:00
                                         const timePart = newVinyl.timebought.split('T')[1] || '';
@@ -268,8 +304,27 @@ export default function AddVinylModal({ onClose, onSave }: AddVinylModalProps) {
                                         const newDate = year && month ? `${year}-${month}-${dayValue}` : '';
                                         handleChange('timebought', `${newDate}T${timeValue}${timezone}`.trim());
 
+                                        // make sure the day is between 1 and 31
+                                        const validDayValue = parseInt(dayValue);
+                                        const constrainedDay = validDayValue < 1 ? '1' :
+                                            validDayValue > 31 ? '31' :
+                                                dayValue;
+                                        if (constrainedDay !== dayValue) {
+                                            e.target.value = constrainedDay;
+                                            const dateParts = newVinyl.timebought.split('T')[0].split('-');
+                                            const year = dateParts[0] || new Date().getFullYear().toString();
+                                            const month = dateParts[1] || (new Date().getMonth() + 1).toString();
+                                            const timePart = newVinyl.timebought.split('T')[1] || '';
+                                            const timeValue = timePart ? timePart.substring(0, 8) : '';
+                                            const timezone = timePart ? timePart.substring(8) : '';
+                                            const newDate = year && month ? `${year}-${month}-${constrainedDay}` : '';
+                                            handleChange('timebought', `${newDate}T${timeValue}${timezone}`.trim());
+                                        }
+                                        // Auto-focus to time when day has 2 digits
                                         if ((dayValue.length === 2) && timeInputRef.current) {
-                                            timeInputRef.current.focus();
+                                            setTimeout(() => {
+                                                timeInputRef.current?.focus();
+                                            }, 50); // Small delay prevents unintended key press
                                         }
                                     }}
                                     className="border p-2 rounded-lg w-16"
@@ -277,18 +332,38 @@ export default function AddVinylModal({ onClose, onSave }: AddVinylModalProps) {
                                 <input
                                     type="time"
                                     ref={timeInputRef}
-                                    value={newVinyl.timebought.split('T')[1]?.substring(0, 5) || ''}
+                                    step="1"
+                                    autoComplete="off"
+                                    value={newVinyl.timebought.split('T')[1]?.substring(0, 8) || ''}
                                     onChange={(e) => {
-                                        const datePart = newVinyl.timebought.split('T')[0] || '';
+                                        const dateParts = newVinyl.timebought.split('T')[0].split('-');
+                                        const year = dateParts[0].padStart(4, '0') || new Date().getFullYear().toString().padStart(4, '0');
+                                        const month = dateParts[1].padStart(2, '0') || (new Date().getMonth() + 1).toString().padStart(2, '0');
+                                        const day = dateParts[2].padStart(2, '0') || new Date().getDate().toString().padStart(2, '0');
+                                        const datePart = year && month && day ? `${year}-${month}-${day}` : '';
+                                        // Extract timezone
                                         const timePart = newVinyl.timebought.split('T')[1] || '';
                                         const timezone = timePart ? timePart.substring(8) : '';
-
-                                        // Append seconds to the time value
-                                        const timeValue = e.target.value + ':00';
+                                        const timeValue = e.target.value;
 
                                         handleChange('timebought', `${datePart}T${timeValue}${timezone}`.trim());
-                                        if ((e.target.value.length === 5) && timeZoneInputRef.current) {
-                                            timeZoneInputRef.current.focus();
+                                    }}
+                                    onKeyUp={(e) => {
+                                        // Only track number keys (0-9)
+                                        if (/^\d$/.test(e.key)) {
+                                            const input = e.currentTarget.value;
+                                            // Track keystrokes with a data attribute
+                                            const currentCount = Number(e.currentTarget.dataset.keyCount || '0');
+                                            const newCount = currentCount + 1;
+                                            e.currentTarget.dataset.keyCount = newCount.toString();
+                                            console.log('Key count:', newCount);
+                                            // Focus to timezone either when the time is fully entered (8 chars)
+                                            // or when user has typed several characters (indicating manual entry)
+                                            if ((input.length === 8 && newCount >= 6) && timeZoneInputRef.current) {
+                                                timeZoneInputRef.current.focus();
+                                                // Reset the counter after focusing
+                                                e.currentTarget.dataset.keyCount = '0';
+                                            }
                                         }
                                     }}
                                     className="border p-2 rounded-lg"
