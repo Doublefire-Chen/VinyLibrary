@@ -2,6 +2,7 @@ import { Vinyl, Track } from '@/app/lib/definitions';
 import { useState, ChangeEvent, useRef } from 'react';
 import MacOSTrafficLights from '@/app/ui/MacOSTrafficLights';
 import { timezones } from '@/app/lib/definitions'
+import { time } from 'console';
 
 interface AddVinylModalProps {
     onClose: () => void;
@@ -17,7 +18,7 @@ export default function AddVinylModal({ onClose, onSave }: AddVinylModalProps) {
         vinyl_type: '',
         vinyl_number: 0,
         play_num: 0,
-        timebought: '',
+        timebought: '', // example: 2024-09-20T10:30:00+02:00
         price: 0,
         currency: '',
         description: '',
@@ -87,6 +88,7 @@ export default function AddVinylModal({ onClose, onSave }: AddVinylModalProps) {
     const monthInputRef = useRef<HTMLInputElement>(null);
     const dayInputRef = useRef<HTMLInputElement>(null);
     const timeInputRef = useRef<HTMLInputElement>(null);
+    const timeZoneInputRef = useRef<HTMLSelectElement>(null);
 
     return (
         <div
@@ -188,32 +190,122 @@ export default function AddVinylModal({ onClose, onSave }: AddVinylModalProps) {
                             <p className="mb-1 text-gray-500">Time Bought</p>
                             <div className="flex space-x-2 items-center">
                                 <input
-                                    type="date"
-                                    value={newVinyl.timebought.split(' ')[0] || ''}
+                                    type="number"
+                                    placeholder="YYYY"
+                                    min="0"
+                                    max="9999"
+                                    value={newVinyl.timebought.split('T')[0].split('-')[0] || ''}
                                     onChange={(e) => {
-                                        const time = newVinyl.timebought.split(' ')[1] || '';
-                                        handleChange('timebought', `${e.target.value} ${time}`);
+                                        const yearValue = e.target.value;
+                                        const [prevDate] = newVinyl.timebought.split('T');
+                                        const parts = prevDate ? prevDate.split('-') : ['', '', ''];
+                                        const month = parts[1] || '';
+                                        const day = parts[2] || '';
+
+                                        // Extract time and timezone from the existing value
+                                        const timePart = newVinyl.timebought.split('T')[1] || '';
+                                        const timeValue = timePart ? timePart.substring(0, 8) : '00:00:00'; // Extract HH:MM:SS
+                                        const timezone = timePart ? timePart.substring(8) : '+00:00'; // Extract timezone offset
+
+                                        // Combine all parts into a new timebought string
+                                        const newDate = yearValue ? `${yearValue}-${month}-${day}` : '';
+                                        handleChange('timebought', `${newDate}T${timeValue}${timezone}`.trim());
+
+                                        // Auto-focus to month when year has 4 digits
+                                        if (yearValue.length === 4 && monthInputRef.current) {
+                                            monthInputRef.current.focus();
+                                        }
                                     }}
-                                    className="border p-2 rounded-lg flex-1"
+                                    className="border p-2 rounded-lg w-20"
+                                />
+                                <span className="self-center">-</span>
+                                <input
+                                    type="number"
+                                    ref={monthInputRef}
+                                    placeholder="MM"
+                                    min="1"
+                                    max="12"
+                                    value={newVinyl.timebought.split('T')[0].split('-')[1] || ''}
+                                    onChange={(e) => {
+                                        const monthValue = e.target.value;
+                                        const dateParts = newVinyl.timebought.split('T')[0].split('-');
+                                        const year = dateParts[0] || new Date().getFullYear().toString();
+                                        const day = dateParts[2] || '';
+
+                                        // Extract time and timezone
+                                        const timePart = newVinyl.timebought.split('T')[1] || '';
+                                        const timeValue = timePart ? timePart.substring(0, 8) : '';
+                                        const timezone = timePart ? timePart.substring(8) : '';
+
+                                        const newDate = year ? `${year}-${monthValue}-${day}` : '';
+                                        handleChange('timebought', `${newDate}T${timeValue}${timezone}`.trim());
+
+                                        if ((monthValue.length === 2) && dayInputRef.current) {
+                                            dayInputRef.current.focus();
+                                        }
+                                    }}
+                                    className="border p-2 rounded-lg w-16"
+                                />
+                                <span className="self-center">-</span>
+                                <input
+                                    type="number"
+                                    ref={dayInputRef}
+                                    placeholder="DD"
+                                    min="1"
+                                    max="31"
+                                    value={newVinyl.timebought.split('T')[0].split('-')[2] || ''}
+                                    onChange={(e) => {
+                                        const dayValue = e.target.value;
+                                        const dateParts = newVinyl.timebought.split('T')[0].split('-');
+                                        const year = dateParts[0] || '';
+                                        const month = dateParts[1] || '';
+
+                                        // Extract time and timezone, example format: 2024-09-20T10:30:00+02:00
+                                        const timePart = newVinyl.timebought.split('T')[1] || '';
+                                        const timeValue = timePart ? timePart.substring(0, 8) : '';
+                                        const timezone = timePart ? timePart.substring(8) : '';
+
+                                        const newDate = year && month ? `${year}-${month}-${dayValue}` : '';
+                                        handleChange('timebought', `${newDate}T${timeValue}${timezone}`.trim());
+
+                                        if ((dayValue.length === 2) && timeInputRef.current) {
+                                            timeInputRef.current.focus();
+                                        }
+                                    }}
+                                    className="border p-2 rounded-lg w-16"
                                 />
                                 <input
                                     type="time"
-                                    value={newVinyl.timebought.split(' ')[1] || ''}
+                                    ref={timeInputRef}
+                                    value={newVinyl.timebought.split('T')[1]?.substring(0, 5) || ''}
                                     onChange={(e) => {
-                                        const date = newVinyl.timebought.split(' ')[0] || '';
-                                        handleChange('timebought', `${date} ${e.target.value}`);
+                                        const datePart = newVinyl.timebought.split('T')[0] || '';
+                                        const timePart = newVinyl.timebought.split('T')[1] || '';
+                                        const timezone = timePart ? timePart.substring(8) : '';
+
+                                        // Append seconds to the time value
+                                        const timeValue = e.target.value + ':00';
+
+                                        handleChange('timebought', `${datePart}T${timeValue}${timezone}`.trim());
+                                        if ((e.target.value.length === 5) && timeZoneInputRef.current) {
+                                            timeZoneInputRef.current.focus();
+                                        }
                                     }}
                                     className="border p-2 rounded-lg"
                                 />
                                 <select
-                                    value={newVinyl.timebought.split(' ')[2] || ''}
+                                    value={newVinyl.timebought.split('T')[1]?.substring(8) || '+00:00'}
+                                    ref={timeZoneInputRef}
                                     onChange={(e) => {
-                                        const dateTime = newVinyl.timebought.split(' ').slice(0, 2).join(' ');
-                                        handleChange('timebought', `${dateTime} ${e.target.value}`);
+                                        const datePart = newVinyl.timebought.split('T')[0] || '';
+                                        const timePart = newVinyl.timebought.split('T')[1] || '';
+                                        const timeValue = timePart ? timePart.substring(0, 8) : '00:00:00';
+
+                                        handleChange('timebought', `${datePart}T${timeValue}${e.target.value}`.trim());
                                     }}
                                     className="border p-2 rounded-lg"
                                 >
-                                    <option value="">Select timezone</option>
+                                    <option value="+00:00">UTC+00:00</option>
                                     {timezones.map((tz) => (
                                         <option key={tz.tzCode} value={tz.tzCode}>{tz.label}</option>
                                     ))}
