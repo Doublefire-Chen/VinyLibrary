@@ -15,6 +15,7 @@
     "@mui/material": "^6.4.8",
     "date-fns": "^4.1.0",
     "date-fns-tz": "^3.2.0",
+    "moment-timezone": "^0.5.48",
     "next": "15.2.2",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"

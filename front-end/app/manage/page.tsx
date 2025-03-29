@@ -6,6 +6,7 @@ import { Vinyl } from '@/app/lib/definitions';
 import VinylItem from '@/app/ui/manage/VinylItem';
 import EditVinylModal from '@/app/ui/manage/EditVinylModal';
 import Link from 'next/link';
+import AddVinylModal from '@/app/ui/manage/AddVinylModal';
 
 export default function ManagePage() {
     const [vinyls, setVinyls] = useState<Vinyl[]>([]);
@@ -15,6 +16,7 @@ export default function ManagePage() {
     const [selectionMode, setSelectionMode] = useState(false);
     const [error, setError] = useState('');
     const router = useRouter();
+    const [addNewVinyl, setAddNewVinyl] = useState(false);
 
     const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
 
@@ -87,7 +89,7 @@ export default function ManagePage() {
                     {!selectionMode && (
                         <>
                             <button onClick={() => setSelectionMode(true)} className="inline-block box-border border border-transparent bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600 font-medium leading-none focus:outline-none focus:ring-2">Select Vinyls</button>
-                            <Link href="/manage/new" className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 font-medium leading-none">Add New Vinyl</Link>
+                            <button onClick={() => setAddNewVinyl(true)} className="inline-block box-border border border-transparent bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 font-medium leading-none focus:outline-none focus:ring-2">Add New Vinyl</button>
                             <Link href="/profile" className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 font-medium leading-none">Profile</Link>
                             <Link href="/" className="bg-gray-700 text-white px-4 py-2 rounded hover:bg-gray-800 font-medium leading-none">Go to Home</Link>
                         </>
@@ -131,6 +133,30 @@ export default function ManagePage() {
                             alert('Failed to update vinyl.');
                         }
                     }}
+                />
+            )}
+
+            {addNewVinyl && (
+                <AddVinylModal
+                    onClose={() => setAddNewVinyl(false)}
+                    onSave={async (newVinyl) => {
+                        try {
+                            const res = await fetch(`${backendUrl}/api/vinyls`, {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                credentials: 'include',
+                                body: JSON.stringify(newVinyl),
+                            });
+                            const data = await res.json();
+                            setVinyls([...vinyls, data]);
+                            setAddNewVinyl(false);
+                            alert('Vinyl added successfully.');
+                        } catch (err) {
+                            console.error('Error adding vinyl:', err);
+                            alert('Failed to add vinyl.');
+                        }
+                    }
+                    }
                 />
             )}
         </div>

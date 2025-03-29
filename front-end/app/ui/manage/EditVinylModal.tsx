@@ -1,6 +1,7 @@
 import { Vinyl } from '@/app/lib/definitions';
 import { useState, ChangeEvent } from 'react';
 import MacOSTrafficLights from '@/app/ui/MacOSTrafficLights';
+import { Track } from '@/app/lib/definitions';
 
 interface EditVinylModalProps {
     vinyl: Vinyl;
@@ -40,6 +41,28 @@ export default function EditVinylModal({ vinyl, onClose, onSave }: EditVinylModa
             }
         }
     };
+
+    const handleTrackChange = (index: number, field: keyof Track, value: string | number) => {
+        const updatedTracklist = [...editedVinyl.tracklist];
+        updatedTracklist[index] = {
+            ...updatedTracklist[index],
+            [field]: value
+        };
+        setEditedVinyl((prev) => ({ ...prev, tracklist: updatedTracklist }));
+    };
+
+    const addTrack = () => {
+        setEditedVinyl((prev) => ({
+            ...prev,
+            tracklist: [...prev.tracklist, { side: '', order: prev.tracklist.length + 1, title: '', length: '' }]
+        }));
+    };
+
+    const removeTrack = (index: number) => {
+        const updatedTracklist = editedVinyl.tracklist.filter((_, i) => i !== index);
+        setEditedVinyl((prev) => ({ ...prev, tracklist: updatedTracklist }));
+    };
+
 
 
 
@@ -124,6 +147,82 @@ export default function EditVinylModal({ vinyl, onClose, onSave }: EditVinylModa
                         <div className="col-span-2">
                             <p className="mb-1 text-gray-500">Description</p>
                             <textarea value={editedVinyl.description} onChange={(e) => handleChange('description', e.target.value)} className="border p-2 rounded-lg w-full" rows={3} />
+                        </div>
+                        {/* Tracklist Section */}
+                        <div className="col-span-2 mt-4">
+                            <div className="flex justify-between items-center mb-2">
+                                <p className="font-medium text-gray-700">Tracklist</p>
+                                <button
+                                    onClick={addTrack}
+                                    className="bg-blue-600 text-white px-3 py-1 text-sm rounded-lg hover:bg-blue-700"
+                                >
+                                    Add Track
+                                </button>
+                            </div>
+
+                            {/* Column Headers */}
+                            <div className="flex gap-2 mb-1 items-center text-sm text-gray-600 font-medium">
+                                <div className="w-1/6 px-2">Side</div>
+                                <div className="w-1/6 px-2">Order</div>
+                                <div className="w-1/2 px-2">Title</div>
+                                <div className="w-1/6 px-2">Length</div>
+                                <div className="w-[28px]"></div>
+                            </div>
+
+                            {editedVinyl.tracklist
+                                .sort((a, b) => {
+                                    // First sort by side
+                                    if (a.side < b.side) return -1;
+                                    if (a.side > b.side) return 1;
+                                    // If sides are the same, sort by order
+                                    return a.order - b.order;
+                                })
+                                .map((track, index) => (
+                                    <div key={index} className="flex gap-2 mb-2 items-center">
+                                        <div className="w-1/6">
+                                            <input
+                                                type="text"
+                                                placeholder="Side"
+                                                value={track.side}
+                                                onChange={(e) => handleTrackChange(index, 'side', e.target.value)}
+                                                className="border p-2 rounded-lg w-full text-sm"
+                                            />
+                                        </div>
+                                        <div className="w-1/6">
+                                            <input
+                                                type="number"
+                                                placeholder="Order"
+                                                value={track.order}
+                                                onChange={(e) => handleTrackChange(index, 'order', parseInt(e.target.value) || 0)}
+                                                className="border p-2 rounded-lg w-full text-sm"
+                                            />
+                                        </div>
+                                        <div className="w-1/2">
+                                            <input
+                                                type="text"
+                                                placeholder="Title"
+                                                value={track.title}
+                                                onChange={(e) => handleTrackChange(index, 'title', e.target.value)}
+                                                className="border p-2 rounded-lg w-full text-sm"
+                                            />
+                                        </div>
+                                        <div className="w-1/6">
+                                            <input
+                                                type="text"
+                                                placeholder="Length"
+                                                value={track.length}
+                                                onChange={(e) => handleTrackChange(index, 'length', e.target.value)}
+                                                className="border p-2 rounded-lg w-full text-sm"
+                                            />
+                                        </div>
+                                        <button
+                                            onClick={() => removeTrack(index)}
+                                            className="text-red-600 hover:text-red-800"
+                                        >
+                                            ✕
+                                        </button>
+                                    </div>
+                                ))}
                         </div>
                     </div>
                 </div>
