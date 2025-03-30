@@ -7,6 +7,7 @@ import VinylItem from '@/app/ui/manage/VinylItem';
 import EditVinylModal from '@/app/ui/manage/EditVinylModal';
 import Link from 'next/link';
 import AddVinylModal from '@/app/ui/manage/AddVinylModal';
+import { format } from 'date-fns';
 
 export default function ManagePage() {
     const [vinyls, setVinyls] = useState<Vinyl[]>([]);
@@ -76,6 +77,34 @@ export default function ManagePage() {
         setSelectedVinylForEdit(null);
     };
 
+    const handlePlay = async (user_id: number, vinyl_id: number) => {
+        const now = new Date();
+        const now_date = format(now, "yyyy-MM-dd'T'HH:mm:ssxxx");
+        console.log(now_date); // Will output like: 2024-09-20T10:30:00+02:00
+
+        try {
+            await fetch(`${backendUrl}/api/vinyls/play`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
+                body: JSON.stringify({
+                    user_id,
+                    vinyl_id,
+                    play_time: now_date
+                }),
+            });
+
+            // Refresh vinyl data after play
+            const res = await fetch(`${backendUrl}/api/vinyls`, { credentials: 'include' });
+            if (res.ok) {
+                const updatedVinyls = await res.json();
+                setVinyls(updatedVinyls);
+            }
+        } catch (err) {
+            console.error('Error recording play:', err);
+        }
+    };
+
     if (isLoading) {
         return <div className="text-center py-8">Loading...</div>;
     }
@@ -107,8 +136,17 @@ export default function ManagePage() {
 
             <div className="flex flex-wrap gap-4 justify-center">
                 {vinyls.map((vinyl) => (
-                    <div key={vinyl.id} onClick={() => handleVinylClick(vinyl)}>
-                        <VinylItem vinyl={vinyl} isSelected={selectedVinyls.includes(vinyl.id)} onToggleSelect={() => toggleSelectVinyl(vinyl.id)} selectionMode={selectionMode} />
+                    <div key={vinyl.id} onClick={() => !selectionMode && handleVinylClick(vinyl)}>
+                        <VinylItem
+                            vinyl={vinyl}
+                            isSelected={selectedVinyls.includes(vinyl.id)}
+                            onToggleSelect={() => toggleSelectVinyl(vinyl.id)}
+                            selectionMode={selectionMode}
+                            onClickPlay={(e) => {
+                                e.stopPropagation();
+                                handlePlay(parseInt(localStorage.getItem('user_id') || '0'), vinyl.id);
+                            }}
+                        />
                     </div>
                 ))}
             </div>

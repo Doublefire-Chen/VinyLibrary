@@ -273,24 +273,58 @@ func AddPlayNum(c *gin.Context) {
 	}
 	defer db.Close()
 
-	id := c.Param("id")
+	// Get user_id and play_time from request body
+	var playData struct {
+		UserID   int    `json:"user_id"`
+		VinylID  int    `json:"vinyl_id"`
+		PlayTime string `json:"play_time"`
+	}
+	if err := c.ShouldBindJSON(&playData); err != nil {
+		// print request body for debug
+		fmt.Println(c.Request.Body)
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request body"})
+		return
+	}
+	vinyl_id := playData.VinylID
+	user_id := playData.UserID
+	play_time := playData.PlayTime
 
-	if id == "" {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Missing id"})
-		fmt.Println(id)
+	//check if these 3 parameters are not empty
+	if vinyl_id == 0 || user_id == 0 || play_time == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Missing vinyl_id, user_id or play_time"})
+		fmt.Println(vinyl_id, user_id, play_time)
 		return
 	}
 
+	// First, record play information
+	var playID int
+	if user_id != 0 && play_time != "" {
+		query := `INSERT INTO play (vinyl_id, user_id, play_time, status)
+			VALUES ($1, $2, $3, True) returning id`
+		err = db.QueryRow(query, vinyl_id, user_id, play_time).Scan(&playID)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to record play info"})
+			fmt.Println(err)
+			return
+		}
+	}
+
+	// Then, update play_num
 	var playNum int
 	query := "UPDATE vinyls SET play_num = play_num + 1 WHERE id = $1 RETURNING play_num"
-	err = db.QueryRow(query, id).Scan(&playNum)
+	err = db.QueryRow(query, vinyl_id).Scan(&playNum)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update play_num"})
 		fmt.Println(err)
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "Vinyl id = " + id + " play_num updated successfully, now play_num = " + fmt.Sprint(playNum)})
+	// If playID is available, include it in the response
+	c.JSON(http.StatusOK, gin.H{
+		"message":  "Play num updated successfully",
+		"play_num": playNum,
+		"play_id":  playID,
+	})
 }
 
 func UpdateVinyl(c *gin.Context) {

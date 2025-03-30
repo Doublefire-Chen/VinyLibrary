@@ -8,10 +8,11 @@ interface VinylItemProps {
     vinyl: Vinyl;
     isSelected: boolean;
     onToggleSelect: () => void;
+    onClickPlay: (e: React.MouseEvent) => void;
     selectionMode: boolean; // Add selectionMode prop
 }
 
-const VinylItem: React.FC<VinylItemProps> = ({ vinyl, isSelected, onToggleSelect, selectionMode }) => {
+const VinylItem: React.FC<VinylItemProps> = ({ vinyl, isSelected, onToggleSelect, selectionMode, onClickPlay }) => {
     return (
         <div
             onClick={selectionMode ? onToggleSelect : undefined} // Allow select only in selection mode
@@ -27,6 +28,17 @@ const VinylItem: React.FC<VinylItemProps> = ({ vinyl, isSelected, onToggleSelect
                 <h2 className="text-xl font-semibold mb-1">{vinyl.title}</h2>
                 <p className="text-sm text-gray-500">by {vinyl.artist}</p>
                 <p className="text-sm mt-2">Played: {vinyl.play_num} times</p>
+                <div className="mt-3 flex justify-end">
+                    <button
+                        className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm flex items-center gap-1 cursor-pointer"
+                        onClick={onClickPlay}
+                    >
+                        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M8 5v14l11-7z" />
+                        </svg>
+                        Play
+                    </button>
+                </div>
             </div>
             {selectionMode && (
                 <div

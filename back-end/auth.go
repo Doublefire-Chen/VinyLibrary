@@ -256,7 +256,8 @@ func Login(c *gin.Context) {
 
 	// Set the session token as a cookie (use your custom token name here)
 	c.SetCookie("bearer-token", token, 86400, "/", "", false, true) // Adjust parameters as needed
-	c.JSON(http.StatusOK, gin.H{"message": loginReq.Username + " logged in successfully"})
+	// return user id
+	c.JSON(http.StatusOK, gin.H{"user_id": userID, "message": loginReq.Username + " logged in successfully"})
 }
 
 func ChangePassword(c *gin.Context) {

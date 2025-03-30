@@ -20,3 +20,11 @@ CREATE TABLE users (
     username varchar(12) PRIMARY KEY,
     password TEXT
 );
+
+CREATE TABLE play (
+    id SERIAL PRIMARY KEY,
+    vinyl_id integer REFERENCES vinyls(id),
+    user_id integer REFERENCES users(id),
+    play_time timestamp with time zone,
+    status boolean
+);

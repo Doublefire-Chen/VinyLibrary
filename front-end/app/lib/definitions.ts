@@ -23,11 +23,33 @@ export type Vinyl = {
     description: string;
 }
 
-export const timezones = moment.tz.names().map((tz) => {
+export const majorCities = [
+    'Asia/Shanghai',       // UTC+8
+    'Asia/Bangkok',        // UTC+7
+    'Asia/Dhaka',          // UTC+6
+    'Asia/Karachi',        // UTC+5
+    'Asia/Dubai',          // UTC+4
+    'Europe/Moscow',       // UTC+3
+    'Europe/Istanbul',     // UTC+3
+    'Europe/Stockholm',    // UTC+2
+    'Europe/London',       // UTC+1/0
+    'Atlantic/Azores',     // UTC-1
+    'America/Sao_Paulo',   // UTC-3
+    'America/New_York',    // UTC-5
+    'America/Chicago',     // UTC-6
+    'America/Denver',      // UTC-7
+    'America/Los_Angeles', // UTC-8
+];
+
+
+export const timezones = majorCities.map((tz) => {
     const offset = moment.tz(tz).format('Z');
-    const formattedOffset = offset.startsWith('+') ? `UTC${offset}` : `UTC${offset}`;
+    const formattedOffset = `UTC${offset}`;
+    const cityName = tz.split('/').pop()?.replace(/_/g, ' ') || tz;
+
     return {
         tzCode: tz,
-        label: `${tz} ${formattedOffset}`
+        label: `${cityName} (${formattedOffset})`,
+        value: `${formattedOffset}`.replace('UTC', ''),
     };
 });

@@ -44,7 +44,7 @@ func main() {
 		protected.GET("/vinyls/:id", GetVinylByID)
 		protected.PUT("/vinyls/:id", UpdateVinyl)
 		protected.DELETE("/vinyls/:id", DeleteVinyl)
-		protected.PUT("/vinyls/:id/play", AddPlayNum)
+		protected.POST("/vinyls/play", AddPlayNum)
 		protected.POST("/changepwd", ChangePassword)
 		protected.POST("/deleteuser", DeleteAccount)
 	}

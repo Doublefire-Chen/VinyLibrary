@@ -24,6 +24,7 @@ export default function LoginPage() {
 
             if (response.ok) {
                 localStorage.setItem('username', username);
+                localStorage.setItem('user_id', (await response.json()).user_id);
                 router.push('/manage'); // redirect to management page
             } else {
                 const data = await response.json();
