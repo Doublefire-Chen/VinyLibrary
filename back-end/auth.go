@@ -76,10 +76,6 @@ func AuthMiddleware() gin.HandlerFunc {
 		if c.Request.URL.Path != "/api/logout" {
 			newToken, _ := GenerateToken(userID)
 			c.SetCookie("bearer-token", newToken, 86400, "/", "", false, true)
-		} else {
-			// Clear the cookie on logout
-			c.SetCookie("bearer-token", "", -1, "/", "", false, true)
-			c.JSON(http.StatusOK, gin.H{"message": "Logged out successfully"})
 		}
 
 		// 4. Store userID in context
@@ -342,6 +338,8 @@ func DeleteAccount(c *gin.Context) {
 }
 
 func Logout(c *gin.Context) {
-	//c.Header("Authorization", "Bearer ")
+	// Invalidate the cookie by setting its value to empty and max age to -1
+	c.SetCookie("bearer-token", "", -1, "/", "", false, true)
 
+	c.JSON(http.StatusOK, gin.H{"message": "Logged out successfully"})
 }

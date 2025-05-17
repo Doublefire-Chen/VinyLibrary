@@ -20,6 +20,24 @@ const VinylCard: React.FC<{ vinyl: Vinyl }> = ({ vinyl }) => {
         return formattedTime.replace(/GMT/i, 'UTC');
     };
     return (
+        <div className="max-w-sm h-[500px] flex flex-col rounded overflow-hidden shadow-lg bg-white">
+            <img className="w-full h-48 object-cover" src={vinyl.album_picture_url} alt={vinyl.title} />
+            <div className="px-6 py-4 flex flex-col justify-between flex-1">
+                <div>
+                    <h2 className="font-bold text-xl mb-1">{vinyl.title}</h2>
+                    <p className="text-gray-700 text-base">{vinyl.artist}</p>
+                    <p className="text-gray-600 text-sm">{vinyl.year}</p>
+                    <p className="text-gray-800 text-sm mt-1 line-clamp-3">{vinyl.description}</p>
+                </div>
+                <div className="mt-2">
+                    <p className="text-gray-800 text-sm">{formatTime(vinyl.timebought)}</p>
+                    <p className="text-gray-900 font-semibold">{vinyl.price} {vinyl.currency}</p>
+                </div>
+            </div>
+        </div>
+    );
+    // 旧版代码
+    /* return (
         <div className="max-w-sm rounded overflow-hidden shadow-lg bg-white">
             <img className="w-full" src={vinyl.album_picture_url} alt={vinyl.title} />
             <div className="px-6 py-4">
@@ -31,7 +49,7 @@ const VinylCard: React.FC<{ vinyl: Vinyl }> = ({ vinyl }) => {
                 <p className="text-gray-900 font-semibold mt-2">{vinyl.price} {vinyl.currency}</p>
             </div>
         </div>
-    );
+    ); */
 };
 
 export default VinylCard;

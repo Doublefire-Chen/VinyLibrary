@@ -53,3 +53,10 @@ export const timezones = majorCities.map((tz) => {
         value: `${formattedOffset}`.replace('UTC', ''),
     };
 });
+
+export type PlayHistory = {
+    id: number;
+    vinyl_id: number;
+    username: string;
+    play_time: string;
+}

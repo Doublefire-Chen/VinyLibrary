@@ -39,6 +39,13 @@ type Vinyl struct {
 	Description     string  `json:"description"`
 }
 
+type PlayHistory struct {
+	ID       int    `json:"id"`
+	VinylID  int    `json:"vinyl_id"`
+	Username string `json:"username"`
+	PlayTime string `json:"play_time"`
+}
+
 // Load environment variables from the .env file
 func loadEnvVariables() {
 	err := godotenv.Load()
@@ -429,4 +436,77 @@ func GetVinylByID(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, v)
+}
+
+func GetPlayHistoryByID(c *gin.Context) {
+
+	id := c.Param("id")
+	if id == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Missing id"})
+		fmt.Println("id is empty")
+		return
+	}
+
+	db, err := connectDB()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to connect to the database"})
+		return
+	}
+	defer db.Close()
+
+	// Retrieve vinyl info based on the provided ID
+	var v Vinyl
+	var tracklistJSON []byte
+	err = db.QueryRow(`
+		SELECT id, title, artist, year, vinyl_type, vinyl_number, tracklist, album_picture_url, play_num, timebought, price, currency, description 
+		FROM vinyls 
+		WHERE id = $1`, id).Scan(
+		&v.ID, &v.Title, &v.Artist, &v.Year, &v.VinylType, &v.VinylNumber, &tracklistJSON,
+		&v.AlbumPictureURL, &v.PlayNum, &v.Timebought, &v.Price, &v.Currency, &v.Description)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve data"})
+		return
+	}
+	if err := json.Unmarshal(tracklistJSON, &v.Tracklist); err != nil {
+		fmt.Printf("Error unmarshaling tracklist JSON: %v\n", err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error decoding tracklist"})
+		return
+	}
+
+	// Retrieve play history with usernames
+	var playHistory []PlayHistory
+	query := `
+		SELECT p.id, p.vinyl_id, u.username, p.play_time
+		FROM play p
+		JOIN users u ON p.user_id = u.id
+		WHERE p.vinyl_id = $1 AND p.status = TRUE
+		ORDER BY p.id DESC
+	`
+	rows, err := db.Query(query, id)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve play history"})
+		return
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var tmp PlayHistory
+		if err := rows.Scan(&tmp.ID, &tmp.VinylID, &tmp.Username, &tmp.PlayTime); err != nil {
+			fmt.Printf("Error scanning data: %v\n", err)
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Error scanning data"})
+			log.Println(err)
+			return
+		}
+		playHistory = append(playHistory, tmp)
+	}
+	if err := rows.Err(); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error iterating rows"})
+		return
+	}
+
+	// Return both vinyl info and play history
+	c.JSON(http.StatusOK, gin.H{
+		"vinyl":        v,
+		"play_history": playHistory,
+	})
 }

@@ -33,7 +33,9 @@ func main() {
 	router.POST("/login", Login)                          // Route for login (to get the token)
 	router.POST("/register", Register)                    // Route for register
 	router.GET("/api/vinyls", GetVinylInfo)               // public api to get all vinyls
+	router.GET("/api/vinyls/:id", GetVinylByID)           // public api to get vinyl by id
 	router.GET("/api/album/:filename", ServeAlbumPicture) // public api to get album picture
+	router.GET("/api/history/:id", GetPlayHistoryByID)    // public api to get play history by user id
 
 	// Protected routes
 	protected := router.Group("/api")
@@ -41,12 +43,12 @@ func main() {
 	{
 		protected.POST("/vinyls", AddVinyl)
 		protected.POST("/upload", UploadAlbumPicture)
-		protected.GET("/vinyls/:id", GetVinylByID)
 		protected.PUT("/vinyls/:id", UpdateVinyl)
 		protected.DELETE("/vinyls/:id", DeleteVinyl)
 		protected.POST("/vinyls/play", AddPlayNum)
 		protected.POST("/changepwd", ChangePassword)
 		protected.POST("/deleteuser", DeleteAccount)
+		protected.POST("logout", Logout)
 	}
 
 	log.Fatal(router.Run(":1234"))

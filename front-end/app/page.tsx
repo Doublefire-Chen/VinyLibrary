@@ -5,10 +5,13 @@ import VinylCard from '@/app/ui/VinylCard';
 import type { Vinyl } from '@/app/lib/definitions'; // 抽离类型定义
 import { BACKEND_URL } from '@/app/lib/config'; // 引入后端地址
 import Link from 'next/link';
+import { parseCookies } from 'nookies';
 
 export default function Page() {
   const [vinyls, setVinyls] = useState<Vinyl[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -22,8 +25,21 @@ export default function Page() {
       }
     };
 
+    // Check if user is logged in by looking for the bearer-token cookie
+    const checkLoginStatus = () => {
+      const cookies = parseCookies();
+      // debug
+      console.log('Cookies:', cookies);
+      setIsLoggedIn(!!cookies['bearer-token']);
+    };
+
     fetchData();
+    checkLoginStatus();
+
   }, []);
+
+
+
 
   if (isLoading) {
     return <div className="text-center py-8">Loading...</div>; // 显示加载状态
@@ -41,15 +57,17 @@ export default function Page() {
           </p>
         </div>
         <Link
-          href="/login"
+          href={isLoggedIn ? "/manage" : "/login"}
           className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white text-black px-3 py-1 rounded hover:bg-gray-200 text-sm"
         >
-          Login
+          {isLoggedIn ? "Manage" : "Login"}
         </Link>
       </div>
       <div className="flex flex-wrap justify-center gap-4">
         {vinyls.map((vinyl) => (
-          <VinylCard key={vinyl.id} vinyl={vinyl} />
+          <Link href={`/${vinyl.id}`} key={vinyl.id}>
+            <VinylCard vinyl={vinyl} />
+          </Link>
         ))}
       </div>
     </div>
