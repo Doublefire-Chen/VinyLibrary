@@ -34,7 +34,7 @@ const VinylItem: React.FC<VinylItemProps> = ({
     return (
         <div
             onClick={selectionMode ? onToggleSelect : undefined}
-            className={`relative w-72 h-[430px] rounded-xl bg-[#f8f6f1] shadow-xl border border-[#ccc] text-black overflow-hidden transition-transform hover:scale-[1.02] font-serif ${isSelected ? 'ring-2 ring-blue-400' : ''
+            className={`relative w-72 h-[320px] rounded-xl bg-[#f8f6f1] shadow-xl border border-[#ccc] text-black overflow-hidden transition-transform hover:scale-[1.02] font-serif ${isSelected ? 'ring-2 ring-blue-400' : ''
                 }`}
         >
             {/* Turntable Deck */}
@@ -67,15 +67,15 @@ const VinylItem: React.FC<VinylItemProps> = ({
             </div>
 
             {/* Info Section */}
-            <div className="p-4 flex flex-col justify-between h-[170px] text-[#2e2e2e]">
-                <div>
+            <div className="p-4 flex flex-row items-center justify-between h-[140px] text-[#2e2e2e]">
+                <div className="flex-1">
                     <h2 className="text-lg font-bold tracking-wide">{vinyl.title}</h2>
                     <p className="text-sm italic text-gray-600">{vinyl.artist}</p>
                     <p className="text-xs text-gray-500 mt-1">
                         {c('played')}: {vinyl.play_num} {c('times')}
                     </p>
                 </div>
-                <div className="mt-4 flex justify-end">
+                <div className="ml-3">
                     <button
                         onClick={handlePlayClick}
                         className="w-10 h-10 rounded-full bg-[#c9b370] text-black font-bold shadow hover:bg-[#b89f56] transition"
