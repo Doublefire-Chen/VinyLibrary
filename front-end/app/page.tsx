@@ -1,19 +1,20 @@
-'use client'; // 强制客户端渲染
+'use client';
 
 import { useEffect, useState } from 'react';
 import VinylCard from '@/app/ui/VinylCard';
-import type { Vinyl } from '@/app/lib/definitions'; // 抽离类型定义
-import { BACKEND_URL } from '@/app/lib/config'; // 引入后端地址
+import type { Vinyl } from '@/app/lib/definitions';
+import { BACKEND_URL } from '@/app/lib/config';
 import Link from 'next/link';
 import LanguageSwitcher from '@/app/ui/LanguageSwitcher';
 import { useTranslation } from 'react-i18next';
+import { UserIcon } from 'lucide-react';
+import LoadingMessage from '@/app/ui/LoadingMessage';
 
 export default function Page() {
   const [vinyls, setVinyls] = useState<Vinyl[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [username, setUsername] = useState('');
-  const [showMenu, setShowMenu] = useState(false);
   const { t: c } = useTranslation('common');
 
   useEffect(() => {
@@ -30,7 +31,6 @@ export default function Page() {
     };
     fetchData();
 
-    // Read login status from localStorage
     const loginStatus = localStorage.getItem('isLoggedIn');
     setIsLoggedIn(loginStatus === 'true');
 
@@ -38,14 +38,13 @@ export default function Page() {
       const storedUsername = localStorage.getItem('username') || 'User';
       setUsername(storedUsername);
     }
-
   }, []);
 
   const handleLogout = async () => {
     try {
       const response = await fetch(`${BACKEND_URL}/api/logout`, {
         method: 'POST',
-        credentials: 'include', // include cookies
+        credentials: 'include',
       });
 
       if (!response.ok) {
@@ -53,71 +52,71 @@ export default function Page() {
         return;
       }
 
-      // Clear local state and storage
       localStorage.setItem('isLoggedIn', 'false');
       localStorage.removeItem('username');
       localStorage.removeItem('user_id');
       setIsLoggedIn(false);
       setUsername('');
-      setShowMenu(false);
     } catch (error) {
       console.error('Logout error:', error);
     }
   };
 
-
   if (isLoading) {
-    return <div className="text-center py-8">Loading...</div>; // 显示加载状态
+    return <LoadingMessage />;
   }
 
   return (
-    <div className="space-y-4">
-      <div className="bg-black text-white text-center py-2 relative">
-        <div className="flex flex-col items-center gap-0">
-          <h1 className="text-2xl font-semibold leading-light">
+    <div className="min-h-screen bg-[#f8f6f1] text-[#2e2e2e] font-serif">
+      {/* Header */}
+      <header className="bg-[#1a1a1a] text-white py-6 px-6 shadow-md border-b-4 border-[#c9b370] relative">
+        <div className="text-center space-y-1">
+          <h1 className="text-3xl font-bold tracking-wide uppercase">
             {c('welcome')}
           </h1>
-          <p className="text-sm font-normal leading-none">
+          <p className="text-sm italic text-[#e3e3e3] tracking-wide">
             {c('welcome_message')}
           </p>
         </div>
-        <div className="absolute right-4 top-1/2 transform -translate-y-1/2 flex space-x-2">
+
+        <div className="absolute right-6 top-1/2 -translate-y-1/2 flex items-center gap-3">
           {isLoggedIn ? (
             <>
               <Link
                 href="/manage"
-                className="bg-white text-black px-3 py-1 rounded hover:bg-gray-200 text-sm"
+                className="bg-[#c9b370] text-black px-4 py-1.5 rounded-full text-sm font-medium tracking-wide shadow hover:bg-[#b89f56] transition"
               >
                 {c('manage')}
               </Link>
-              <div className="relative w-max group">
-                <div className="flex flex-col">
-                  <div className="flex items-center bg-white text-black px-3 py-1 rounded hover:bg-gray-200 text-sm cursor-pointer w-full">
-                    <span className="mr-2">👤</span> {username}
-                  </div>
-                  <div className="absolute right-0 top-full mt-1 bg-white text-black rounded-md shadow-lg text-sm z-10 invisible opacity-0 group-hover:visible group-hover:opacity-100 transition-all duration-200 w-full overflow-hidden">
-                    <Link
-                      href="/profile"
-                      className="block px-4 py-2 hover:bg-gray-100"
-                    >
-                      {c('profile')}
-                    </Link>
-                    <button
-                      onClick={handleLogout}
-                      className="w-full text-left px-4 py-2 hover:bg-gray-100"
-                    >
-                      {c('logout')}
-                    </button>
-                  </div>
+
+              <div className="relative group">
+                <button className="flex items-center gap-1 bg-[#c9b370] text-black px-4 py-1.5 rounded-full text-sm tracking-wide font-medium shadow hover:bg-[#b89f56] transition">
+                  <UserIcon className="w-4 h-4" />
+                  {username}
+                </button>
+                <div className="absolute right-0 mt-2 bg-white text-black rounded-md border border-[#c9b370] shadow-xl text-sm w-36 opacity-0 group-hover:opacity-100 group-hover:visible invisible transition-opacity duration-200">
+                  <Link
+                    href="/profile"
+                    className="block px-4 py-2 hover:bg-[#f5f0e6]"
+                  >
+                    {c('profile')}
+                  </Link>
+                  <button
+                    onClick={handleLogout}
+                    className="w-full text-left px-4 py-2 hover:bg-[#f5f0e6]"
+                  >
+                    {c('logout')}
+                  </button>
                 </div>
               </div>
+
               <LanguageSwitcher />
             </>
           ) : (
             <>
               <Link
                 href="/login"
-                className="bg-white text-black px-3 py-1 rounded hover:bg-gray-200 text-sm"
+                className="bg-[#c9b370] text-black px-4 py-1.5 rounded-full text-sm font-medium tracking-wide shadow hover:bg-[#b89f56] transition"
               >
                 {c('login')}
               </Link>
@@ -125,14 +124,18 @@ export default function Page() {
             </>
           )}
         </div>
-      </div>
-      <div className="flex flex-wrap justify-center gap-4">
-        {vinyls.map((vinyl) => (
-          <Link href={`/${vinyl.id}`} key={vinyl.id}>
-            <VinylCard vinyl={vinyl} />
-          </Link>
-        ))}
-      </div>
+      </header>
+
+      {/* Vinyl Grid */}
+      <main className="px-6 py-10 bg-[#f8f6f1]">
+        <div className="flex flex-wrap justify-center gap-6">
+          {vinyls.map((vinyl) => (
+            <Link href={`/${vinyl.id}`} key={vinyl.id}>
+              <VinylCard vinyl={vinyl} />
+            </Link>
+          ))}
+        </div>
+      </main>
     </div>
   );
 }
