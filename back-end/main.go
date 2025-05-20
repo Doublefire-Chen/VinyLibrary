@@ -48,7 +48,7 @@ func main() {
 		protected.POST("/vinyls/play", AddPlayNum)
 		protected.POST("/changepwd", ChangePassword)
 		protected.POST("/deleteuser", DeleteAccount)
-		protected.POST("logout", Logout)
+		protected.POST("/logout", Logout)
 	}
 
 	log.Fatal(router.Run(":1234"))

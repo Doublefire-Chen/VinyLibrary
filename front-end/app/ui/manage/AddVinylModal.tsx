@@ -140,7 +140,7 @@ export default function AddVinylModal({ onClose, onSave }: AddVinylModalProps) {
                         </label>
                         {(!newVinyl.title || !newVinyl.artist || !newVinyl.vinyl_type || !newVinyl.vinyl_number) && (
                             <p className="text-xs text-red-500 max-w-[200px]">
-                                Please fill in title, artist, vinyl type and vinyl number before uploading
+                                Please fill in title, artist, vinyl type and vinyl number before uploading vinyl cover.
                             </p>
                         )}
                     </div>

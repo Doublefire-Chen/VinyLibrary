@@ -11,6 +11,8 @@ export default function Page() {
   const [vinyls, setVinyls] = useState<Vinyl[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [username, setUsername] = useState('');
+  const [showMenu, setShowMenu] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -24,21 +26,42 @@ export default function Page() {
         setIsLoading(false);
       }
     };
-
-    // Check if user is logged in by looking for the bearer-token cookie
-    const checkLoginStatus = () => {
-      const cookies = parseCookies();
-      // debug
-      console.log('Cookies:', cookies);
-      setIsLoggedIn(!!cookies['bearer-token']);
-    };
-
     fetchData();
-    checkLoginStatus();
+
+    // Read login status from localStorage
+    const loginStatus = localStorage.getItem('isLoggedIn');
+    setIsLoggedIn(loginStatus === 'true');
+
+    if (loginStatus) {
+      const storedUsername = localStorage.getItem('username') || 'User';
+      setUsername(storedUsername);
+    }
 
   }, []);
 
+  const handleLogout = async () => {
+    try {
+      const response = await fetch(`${BACKEND_URL}/api/logout`, {
+        method: 'POST',
+        credentials: 'include', // include cookies
+      });
 
+      if (!response.ok) {
+        console.error('Logout failed');
+        return;
+      }
+
+      // Clear local state and storage
+      localStorage.setItem('isLoggedIn', 'false');
+      localStorage.removeItem('username');
+      localStorage.removeItem('user_id');
+      setIsLoggedIn(false);
+      setUsername('');
+      setShowMenu(false);
+    } catch (error) {
+      console.error('Logout error:', error);
+    }
+  };
 
 
   if (isLoading) {
@@ -56,12 +79,48 @@ export default function Page() {
             Explore a collection of timeless vinyl records.
           </p>
         </div>
-        <Link
-          href={isLoggedIn ? "/manage" : "/login"}
-          className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white text-black px-3 py-1 rounded hover:bg-gray-200 text-sm"
-        >
-          {isLoggedIn ? "Manage" : "Login"}
-        </Link>
+        <div className="absolute right-4 top-1/2 transform -translate-y-1/2 flex space-x-2">
+          {isLoggedIn ? (
+            <>
+              <Link
+                href="/manage"
+                className="bg-white text-black px-3 py-1 rounded hover:bg-gray-200 text-sm"
+              >
+                Manage
+              </Link>
+              <div className="relative w-max group">
+                <div className="flex flex-col">
+                  <div className="flex items-center bg-white text-black px-3 py-1 rounded hover:bg-gray-200 text-sm cursor-pointer w-full">
+                    <span className="mr-2">👤</span> {username}
+                  </div>
+                  <div className="absolute right-0 top-full mt-1 bg-white text-black rounded-md shadow-lg text-sm z-10 invisible opacity-0 group-hover:visible group-hover:opacity-100 transition-all duration-200 w-full overflow-hidden">
+                    <Link
+                      href="/profile"
+                      className="block px-4 py-2 hover:bg-gray-100"
+                    >
+                      Profile
+                    </Link>
+                    <button
+                      onClick={handleLogout}
+                      className="w-full text-left px-4 py-2 hover:bg-gray-100"
+                    >
+                      Logout
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+            </>
+          ) : (
+            <Link
+              href="/login"
+              className="bg-white text-black px-3 py-1 rounded hover:bg-gray-200 text-sm"
+            >
+              Login
+            </Link>
+          )}
+        </div>
+
       </div>
       <div className="flex flex-wrap justify-center gap-4">
         {vinyls.map((vinyl) => (

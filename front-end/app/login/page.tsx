@@ -25,10 +25,14 @@ export default function LoginPage() {
             if (response.ok) {
                 localStorage.setItem('username', username);
                 localStorage.setItem('user_id', (await response.json()).user_id);
+                localStorage.setItem('isLoggedIn', 'true');
+                router.refresh(); // refresh the page to update the state
                 router.push('/manage'); // redirect to management page
             } else {
-                const data = await response.json();
-                setError(data.message || 'Login failed');
+                localStorage.setItem('isLoggedIn', 'false');
+                localStorage.removeItem('username');
+                localStorage.removeItem('user_id');
+                setError((await response.json()).message || 'Login failed');
             }
         } catch (err) {
             setError('Network error');
