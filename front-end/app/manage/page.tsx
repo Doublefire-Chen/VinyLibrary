@@ -113,33 +113,74 @@ export default function ManagePage() {
     }
 
     return (
-        <div className="p-4 space-y-4">
-            {error && <div className="bg-red-100 text-red-700 p-2 rounded">{error}</div>}
-            <div className="flex justify-between items-center mb-4">
-                <h1 className="text-2xl font-bold">{m("manage")}</h1>
-                <div className="space-x-2">
-                    {!selectionMode && (
+        <div className="min-h-screen bg-[#f8f6f1] p-6 font-serif text-[#2e2e2e]">
+            {error && (
+                <div className="bg-red-100 text-red-700 p-3 mb-4 rounded border border-red-300">
+                    {error}
+                </div>
+            )}
+
+            <div className="flex justify-between items-center mb-6 pb-2 border-b border-[#c9b370]">
+                <h1 className="text-3xl font-bold tracking-wide uppercase">{m('manage')}</h1>
+                <div className="flex flex-wrap gap-3">
+                    {!selectionMode ? (
                         <>
-                            <button onClick={() => setSelectionMode(true)} className="inline-block box-border border border-transparent bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600 font-medium leading-none focus:outline-none focus:ring-2">{m("select")}</button>
-                            <button onClick={() => setAddNewVinyl(true)} className="inline-block box-border border border-transparent bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 font-medium leading-none focus:outline-none focus:ring-2">{m("add_new_vinyl")}</button>
-                            <Link href="/profile" className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 font-medium leading-none">{c("profile")}</Link>
-                            <Link href="/" className="bg-gray-700 text-white px-4 py-2 rounded hover:bg-gray-800 font-medium leading-none">{c("homepage")}</Link>
+                            <button
+                                onClick={() => setSelectionMode(true)}
+                                className="bg-[#c9b370] text-black px-4 py-1.5 rounded-full hover:bg-[#b89f56] transition"
+                            >
+                                {m('select')}
+                            </button>
+                            <button
+                                onClick={() => setAddNewVinyl(true)}
+                                className="bg-[#5a8f66] text-white px-4 py-1.5 rounded-full hover:bg-[#497a55] transition"
+                            >
+                                {m('add_new_vinyl')}
+                            </button>
+                            <Link
+                                href="/profile"
+                                className="bg-[#445a7c] text-white px-4 py-1.5 rounded-full hover:bg-[#394e6b] transition"
+                            >
+                                {c('profile')}
+                            </Link>
+                            <Link
+                                href="/"
+                                className="bg-[#666] text-white px-4 py-1.5 rounded-full hover:bg-[#555] transition"
+                            >
+                                {c('homepage')}
+                            </Link>
                         </>
-                    )}
-                    {selectionMode && (
+                    ) : (
                         <>
                             {selectedVinyls.length > 0 && (
-                                <button onClick={handleDeleteSelected} className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">{c("delete_selected")}</button>
+                                <button
+                                    onClick={handleDeleteSelected}
+                                    className="bg-[#aa4a44] text-white px-4 py-1.5 rounded-full hover:bg-[#993d38] transition"
+                                >
+                                    {c('delete_selected')}
+                                </button>
                             )}
-                            <button onClick={() => { setSelectionMode(false); setSelectedVinyls([]); }} className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">{m("cancel")}</button>
+                            <button
+                                onClick={() => {
+                                    setSelectionMode(false);
+                                    setSelectedVinyls([]);
+                                }}
+                                className="bg-[#888] text-white px-4 py-1.5 rounded-full hover:bg-[#777] transition"
+                            >
+                                {m('cancel')}
+                            </button>
                         </>
                     )}
                 </div>
             </div>
 
-            <div className="flex flex-wrap gap-4 justify-center">
+            <div className="flex flex-wrap gap-6 justify-center">
                 {vinyls.map((vinyl) => (
-                    <div key={vinyl.id} onClick={() => !selectionMode && handleVinylClick(vinyl)}>
+                    <div
+                        key={vinyl.id}
+                        onClick={() => !selectionMode && handleVinylClick(vinyl)}
+                        className="cursor-pointer"
+                    >
                         <VinylItem
                             vinyl={vinyl}
                             isSelected={selectedVinyls.includes(vinyl.id)}
@@ -196,8 +237,7 @@ export default function ManagePage() {
                             console.error('Error adding vinyl:', err);
                             alert('Failed to add vinyl.');
                         }
-                    }
-                    }
+                    }}
                 />
             )}
         </div>
