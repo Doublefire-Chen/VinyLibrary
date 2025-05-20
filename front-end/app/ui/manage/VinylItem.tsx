@@ -38,7 +38,7 @@ const VinylItem: React.FC<VinylItemProps> = ({
                 }`}
         >
             {/* Turntable Deck */}
-            <div className="relative h-48 bg-gradient-to-b from-[#1a1a1a] to-[#2e2e2e] flex items-center justify-center">
+            <div className="relative h-48 bg-gradient-to-b from-[#c49a6c] to-[#7b5e3b] flex items-center justify-center">
                 {/* Vinyl Record */}
                 <div className={`relative w-42 h-42 flex items-center justify-center ${isPlaying ? 'animate-[spin_4s_linear_infinite]' : ''}`}>
                     {/* SVG vinyl with grooves as background */}
