@@ -36,20 +36,6 @@ const VinylCard: React.FC<{ vinyl: Vinyl }> = ({ vinyl }) => {
             </div>
         </div>
     );
-    // 旧版代码
-    /* return (
-        <div className="max-w-sm rounded overflow-hidden shadow-lg bg-white">
-            <img className="w-full" src={vinyl.album_picture_url} alt={vinyl.title} />
-            <div className="px-6 py-4">
-                <h2 className="font-bold text-xl mb-2">{vinyl.title}</h2>
-                <p className="text-gray-700 text-base">{vinyl.artist}</p>
-                <p className="text-gray-600 text-sm">{vinyl.year}</p>
-                <p className="text-gray-800 text-md mt-2">{vinyl.description}</p>
-                <p className="text-gray-800 text-md mt-2">{formatTime(vinyl.timebought)}</p>
-                <p className="text-gray-900 font-semibold mt-2">{vinyl.price} {vinyl.currency}</p>
-            </div>
-        </div>
-    ); */
 };
 
 export default VinylCard;

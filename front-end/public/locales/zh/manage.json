@@ -1,0 +1,24 @@
+{
+    "select": "选择黑胶唱片",
+    "manage": "管理黑胶唱片",
+    "delete_selected": "删除所选",
+    "choose_file": "选择文件",
+    "cover_upload_warning": "请在上传黑胶封面之前填写标题、艺术家、黑胶类型和黑胶编号。",
+    "currency": {
+        "USD": "美元",
+        "EUR": "欧元",
+        "SEK": "瑞典克朗",
+        "GBP": "英镑",
+        "JPY": "日元",
+        "CNY": "人民币",
+        "CHF": "瑞士法郎",
+        "CAD": "加拿大元",
+        "AUD": "澳元"
+    },
+    "select_or_type": "选择或输入自定义值",
+    "select_timezone": "选择时区",
+    "add_track": "添加曲目",
+    "add_new_vinyl": "添加新黑胶唱片",
+    "cancel": "取消",
+    "play": "播放"
+}

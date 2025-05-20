@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useTranslation } from 'react-i18next';
 
 export default function ProfilePage() {
     const username = localStorage.getItem('username');
@@ -10,6 +11,8 @@ export default function ProfilePage() {
     const [confirmPassword, setConfirmPassword] = useState('');
     const router = useRouter();
     const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
+    const { t: c } = useTranslation('common');
+    const { t: p } = useTranslation('profile');
 
     const handleChangePassword = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -57,13 +60,13 @@ export default function ProfilePage() {
 
     return (
         <div className="max-w-md mx-auto mt-10 p-6 bg-white shadow-lg rounded-lg">
-            <h1 className="text-2xl font-bold mb-4">Profile</h1>
-            <p className="mb-6">Username: <strong>{username}</strong></p>
-            <h2 className="text-xl font-semibold mb-2">Change Password</h2>
+            <h1 className="text-2xl font-bold mb-4">{c("profile")}</h1>
+            <p className="mb-6">{c("username")}: <strong>{username}</strong></p>
+            <h2 className="text-xl font-semibold mb-2">{p("change_password")}</h2>
             <form onSubmit={handleChangePassword} className="space-y-4">
                 <input
                     type="password"
-                    placeholder="Old Password"
+                    placeholder={p("current_password")}
                     value={oldPassword}
                     onChange={(e) => setOldPassword(e.target.value)}
                     className="w-full border p-2 rounded"
@@ -71,7 +74,7 @@ export default function ProfilePage() {
                 />
                 <input
                     type="password"
-                    placeholder="New Password"
+                    placeholder={p("new_password")}
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
                     className="w-full border p-2 rounded"
@@ -79,7 +82,7 @@ export default function ProfilePage() {
                 />
                 <input
                     type="password"
-                    placeholder="Confirm New Password"
+                    placeholder={p("confirm_password")}
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     className="w-full border p-2 rounded"
@@ -89,7 +92,7 @@ export default function ProfilePage() {
                     type="submit"
                     className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700"
                 >
-                    Change Password
+                    {p("change_password")}
                 </button>
             </form>
         </div>

@@ -5,7 +5,8 @@ import VinylCard from '@/app/ui/VinylCard';
 import type { Vinyl } from '@/app/lib/definitions'; // 抽离类型定义
 import { BACKEND_URL } from '@/app/lib/config'; // 引入后端地址
 import Link from 'next/link';
-import { parseCookies } from 'nookies';
+import LanguageSwitcher from '@/app/ui/LanguageSwitcher';
+import { useTranslation } from 'react-i18next';
 
 export default function Page() {
   const [vinyls, setVinyls] = useState<Vinyl[]>([]);
@@ -13,6 +14,7 @@ export default function Page() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [username, setUsername] = useState('');
   const [showMenu, setShowMenu] = useState(false);
+  const { t: c } = useTranslation('common');
 
   useEffect(() => {
     const fetchData = async () => {
@@ -73,10 +75,10 @@ export default function Page() {
       <div className="bg-black text-white text-center py-2 relative">
         <div className="flex flex-col items-center gap-0">
           <h1 className="text-2xl font-semibold leading-light">
-            Welcome to Vinyl Collection
+            {c('welcome')}
           </h1>
           <p className="text-sm font-normal leading-none">
-            Explore a collection of timeless vinyl records.
+            {c('welcome_message')}
           </p>
         </div>
         <div className="absolute right-4 top-1/2 transform -translate-y-1/2 flex space-x-2">
@@ -86,7 +88,7 @@ export default function Page() {
                 href="/manage"
                 className="bg-white text-black px-3 py-1 rounded hover:bg-gray-200 text-sm"
               >
-                Manage
+                {c('manage')}
               </Link>
               <div className="relative w-max group">
                 <div className="flex flex-col">
@@ -98,29 +100,31 @@ export default function Page() {
                       href="/profile"
                       className="block px-4 py-2 hover:bg-gray-100"
                     >
-                      Profile
+                      {c('profile')}
                     </Link>
                     <button
                       onClick={handleLogout}
                       className="w-full text-left px-4 py-2 hover:bg-gray-100"
                     >
-                      Logout
+                      {c('logout')}
                     </button>
                   </div>
                 </div>
               </div>
-
+              <LanguageSwitcher />
             </>
           ) : (
-            <Link
-              href="/login"
-              className="bg-white text-black px-3 py-1 rounded hover:bg-gray-200 text-sm"
-            >
-              Login
-            </Link>
+            <>
+              <Link
+                href="/login"
+                className="bg-white text-black px-3 py-1 rounded hover:bg-gray-200 text-sm"
+              >
+                {c('login')}
+              </Link>
+              <LanguageSwitcher />
+            </>
           )}
         </div>
-
       </div>
       <div className="flex flex-wrap justify-center gap-4">
         {vinyls.map((vinyl) => (

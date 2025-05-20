@@ -2,7 +2,7 @@ import { Vinyl, Track } from '@/app/lib/definitions';
 import { useState, ChangeEvent, useRef } from 'react';
 import MacOSTrafficLights from '@/app/ui/MacOSTrafficLights';
 import { timezones } from '@/app/lib/definitions'
-import { time } from 'console';
+import { useTranslation } from 'react-i18next';
 
 interface AddVinylModalProps {
     onClose: () => void;
@@ -10,6 +10,9 @@ interface AddVinylModalProps {
 }
 
 export default function AddVinylModal({ onClose, onSave }: AddVinylModalProps) {
+    const { t: m } = useTranslation('manage');
+    const { t: c } = useTranslation('common');
+
     const [newVinyl, setNewVinyl] = useState<Vinyl>({
         id: 0, // This will likely be set by the backend
         title: '',
@@ -101,7 +104,7 @@ export default function AddVinylModal({ onClose, onSave }: AddVinylModalProps) {
             >
                 {/* Tab bar */}
                 <div className="absolute top-0 left-0 right-0 h-10 bg-blue-100 rounded-t-xl flex items-center px-24">
-                    <div className="text-gray-700 font-medium truncate">Add New Vinyl</div>
+                    <div className="text-gray-700 font-medium truncate">{m('add_new_vinyl')}</div>
                 </div>
 
                 {/* macOS Traffic Lights */}
@@ -114,7 +117,7 @@ export default function AddVinylModal({ onClose, onSave }: AddVinylModalProps) {
                     <MacOSTrafficLights type="maximize" isHovered={isHovered} />
                 </div>
 
-                <h2 className="text-xl font-bold mb-4 mt-4 text-center">Add New Vinyl</h2>
+                <h2 className="text-xl font-bold mb-4 mt-4 text-center">{m('add_new_vinyl')}</h2>
                 <div className="flex justify-center items-center mb-4 gap-4">
                     <div className="p-2 bg-white rounded-xl shadow-lg border border-gray-200">
                         <img
@@ -130,7 +133,7 @@ export default function AddVinylModal({ onClose, onSave }: AddVinylModalProps) {
                                 : "bg-gray-400 cursor-not-allowed"
                                 } text-white px-4 py-2 rounded-lg`}
                         >
-                            Choose File
+                            {m('choose_file')}
                             <input
                                 type="file"
                                 className="hidden"
@@ -140,7 +143,7 @@ export default function AddVinylModal({ onClose, onSave }: AddVinylModalProps) {
                         </label>
                         {(!newVinyl.title || !newVinyl.artist || !newVinyl.vinyl_type || !newVinyl.vinyl_number) && (
                             <p className="text-xs text-red-500 max-w-[200px]">
-                                Please fill in title, artist, vinyl type and vinyl number before uploading vinyl cover.
+                                {m('cover_upload_warning')}
                             </p>
                         )}
                     </div>
@@ -148,26 +151,26 @@ export default function AddVinylModal({ onClose, onSave }: AddVinylModalProps) {
 
                 <div className="max-h-[50vh] overflow-auto mb-4 grid grid-cols-2 gap-4 auto-rows-min" id="tracklist-container">
                     <div>
-                        <p className="mb-1 text-gray-500">Title</p>
+                        <p className="mb-1 text-gray-500">{c('title')}</p>
                         <input type="text" value={newVinyl.title} onChange={(e) => handleChange('title', e.target.value)} className="border p-2 rounded-lg w-full" />
                     </div>
                     <div>
-                        <p className="mb-1 text-gray-500">Artist</p>
+                        <p className="mb-1 text-gray-500">{c('artist')}</p>
                         <input type="text" value={newVinyl.artist} onChange={(e) => handleChange('artist', e.target.value)} className="border p-2 rounded-lg w-full" />
                     </div>
                     <div>
-                        <p className="mb-1 text-gray-500">Year</p>
+                        <p className="mb-1 text-gray-500">{c('year')}</p>
                         <input type="number" value={newVinyl.year} onChange={(e) => handleChange('year', parseInt(e.target.value) || 0)} className="border p-2 rounded-lg w-full" />
                     </div>
                     <div>
-                        <p className="mb-1 text-gray-500">Vinyl Type</p>
+                        <p className="mb-1 text-gray-500">{c('vinyl_type')}</p>
                         <div className="relative">
                             <input
                                 type="text"
                                 value={newVinyl.vinyl_type}
                                 onChange={(e) => handleChange('vinyl_type', e.target.value)}
                                 className="border p-2 rounded-lg w-full"
-                                placeholder="Select or type custom"
+                                placeholder={m('select_or_type')}
                                 list="vinyl-types"
                             />
                             <datalist id="vinyl-types">
@@ -178,15 +181,15 @@ export default function AddVinylModal({ onClose, onSave }: AddVinylModalProps) {
                         </div>
                     </div>
                     <div>
-                        <p className="mb-1 text-gray-500">Vinyl Number</p>
+                        <p className="mb-1 text-gray-500">{c('vinyl_number')}</p>
                         <input type="number" value={newVinyl.vinyl_number} onChange={(e) => handleChange('vinyl_number', parseInt(e.target.value) || 0)} className="border p-2 rounded-lg w-full" />
                     </div>
                     <div>
-                        <p className="mb-1 text-gray-500">Play Count</p>
+                        <p className="mb-1 text-gray-500">{c('play_count')}</p>
                         <input type="number" value={newVinyl.play_num} onChange={(e) => handleChange('play_num', parseInt(e.target.value) || 0)} className="border p-2 rounded-lg w-full" />
                     </div>
                     <div className="col-span-2 grid grid-cols-[2fr_1fr] auto-rows-min">
-                        <p className="mb-1 text-gray-500 col-span-2">Time Bought</p>
+                        <p className="mb-1 text-gray-500 col-span-2">{c('time_bought')}</p>
                         <div className="flex gap-1 items-center mr-2">
                             <input
                                 type="number"
@@ -382,7 +385,7 @@ export default function AddVinylModal({ onClose, onSave }: AddVinylModalProps) {
                                 }}
                                 className="max-w-full border p-2 rounded-lg w-full h-[42px]"
                             >
-                                <option value="">Select timezone</option>
+                                <option value="">{m('select_timezone')}</option>
                                 <option value="+02:00">CET summer (UTC+02:00)</option>
                                 <option value="+01:00">CET (UTC+01:00)</option>
                                 {timezones.map((tz) => (
@@ -392,41 +395,41 @@ export default function AddVinylModal({ onClose, onSave }: AddVinylModalProps) {
                         </div>
                     </div>
                     <div>
-                        <p className="mb-1 text-gray-500">Price</p>
+                        <p className="mb-1 text-gray-500">{c('price')}</p>
                         <input type="number" value={newVinyl.price} onChange={(e) => handleChange('price', parseFloat(e.target.value) || 0)} className="border p-2 rounded-lg w-full" />
                     </div>
                     <div>
-                        <p className="mb-1 text-gray-500">Currency</p>
+                        <p className="mb-1 text-gray-500">{c('currency')}</p>
                         <div className="relative">
                             <input
                                 type="text"
                                 value={newVinyl.currency}
                                 onChange={(e) => handleChange('currency', e.target.value)}
                                 className="border p-2 rounded-lg w-full"
-                                placeholder="Select or type custom"
+                                placeholder={m('select_or_type')}
                                 list="currencies"
                             />
                             <datalist id="currencies">
-                                <option value="USD">🇺🇸 $ (US Dollar)</option>
-                                <option value="EUR">🇪🇺 € (Euro)</option>
-                                <option value="SEK">🇸🇪 kr (Swedish Krona)</option>
-                                <option value="GBP">🇬🇧 £ (British Pound)</option>
-                                <option value="JPY">🇯🇵 ¥ (Japanese Yen)</option>
-                                <option value="CNY">🇨🇳 ¥ (Chinese Yuan)</option>
-                                <option value="CHF">🇨🇭 Fr (Swiss Franc)</option>
-                                <option value="CAD">🇨🇦 $ (Canadian Dollar)</option>
-                                <option value="AUD">🇦🇺 $ (Australian Dollar)</option>
+                                <option value="USD">🇺🇸 $ ({m('currency.USD')})</option>
+                                <option value="EUR">🇪🇺 € ({m('currency.EUR')})</option>
+                                <option value="SEK">🇸🇪 kr ({m('currency.SEK')})</option>
+                                <option value="GBP">🇬🇧 £ ({m('currency.GBP')})</option>
+                                <option value="JPY">🇯🇵 ¥ ({m('currency.JPY')})</option>
+                                <option value="CNY">🇨🇳 ¥ ({m('currency.CNY')})</option>
+                                <option value="CHF">🇨🇭 Fr ({m('currency.CHF')})</option>
+                                <option value="CAD">🇨🇦 $ ({m('currency.CAD')})</option>
+                                <option value="AUD">🇦🇺 $ ({m('currency.AUD')})</option>
                             </datalist>
                         </div>
                     </div>
                     <div className="col-span-2">
-                        <p className="mb-1 text-gray-500">Description</p>
+                        <p className="mb-1 text-gray-500">{c('description')}</p>
                         <textarea value={newVinyl.description} onChange={(e) => handleChange('description', e.target.value)} className="border p-2 rounded-lg w-full" rows={3} />
                     </div>
                     {/* Tracklist Section */}
                     <div className="col-span-2 mt-4">
                         <div className="flex justify-between items-center mb-2">
-                            <p className="font-medium text-gray-700">Tracklist</p>
+                            <p className="font-medium text-gray-700">{c('track_list')}</p>
                             <button
                                 onClick={() => {
                                     addTrack();
@@ -444,16 +447,16 @@ export default function AddVinylModal({ onClose, onSave }: AddVinylModalProps) {
                                 }}
                                 className="bg-blue-600 text-white px-3 py-1 text-sm rounded-lg hover:bg-blue-700"
                             >
-                                Add Track
+                                {m('add_track')}
                             </button>
                         </div>
 
                         {/* Column Headers */}
                         <div className="flex gap-2 mb-1 items-center text-sm text-gray-600 font-medium w-full">
-                            <div className="w-[12%] px-2">Side</div>
-                            <div className="w-[12%] px-2">Order</div>
-                            <div className="w-[43%] px-2">Title</div>
-                            <div className="w-[25%] px-2">Length</div>
+                            <div className="w-[12%] px-2">{c('side')}</div>
+                            <div className="w-[12%] px-2">{c('order')}</div>
+                            <div className="w-[43%] px-2">{c('title')}</div>
+                            <div className="w-[25%] px-2">{c('length')}</div>
                         </div>
 
                         {newVinyl.tracklist
@@ -564,9 +567,9 @@ export default function AddVinylModal({ onClose, onSave }: AddVinylModalProps) {
                         className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700"
                         disabled={!newVinyl.title || !newVinyl.artist}
                     >
-                        Add Vinyl
+                        {m("add_new_vinyl")}
                     </button>
-                    <button onClick={onClose} className="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600">Cancel</button>
+                    <button onClick={onClose} className="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600">{m("cancel")}</button>
                 </div>
             </div>
         </div >

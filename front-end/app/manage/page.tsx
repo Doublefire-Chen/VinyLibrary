@@ -8,6 +8,7 @@ import EditVinylModal from '@/app/ui/manage/EditVinylModal';
 import Link from 'next/link';
 import AddVinylModal from '@/app/ui/manage/AddVinylModal';
 import { format } from 'date-fns';
+import { useTranslation } from 'react-i18next';
 
 export default function ManagePage() {
     const [vinyls, setVinyls] = useState<Vinyl[]>([]);
@@ -18,6 +19,8 @@ export default function ManagePage() {
     const [error, setError] = useState('');
     const router = useRouter();
     const [addNewVinyl, setAddNewVinyl] = useState(false);
+    const { t: m } = useTranslation('manage');
+    const { t: c } = useTranslation('common');
 
     const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
 
@@ -106,29 +109,29 @@ export default function ManagePage() {
     };
 
     if (isLoading) {
-        return <div className="text-center py-8">Loading...</div>;
+        return <div className="text-center py-8">{m("loading")}</div>;
     }
 
     return (
         <div className="p-4 space-y-4">
             {error && <div className="bg-red-100 text-red-700 p-2 rounded">{error}</div>}
             <div className="flex justify-between items-center mb-4">
-                <h1 className="text-2xl font-bold">Manage Vinyls</h1>
+                <h1 className="text-2xl font-bold">{m("manage")}</h1>
                 <div className="space-x-2">
                     {!selectionMode && (
                         <>
-                            <button onClick={() => setSelectionMode(true)} className="inline-block box-border border border-transparent bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600 font-medium leading-none focus:outline-none focus:ring-2">Select Vinyls</button>
-                            <button onClick={() => setAddNewVinyl(true)} className="inline-block box-border border border-transparent bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 font-medium leading-none focus:outline-none focus:ring-2">Add New Vinyl</button>
-                            <Link href="/profile" className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 font-medium leading-none">Profile</Link>
-                            <Link href="/" className="bg-gray-700 text-white px-4 py-2 rounded hover:bg-gray-800 font-medium leading-none">Go to Home</Link>
+                            <button onClick={() => setSelectionMode(true)} className="inline-block box-border border border-transparent bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600 font-medium leading-none focus:outline-none focus:ring-2">{m("select")}</button>
+                            <button onClick={() => setAddNewVinyl(true)} className="inline-block box-border border border-transparent bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 font-medium leading-none focus:outline-none focus:ring-2">{m("add_new_vinyl")}</button>
+                            <Link href="/profile" className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 font-medium leading-none">{c("profile")}</Link>
+                            <Link href="/" className="bg-gray-700 text-white px-4 py-2 rounded hover:bg-gray-800 font-medium leading-none">{c("homepage")}</Link>
                         </>
                     )}
                     {selectionMode && (
                         <>
                             {selectedVinyls.length > 0 && (
-                                <button onClick={handleDeleteSelected} className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">Delete Selected</button>
+                                <button onClick={handleDeleteSelected} className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">{c("delete_selected")}</button>
                             )}
-                            <button onClick={() => { setSelectionMode(false); setSelectedVinyls([]); }} className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">Cancel</button>
+                            <button onClick={() => { setSelectionMode(false); setSelectedVinyls([]); }} className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">{m("cancel")}</button>
                         </>
                     )}
                 </div>
