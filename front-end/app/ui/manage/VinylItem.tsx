@@ -40,19 +40,46 @@ const VinylItem: React.FC<VinylItemProps> = ({
             {/* Turntable Deck */}
             <div className="relative h-48 bg-gradient-to-b from-[#1a1a1a] to-[#2e2e2e] flex items-center justify-center">
                 {/* Vinyl Record */}
-                <div
-                    className={`w-42 h-42 rounded-full bg-black border-[4px] border-gray-800 shadow-inner flex items-center justify-center relative ${isPlaying ? 'animate-[spin_4s_linear_infinite]' : ''
-                        }`}
-                >
-                    <div className="w-14 h-14 rounded-full overflow-hidden">
+                <div className={`relative w-42 h-42 flex items-center justify-center ${isPlaying ? 'animate-[spin_4s_linear_infinite]' : ''}`}>
+                    {/* SVG vinyl with grooves as background */}
+                    <svg
+                        width="168"
+                        height="168"
+                        viewBox="0 0 168 168"
+                        style={{ position: 'absolute', top: 0, left: 0, zIndex: 1 }}
+                        className="pointer-events-none select-none"
+                    >
+                        {/* Main vinyl base - pure black */}
+                        <circle cx="84" cy="84" r="80" fill="#000" />
+                        {/* Tighter etched grooves */}
+                        {Array.from({ length: 22 }).map((_, i) => (
+                            <circle
+                                key={i}
+                                cx="84"
+                                cy="84"
+                                r={48 + i * 1.6} // Start closer to label, expand in small steps
+                                fill="none"
+                                stroke="#aaa"
+                                strokeOpacity={0.08 + 0.07 * Math.cos(i * 0.8)}
+                                strokeWidth={i % 7 === 0 ? 0.95 : 0.5}
+                            />
+                        ))}
+                        {/* Outer ring for sharp edge */}
+                        <circle cx="84" cy="84" r="79" fill="none" stroke="#222" strokeWidth="2" strokeOpacity="0.22" />
+                    </svg>
+                    {/* Album art in center */}
+                    <div className="absolute left-1/2 top-1/2 w-14 h-14 rounded-full overflow-hidden shadow-lg border-4 border-black z-10" style={{ transform: 'translate(-50%, -50%)' }}>
                         <img
                             src={vinyl.album_picture_url}
                             alt={vinyl.title}
                             className="w-full h-full object-cover rounded-full"
+                            draggable={false}
                         />
                     </div>
-                    <div className="absolute w-2.5 h-2.5 bg-[#c9b370] rounded-full z-10" />
+                    {/* Spindle */}
+                    <div className="absolute left-1/2 top-1/2 w-2.5 h-2.5 rounded-full bg-[#c9b370] border border-[#8b7b35] z-20" style={{ transform: 'translate(-50%, -50%)' }} />
                 </div>
+
 
                 {/* SVG Tonearm - More Realistic */}
                 <svg
@@ -65,7 +92,7 @@ const VinylItem: React.FC<VinylItemProps> = ({
                         pointerEvents: 'none',
                         zIndex: 10,
                         transform: isPlaying
-                            ? 'rotate(-62deg)'
+                            ? 'rotate(-75deg)'
                             : 'rotate(-90deg)',
                         transformOrigin: '100px 20px', // still arm base
                         transition: 'transform 0.7s cubic-bezier(0.4,0,0.2,1)',
