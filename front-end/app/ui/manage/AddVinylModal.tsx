@@ -449,12 +449,11 @@ export default function AddVinylModal({ onClose, onSave }: AddVinylModalProps) {
                         </div>
 
                         {/* Column Headers */}
-                        <div className="flex gap-2 mb-1 items-center text-sm text-gray-600 font-medium">
-                            <div className="w-1/6 px-2">Side</div>
-                            <div className="w-1/6 px-2">Order</div>
-                            <div className="w-1/2 px-2">Title</div>
-                            <div className="w-1/6 px-2">Length</div>
-                            <div className="w-[28px]"></div>
+                        <div className="flex gap-2 mb-1 items-center text-sm text-gray-600 font-medium w-full">
+                            <div className="w-[12%] px-2">Side</div>
+                            <div className="w-[12%] px-2">Order</div>
+                            <div className="w-[43%] px-2">Title</div>
+                            <div className="w-[25%] px-2">Length</div>
                         </div>
 
                         {newVinyl.tracklist
@@ -466,8 +465,8 @@ export default function AddVinylModal({ onClose, onSave }: AddVinylModalProps) {
                                 return a.order - b.order;
                             })
                             .map((track, index) => (
-                                <div key={index} className="flex gap-2 mb-2 items-center">
-                                    <div className="w-1/6">
+                                <div key={index} className="flex gap-2 mb-2 items-center w-full">
+                                    <div className="w-[12%]">
                                         <input
                                             type="text"
                                             placeholder="Side"
@@ -476,7 +475,7 @@ export default function AddVinylModal({ onClose, onSave }: AddVinylModalProps) {
                                             className="border p-2 rounded-lg w-full text-sm"
                                         />
                                     </div>
-                                    <div className="w-1/6">
+                                    <div className="w-[12%]">
                                         <input
                                             type="number"
                                             placeholder="Order"
@@ -485,7 +484,7 @@ export default function AddVinylModal({ onClose, onSave }: AddVinylModalProps) {
                                             className="border p-2 rounded-lg w-full text-sm"
                                         />
                                     </div>
-                                    <div className="w-1/2">
+                                    <div className="w-[43%]">
                                         <input
                                             type="text"
                                             placeholder="Title"
@@ -494,14 +493,59 @@ export default function AddVinylModal({ onClose, onSave }: AddVinylModalProps) {
                                             className="border p-2 rounded-lg w-full text-sm"
                                         />
                                     </div>
-                                    <div className="w-1/6">
-                                        <input
-                                            type="text"
-                                            placeholder="Length"
-                                            value={track.length}
-                                            onChange={(e) => handleTrackChange(index, 'length', e.target.value)}
-                                            className="border p-2 rounded-lg w-full text-sm"
-                                        />
+                                    <div className="w-[25%]">
+                                        <div className="flex items-center">
+                                            <input
+                                                type="number"
+                                                min="0"
+                                                max="999"
+                                                placeholder="Min"
+                                                value={track.length.split(':')[0] || ''}
+                                                onChange={(e) => {
+                                                    const min = e.target.value;
+                                                    const sec = track.length.split(':')[1] || '00';
+                                                    handleTrackChange(index, 'length', `${min}:${sec}`);
+                                                }}
+                                                onBlur={(e) => {
+                                                    if (e.target.value === '') {
+                                                        const sec = track.length.split(':')[1] || '00';
+                                                        handleTrackChange(index, 'length', `0:${sec}`);
+                                                    }
+                                                }}
+                                                className="w-[45%] p-2 border rounded-lg text-sm text-center"
+                                            />
+                                            <span className="mx-1.5 text-gray-500">:</span>
+                                            <input
+                                                type="number"
+                                                min="0"
+                                                max="59"
+                                                placeholder="Sec"
+                                                value={track.length.split(':')[1] || ''}
+                                                onChange={(e) => {
+                                                    let raw = parseInt(e.target.value);
+                                                    if (isNaN(raw)) raw = 0;
+                                                    if (raw > 59) raw = 59;
+                                                    if (raw < 0) raw = 0;
+                                                    const formattedSec = raw.toString().padStart(2, '0');
+                                                    const min = track.length.split(':')[0] || '0';
+                                                    handleTrackChange(index, 'length', `${min}:${formattedSec}`);
+                                                }}
+                                                onBlur={(e) => {
+                                                    if (e.target.value === '') {
+                                                        const min = track.length.split(':')[0] || '0';
+                                                        handleTrackChange(index, 'length', `${min}:00`);
+                                                    } else {
+                                                        // Ensure proper formatting on blur
+                                                        const secValue = e.target.value;
+                                                        // Only pad with zeros if it's a single digit
+                                                        const sec = secValue.length === 1 ? secValue.padStart(2, '0') : secValue;
+                                                        const min = track.length.split(':')[0] || '0';
+                                                        handleTrackChange(index, 'length', `${min}:${sec}`);
+                                                    }
+                                                }}
+                                                className="w-[45%] p-2 border rounded-lg text-sm text-center"
+                                            />
+                                        </div>
                                     </div>
                                     <button
                                         onClick={() => removeTrack(index)}

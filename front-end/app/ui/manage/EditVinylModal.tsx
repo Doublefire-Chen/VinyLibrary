@@ -206,14 +206,54 @@ export default function EditVinylModal({ vinyl, onClose, onSave }: EditVinylModa
                                                 className="border p-2 rounded-lg w-full text-sm"
                                             />
                                         </div>
-                                        <div className="w-1/6">
-                                            <input
-                                                type="text"
-                                                placeholder="Length"
-                                                value={track.length}
-                                                onChange={(e) => handleTrackChange(index, 'length', e.target.value)}
-                                                className="border p-2 rounded-lg w-full text-sm"
-                                            />
+                                        <div className="w-[20%]">
+                                            <div className="flex items-center">
+                                                <input
+                                                    type="number"
+                                                    min="0"
+                                                    max="999"
+                                                    placeholder="Min"
+                                                    value={track.length.split(':')[0] || '0'}
+                                                    onChange={(e) => {
+                                                        const min = e.target.value || '0';
+                                                        const sec = track.length.split(':')[1] || '00';
+                                                        handleTrackChange(index, 'length', `${min}:${sec}`);
+                                                    }}
+                                                    onBlur={(e) => {
+                                                        if (e.target.value === '') {
+                                                            const sec = track.length.split(':')[1] || '00';
+                                                            handleTrackChange(index, 'length', `0:${sec}`);
+                                                        }
+                                                    }}
+                                                    className="w-[45%] p-2 border rounded-lg text-sm text-center"
+                                                />
+                                                <span className="mx-1.5 text-gray-500">:</span>
+                                                <input
+                                                    type="text"
+                                                    inputMode="numeric"
+                                                    pattern="[0-9]*"
+                                                    placeholder="Sec"
+                                                    value={(track.length.split(':')[1] || '00').padStart(2, '0')}
+                                                    onChange={(e) => {
+                                                        let raw = e.target.value.replace(/\D/g, ''); // remove non-digit
+                                                        let num = parseInt(raw);
+                                                        if (isNaN(num)) num = 0;
+                                                        if (num > 59) num = 59;
+                                                        const formattedSec = num.toString().padStart(2, '0');
+                                                        const min = track.length.split(':')[0] || '0';
+                                                        handleTrackChange(index, 'length', `${min}:${formattedSec}`);
+                                                    }}
+                                                    onBlur={(e) => {
+                                                        let raw = e.target.value.replace(/\D/g, '');
+                                                        let num = parseInt(raw);
+                                                        if (isNaN(num)) num = 0;
+                                                        const formattedSec = num.toString().padStart(2, '0');
+                                                        const min = track.length.split(':')[0] || '0';
+                                                        handleTrackChange(index, 'length', `${min}:${formattedSec}`);
+                                                    }}
+                                                    className="w-[45%] p-2 border rounded-lg text-sm text-center"
+                                                />
+                                            </div>
                                         </div>
                                         <button
                                             onClick={() => removeTrack(index)}
