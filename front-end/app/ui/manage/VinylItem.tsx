@@ -54,16 +54,99 @@ const VinylItem: React.FC<VinylItemProps> = ({
                     <div className="absolute w-2.5 h-2.5 bg-[#c9b370] rounded-full z-10" />
                 </div>
 
-                {/* Tonearm with vertical (90 deg) initial position */}
-                <div
-                    className="absolute top-6 right-6 w-28 h-[2px] bg-gray-300 rounded-sm origin-top-right transition-transform duration-700"
+                {/* SVG Tonearm - More Realistic */}
+                <svg
+                    className="absolute"
                     style={{
-                        transform: isPlaying ? 'rotate(-62deg)' : 'rotate(-90deg)',
+                        top: '18px',
+                        right: '18px',
+                        width: '130px', // canvas wider for counterweight
+                        height: '40px',
+                        pointerEvents: 'none',
+                        zIndex: 10,
+                        transform: isPlaying
+                            ? 'rotate(-62deg)'
+                            : 'rotate(-90deg)',
+                        transformOrigin: '100px 20px', // still arm base
+                        transition: 'transform 0.7s cubic-bezier(0.4,0,0.2,1)',
                     }}
                 >
-                    {/* Add tonearm head */}
-                    <div className="absolute right-0 -bottom-2 w-4 h-4 bg-gray-400 rounded-sm" />
-                </div>
+                    <defs>
+                        <radialGradient id="pivotGradient" cx="60%" cy="40%" r="90%">
+                            <stop offset="0%" stopColor="#f0f0f0" />
+                            <stop offset="100%" stopColor="#888" />
+                        </radialGradient>
+                        <linearGradient id="armGradient" x1="100" y1="20" x2="20" y2="20" gradientUnits="userSpaceOnUse">
+                            <stop offset="0%" stopColor="#ececec" />
+                            <stop offset="100%" stopColor="#b0b0b0" />
+                        </linearGradient>
+                        <filter id="armShadow" x="0" y="0" width="150%" height="150%">
+                            <feDropShadow dx="0.5" dy="1.2" stdDeviation="1" floodColor="#000" floodOpacity="0.16" />
+                        </filter>
+                    </defs>
+                    {/* --- Counterweight and gap --- */}
+                    {/* Short shaft ("gap") between pivot and counterweight */}
+                    <rect
+                        x="100"
+                        y="17.5"
+                        width="12"
+                        height="5"
+                        rx="2.5"
+                        fill="#bbb"
+                        stroke="#888"
+                        strokeWidth="0.6"
+                    />
+                    {/* Counterweight at end */}
+                    <circle
+                        cx="118"
+                        cy="20"
+                        r="8"
+                        fill="url(#pivotGradient)"
+                        stroke="#555"
+                        strokeWidth="2"
+                    />
+                    {/* Pivot ring (bearing) */}
+                    <circle
+                        cx="100"
+                        cy="20"
+                        r="4"
+                        fill="#bbb"
+                        stroke="#444"
+                        strokeWidth="1"
+                    />
+                    {/* --- Main arm --- */}
+                    <rect
+                        x="20"
+                        y="17"
+                        width="80"
+                        height="6"
+                        rx="3"
+                        fill="url(#armGradient)"
+                        stroke="#999"
+                        strokeWidth="1"
+                        filter="url(#armShadow)"
+                    />
+                    {/* --- Headshell/Cartridge --- */}
+                    <rect
+                        x="10"
+                        y="13"
+                        width="14"
+                        height="14"
+                        rx="2.5"
+                        fill="#191919"
+                        stroke="#333"
+                        strokeWidth="1"
+                    />
+                    {/* Stylus tip */}
+                    <circle
+                        cx="10"
+                        cy="20"
+                        r="2"
+                        fill="#e3e300"
+                        stroke="#555"
+                        strokeWidth="0.7"
+                    />
+                </svg>
             </div>
 
             {/* Info Section */}
