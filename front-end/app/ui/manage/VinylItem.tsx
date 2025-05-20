@@ -41,7 +41,7 @@ const VinylItem: React.FC<VinylItemProps> = ({
             <div className="relative h-48 bg-gradient-to-b from-[#1a1a1a] to-[#2e2e2e] flex items-center justify-center">
                 {/* Vinyl Record */}
                 <div
-                    className={`w-36 h-36 rounded-full bg-black border-[4px] border-gray-800 shadow-inner flex items-center justify-center relative ${isPlaying ? 'animate-[spin_4s_linear_infinite]' : ''
+                    className={`w-42 h-42 rounded-full bg-black border-[4px] border-gray-800 shadow-inner flex items-center justify-center relative ${isPlaying ? 'animate-[spin_4s_linear_infinite]' : ''
                         }`}
                 >
                     <div className="w-14 h-14 rounded-full overflow-hidden">
@@ -58,7 +58,7 @@ const VinylItem: React.FC<VinylItemProps> = ({
                 <div
                     className="absolute top-6 right-6 w-28 h-[2px] bg-gray-300 rounded-sm origin-top-right transition-transform duration-700"
                     style={{
-                        transform: isPlaying ? 'rotate(-58deg)' : 'rotate(-90deg)',
+                        transform: isPlaying ? 'rotate(-62deg)' : 'rotate(-90deg)',
                     }}
                 >
                     {/* Add tonearm head */}
