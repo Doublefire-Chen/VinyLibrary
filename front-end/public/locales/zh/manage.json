@@ -20,5 +20,8 @@
     "add_track": "添加曲目",
     "add_new_vinyl": "添加新黑胶唱片",
     "cancel": "取消",
-    "play": "播放"
+    "play": "播放",
+    "backup": "备份",
+    "backup_success": "备份创建成功",
+    "backup_failed": "备份创建失败"
 }

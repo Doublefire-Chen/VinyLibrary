@@ -108,6 +108,40 @@ export default function ManagePage() {
         }
     };
 
+    const handleBackup = async () => {
+        try {
+            const res = await fetch(`${backendUrl}/api/backup`, {
+                method: 'GET',
+                credentials: 'include'
+            });
+
+            if (!res.ok) {
+                alert('Backup failed');
+                return;
+            }
+
+            const blob = await res.blob();
+            let filename = "backup.zip";
+            const disposition = res.headers.get('Content-Disposition');
+            if (disposition) {
+                const match = disposition.match(/filename="?([^"]+)"?/);
+                if (match && match[1]) {
+                    filename = match[1];
+                }
+            }
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            window.URL.revokeObjectURL(url);
+        } catch (err) {
+            alert('Backup failed');
+        }
+    };
+
     if (isLoading) {
         return <div className="text-center py-8">{m("loading")}</div>;
     }
@@ -149,6 +183,13 @@ export default function ManagePage() {
                             >
                                 {c('homepage')}
                             </Link>
+                            <button
+                                onClick={handleBackup}
+                                className="bg-[#5a8f66] text-white px-4 py-1.5 rounded-full hover:bg-[#497a55] transition"
+                            >
+                                Backup
+                            </button>
+
                         </>
                     ) : (
                         <>

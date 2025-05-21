@@ -20,5 +20,8 @@
     "add_track": "Add Track",
     "add_new_vinyl": "Add New Vinyl",
     "cancel": "Cancel",
-    "play": "Play"
+    "play": "Play",
+    "backup": "Backup",
+    "backup_success": "Backup created successfully",
+    "backup_failed": "Backup creation failed"
 }

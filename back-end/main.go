@@ -49,6 +49,7 @@ func main() {
 		protected.POST("/changepwd", ChangePassword)
 		protected.POST("/deleteuser", DeleteAccount)
 		protected.POST("/logout", Logout)
+		protected.GET("/backup", Backup)
 	}
 
 	log.Fatal(router.Run(":1234"))

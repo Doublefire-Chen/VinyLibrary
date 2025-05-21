@@ -1,15 +1,19 @@
 package main
 
 import (
+	"archive/zip"
 	"database/sql"
 	"encoding/json"
 	"fmt"
+	"io"
 	"log"
 	"net/http"
 	"net/url"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"strings"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
@@ -508,5 +512,120 @@ func GetPlayHistoryByID(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"vinyl":        v,
 		"play_history": playHistory,
+	})
+}
+
+func Backup(c *gin.Context) {
+	now := time.Now()
+	zone, offset := now.Zone()
+	backupName := fmt.Sprintf("backup_%s_%s%+03d.zip", now.Format("20060102_150405"), zone, offset/3600)
+	backupDir := strings.TrimSuffix(backupName, ".zip")
+
+	// 1. Create backup directory
+	if err := os.MkdirAll(backupDir, os.ModePerm); err != nil {
+		c.JSON(500, gin.H{"error": "Failed to create backup directory"})
+		return
+	}
+
+	// 2. Copy album folder using Linux cp -r
+	albumDir := "./album"
+	albumBackupDir := filepath.Join(backupDir, "album")
+	if err := os.MkdirAll(albumBackupDir, os.ModePerm); err != nil {
+		os.RemoveAll(backupDir)
+		c.JSON(500, gin.H{"error": "Failed to create album backup directory"})
+		return
+	}
+	cmd := exec.Command("cp", "-r", albumDir+"/.", albumBackupDir)
+	if err := cmd.Run(); err != nil {
+		os.RemoveAll(backupDir)
+		c.JSON(500, gin.H{"error": "Failed to copy album folder: " + err.Error()})
+		return
+	}
+
+	// 3. Dump PostgreSQL database using pg_dump with env vars
+	dbUser := os.Getenv("DB_USER")
+	dbPassword := os.Getenv("DB_PASSWORD")
+	dbHost := os.Getenv("DB_HOST")
+	dbPort := os.Getenv("DB_PORT")
+	dbName := os.Getenv("DB_NAME")
+	dumpPath := filepath.Join(backupDir, "db_backup.sql")
+	pgDumpCmd := exec.Command("pg_dump", "-U", dbUser, "-h", dbHost, "-p", dbPort, "-F", "p", "-d", dbName)
+	pgDumpCmd.Env = append(os.Environ(), "PGPASSWORD="+dbPassword)
+	dumpFile, err := os.Create(dumpPath)
+	if err != nil {
+		os.RemoveAll(backupDir)
+		c.JSON(500, gin.H{"error": "Failed to create DB dump file"})
+		return
+	}
+	defer dumpFile.Close()
+	pgDumpCmd.Stdout = dumpFile
+	if err := pgDumpCmd.Run(); err != nil {
+		os.RemoveAll(backupDir)
+		c.JSON(500, gin.H{"error": "Failed to dump database: " + err.Error()})
+		return
+	}
+
+	// 4. Zip the backup directory
+	zipPath := backupDir + ".zip"
+	if err := zipDir(backupDir, zipPath); err != nil {
+		os.RemoveAll(backupDir)
+		c.JSON(500, gin.H{"error": "Failed to create zip archive"})
+		return
+	}
+
+	// 5. Download the zip file and remove after sent
+
+	file, err := os.Open(zipPath)
+	if err != nil {
+		c.JSON(500, gin.H{"error": "Failed to open backup file"})
+		return
+	}
+	defer file.Close()
+	defer os.RemoveAll(backupDir) // Remove the unzipped backup directory
+	defer os.Remove(zipPath)
+
+	fi, err := file.Stat()
+	if err != nil {
+		c.JSON(500, gin.H{"error": "Failed to stat backup file"})
+		return
+	}
+	c.Writer.Header().Set("Access-Control-Expose-Headers", "Content-Disposition")
+	c.Writer.Header().Set("Content-Disposition", fmt.Sprintf(`attachment; filename="%s"`, filepath.Base(zipPath)))
+	http.ServeContent(c.Writer, c.Request, filepath.Base(zipPath), fi.ModTime(), file)
+}
+
+// Helper: zip a directory
+func zipDir(source, target string) error {
+	zipfile, err := os.Create(target)
+	if err != nil {
+		return err
+	}
+	defer zipfile.Close()
+
+	archive := zip.NewWriter(zipfile)
+	defer archive.Close()
+
+	return filepath.Walk(source, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+		if info.IsDir() {
+			return nil
+		}
+		relPath, err := filepath.Rel(source, path)
+		if err != nil {
+			return err
+		}
+		f, err := archive.Create(relPath)
+		if err != nil {
+			return err
+		}
+		file, err := os.Open(path)
+		if err != nil {
+			return err
+		}
+		defer file.Close()
+		_, err = io.Copy(f, file)
+		return err
 	})
 }
