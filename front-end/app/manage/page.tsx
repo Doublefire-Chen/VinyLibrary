@@ -9,6 +9,7 @@ import Link from 'next/link';
 import AddVinylModal from '@/app/ui/manage/AddVinylModal';
 import { format } from 'date-fns';
 import { useTranslation } from 'react-i18next';
+import LanguageSwitcher from '@/app/ui/LanguageSwitcher';
 
 export default function ManagePage() {
     const [vinyls, setVinyls] = useState<Vinyl[]>([]);
@@ -230,6 +231,7 @@ export default function ManagePage() {
                             >
                                 {c('restore')}
                             </button>
+                            <LanguageSwitcher />
                         </>
                     ) : (
                         <>
