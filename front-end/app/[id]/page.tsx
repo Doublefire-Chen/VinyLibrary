@@ -29,38 +29,56 @@ export default function VinylDetailPage() {
         fetchVinylData();
     }, [id]);
 
-    if (isLoading) return <div className="text-center py-8">Loading...</div>;
-    if (!vinyl) return <div className="text-center py-8">Vinyl not found</div>;
+    if (isLoading) return (
+        <div className="flex items-center justify-center min-h-[300px] text-[#b89f56] text-lg font-mono bg-[#f5f2ec]">
+            Loading...
+        </div>
+    );
+    if (!vinyl) return (
+        <div className="flex items-center justify-center min-h-[300px] text-[#e14a4a] text-lg font-mono bg-[#f5f2ec]">
+            Vinyl not found
+        </div>
+    );
 
     return (
-        <div className="max-w-3xl mx-auto p-4 space-y-6">
+        <div className="max-w-3xl mx-auto p-6 md:p-10 space-y-8">
+            {/* Back Button */}
             <div className="mb-4">
                 <Link href="/">
-                    <button className="bg-gray-200 hover:bg-gray-300 text-black px-4 py-2 rounded">
-                        ← Back to Home
+                    <button className="flex items-center gap-2 bg-[#c9b370] text-black px-5 py-2 rounded-full text-sm font-medium shadow hover:bg-[#b89f56] transition">
+                        <span className="text-xl">←</span>
+                        Back to Home
                     </button>
                 </Link>
             </div>
 
-            <div className="border p-4 rounded shadow">
-                <h2 className="text-xl font-semibold">{vinyl.title}</h2>
-                <p className="text-sm text-gray-600">{vinyl.artist} ・ {vinyl.year}</p>
-                <img src={vinyl.album_picture_url} alt={vinyl.title} className="w-full max-h-80 object-contain my-4" />
-                <p>{vinyl.description}</p>
-                <div className="mt-2 text-sm">
-                    <p><strong>Type:</strong> {vinyl.vinyl_type}</p>
-                    <p><strong>Number:</strong> {vinyl.vinyl_number}</p>
-                    <p><strong>Price:</strong> {vinyl.price} {vinyl.currency}</p>
-                    <p><strong>Times Played:</strong> {vinyl.play_num}</p>
+            {/* Vinyl Card */}
+            <div className="rounded-2xl shadow-xl bg-gradient-to-br from-[#f5f2ec] to-[#ece7d8] border-2 border-[#c9b370] p-6 flex flex-col md:flex-row gap-6 items-center">
+                <img
+                    src={vinyl.album_picture_url}
+                    alt={vinyl.title}
+                    className="w-56 h-56 object-cover rounded-xl border-4 border-[#c9b370] shadow"
+                />
+                <div className="flex-1 min-w-0">
+                    <h2 className="text-3xl font-bold tracking-wider uppercase text-[#1a1a1a] mb-1">{vinyl.title}</h2>
+                    <p className="text-md text-[#445a7c] font-semibold mb-2">{vinyl.artist} ・ {vinyl.year}</p>
+                    <p className="mb-4 text-gray-800">{vinyl.description}</p>
+                    <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm text-[#2e2e2e] font-mono">
+                        <span><strong>Type:</strong> {vinyl.vinyl_type}</span>
+                        <span><strong>Number:</strong> {vinyl.vinyl_number}</span>
+                        <span><strong>Price:</strong> {vinyl.price} {vinyl.currency}</span>
+                        <span><strong>Times Played:</strong> {vinyl.play_num}</span>
+                    </div>
                 </div>
             </div>
 
-            <div className="border p-4 rounded shadow">
-                <h3 className="text-lg font-semibold mb-2">Play History</h3>
+            {/* Play History */}
+            <div className="rounded-2xl shadow-lg bg-gradient-to-br from-[#f5f2ec] to-[#ece7d8] border border-[#c9b370] p-6">
+                <h3 className="text-xl font-bold tracking-wider uppercase text-[#445a7c] mb-4">Play History</h3>
                 {playHistory.length === 0 ? (
-                    <p className="text-gray-500">No play records yet.</p>
+                    <p className="text-gray-500 font-mono">No play records yet.</p>
                 ) : (
-                    <ul className="space-y-2">
+                    <ul className="space-y-3">
                         {playHistory.map((entry) => {
                             const date = new Date(entry.play_time);
                             const localTime = new Intl.DateTimeFormat('en-GB', {
@@ -71,14 +89,14 @@ export default function VinylDetailPage() {
                                 minute: '2-digit',
                                 second: '2-digit',
                             }).format(date);
-
-                            // Extract timezone offset (e.g., +02:00) from the original ISO string
                             const match = entry.play_time.match(/([+-]\d{2}):?(\d{2})$/);
                             const tzOffset = match ? `UTC${match[1]}` : '';
 
                             return (
-                                <li key={entry.id} className="border-b pb-1">
-                                    Played by <strong>{entry.username}</strong> on {localTime} {tzOffset}
+                                <li key={entry.id} className="border-b border-[#ece7d8] pb-1 last:border-none">
+                                    <span className="font-semibold text-[#1a1a1a]">{entry.username}</span>
+                                    <span className="text-[#445a7c]"> played on </span>
+                                    <span className="font-mono">{localTime} {tzOffset}</span>
                                 </li>
                             );
                         })}
