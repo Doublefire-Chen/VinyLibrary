@@ -142,6 +142,39 @@ export default function ManagePage() {
         }
     };
 
+    const handleRestore = async () => {
+        // Create file input dynamically
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = '.zip';
+
+        input.onchange = async (e: any) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const formData = new FormData();
+            formData.append('backup', file);
+
+            try {
+                const res = await fetch(`${backendUrl}/api/restore`, {
+                    method: 'POST',
+                    body: formData,
+                    credentials: 'include',
+                });
+                if (res.ok) {
+                    alert('Restore successful! Please refresh the page.');
+                } else {
+                    const data = await res.json();
+                    alert('Restore failed: ' + (data?.error || 'Unknown error'));
+                }
+            } catch (err) {
+                alert('Restore failed.');
+            }
+        };
+
+        input.click();
+    };
+
     if (isLoading) {
         return <div className="text-center py-8">{m("loading")}</div>;
     }
@@ -187,7 +220,13 @@ export default function ManagePage() {
                                 onClick={handleBackup}
                                 className="bg-[#5a8f66] text-white px-4 py-1.5 rounded-full hover:bg-[#497a55] transition"
                             >
-                                Backup
+                                {c('backup')}
+                            </button>
+                            <button
+                                onClick={handleRestore}
+                                className="bg-[#aa4a44] text-white px-4 py-1.5 rounded-full hover:bg-[#993d38] transition"
+                            >
+                                {c('restore')}
                             </button>
 
                         </>
@@ -198,7 +237,7 @@ export default function ManagePage() {
                                     onClick={handleDeleteSelected}
                                     className="bg-[#aa4a44] text-white px-4 py-1.5 rounded-full hover:bg-[#993d38] transition"
                                 >
-                                    {c('delete_selected')}
+                                    {m('delete_selected')}
                                 </button>
                             )}
                             <button

@@ -629,3 +629,143 @@ func zipDir(source, target string) error {
 		return err
 	})
 }
+
+// Restore restores the album folder and database from a backup zip file
+func Restore(c *gin.Context) {
+	// debug
+	fmt.Println("Restore function called")
+
+	// 1. Receive uploaded zip file
+	file, err := c.FormFile("backup")
+	if err != nil {
+		c.JSON(400, gin.H{"error": "Backup file required"})
+		return
+	}
+
+	backupZipPath := "./tmp_restore_backup.zip"
+	if err := c.SaveUploadedFile(file, backupZipPath); err != nil {
+		c.JSON(500, gin.H{"error": "Failed to save uploaded backup"})
+		return
+	}
+
+	defer os.Remove(backupZipPath)
+
+	// 2. Unzip to temp directory
+	restoreDir := "./tmp_restore"
+	if err := os.RemoveAll(restoreDir); err != nil {
+		c.JSON(500, gin.H{"error": "Failed to clear previous temp restore dir"})
+		return
+	}
+	if err := unzipFile(backupZipPath, restoreDir); err != nil {
+		c.JSON(500, gin.H{"error": "Failed to unzip backup: " + err.Error()})
+		return
+	}
+	defer os.RemoveAll(restoreDir)
+
+	// 3. Restore album folder
+	albumBackupDir := filepath.Join(restoreDir, "album")
+	albumDir := "./album"
+	if err := os.RemoveAll(albumDir); err != nil {
+		c.JSON(500, gin.H{"error": "Failed to clear album folder"})
+		return
+	}
+	if err := copyDir(albumBackupDir, albumDir); err != nil {
+		c.JSON(500, gin.H{"error": "Failed to restore album folder: " + err.Error()})
+		return
+	}
+
+	// 4. Drop and recreate schema BEFORE restoring the database
+	db, err := connectDB()
+	if err != nil {
+		c.JSON(500, gin.H{"error": "Failed to connect to database"})
+		return
+	}
+	defer db.Close()
+	_, err = db.Exec("DROP SCHEMA public CASCADE; CREATE SCHEMA public;")
+	if err != nil {
+		c.JSON(500, gin.H{"error": "Failed to drop/recreate schema: " + err.Error()})
+		return
+	}
+
+	// 5. Restore PostgreSQL database
+	dbUser := os.Getenv("DB_USER")
+	dbPassword := os.Getenv("DB_PASSWORD")
+	dbHost := os.Getenv("DB_HOST")
+	dbPort := os.Getenv("DB_PORT")
+	dbName := os.Getenv("DB_NAME")
+	dumpPath := filepath.Join(restoreDir, "db_backup.sql")
+
+	psqlCmd := exec.Command("psql", "-U", dbUser, "-h", dbHost, "-p", dbPort, "-d", dbName, "-f", dumpPath)
+	psqlCmd.Env = append(os.Environ(), "PGPASSWORD="+dbPassword)
+	output, err := psqlCmd.CombinedOutput()
+	if err != nil {
+		c.JSON(500, gin.H{"error": "Failed to restore database", "details": string(output)})
+		return
+	}
+
+	c.JSON(200, gin.H{"message": "Restore completed successfully"})
+}
+
+// Helper: unzip a zip file to target directory
+func unzipFile(src, dest string) error {
+	r, err := zip.OpenReader(src)
+	if err != nil {
+		return err
+	}
+	defer r.Close()
+	for _, f := range r.File {
+		fpath := filepath.Join(dest, f.Name)
+		if f.FileInfo().IsDir() {
+			os.MkdirAll(fpath, os.ModePerm)
+			continue
+		}
+		if err := os.MkdirAll(filepath.Dir(fpath), os.ModePerm); err != nil {
+			return err
+		}
+		outFile, err := os.OpenFile(fpath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, f.Mode())
+		if err != nil {
+			return err
+		}
+		rc, err := f.Open()
+		if err != nil {
+			outFile.Close()
+			return err
+		}
+		_, err = io.Copy(outFile, rc)
+		outFile.Close()
+		rc.Close()
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+// Helper: copy a directory recursively
+func copyDir(src, dest string) error {
+	return filepath.Walk(src, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+		rel, err := filepath.Rel(src, path)
+		if err != nil {
+			return err
+		}
+		destPath := filepath.Join(dest, rel)
+		if info.IsDir() {
+			return os.MkdirAll(destPath, info.Mode())
+		}
+		srcFile, err := os.Open(path)
+		if err != nil {
+			return err
+		}
+		defer srcFile.Close()
+		destFile, err := os.Create(destPath)
+		if err != nil {
+			return err
+		}
+		defer destFile.Close()
+		_, err = io.Copy(destFile, srcFile)
+		return err
+	})
+}

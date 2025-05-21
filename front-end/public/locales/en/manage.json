@@ -23,5 +23,8 @@
     "play": "Play",
     "backup": "Backup",
     "backup_success": "Backup created successfully",
-    "backup_failed": "Backup creation failed"
+    "backup_failed": "Backup creation failed",
+    "restore": "Restore",
+    "restore_success": "Restore completed successfully",
+    "restore_failed": "Restore failed"
 }

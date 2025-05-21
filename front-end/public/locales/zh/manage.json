@@ -23,5 +23,8 @@
     "play": "播放",
     "backup": "备份",
     "backup_success": "备份创建成功",
-    "backup_failed": "备份创建失败"
+    "backup_failed": "备份创建失败",
+    "restore": "恢复",
+    "restore_success": "恢复成功",
+    "restore_failed": "恢复失败"
 }
