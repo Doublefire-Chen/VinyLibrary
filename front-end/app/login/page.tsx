@@ -1,33 +1,47 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { BACKEND_URL } from '@/app/lib/config'; // 引入后端地址
+import { BACKEND_URL } from '@/app/lib/config';
+import LanguageSwitcher from '@/app/ui/LanguageSwitcher';
+import { useTranslation } from 'react-i18next';
+import LoadingMessage from '@/app/ui/LoadingMessage';
 
 export default function LoginPage() {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
+    const { t: c } = useTranslation('common');
+    const { t: l } = useTranslation('login');
     const router = useRouter();
+
+    useEffect(() => {
+        const loginStatus = localStorage.getItem('isLoggedIn');
+        setIsLoggedIn(loginStatus === 'true');
+        setIsLoading(false);
+    }, []);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setError('');
-
         try {
             const response = await fetch(`${BACKEND_URL}/login`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                credentials: 'include', // important! so cookies (session) are sent
+                credentials: 'include',
                 body: JSON.stringify({ username, password }),
             });
 
             if (response.ok) {
+                const data = await response.json();
                 localStorage.setItem('username', username);
-                localStorage.setItem('user_id', (await response.json()).user_id);
+                localStorage.setItem('user_id', data.user_id);
                 localStorage.setItem('isLoggedIn', 'true');
-                router.refresh(); // refresh the page to update the state
-                router.push('/manage'); // redirect to management page
+                router.refresh();
+                router.push('/manage');
             } else {
                 localStorage.setItem('isLoggedIn', 'false');
                 localStorage.removeItem('username');
@@ -39,43 +53,69 @@ export default function LoginPage() {
         }
     };
 
+    if (isLoading) {
+        return <LoadingMessage />;
+    }
+
     return (
-        <div>
-            <div className="bg-black text-white text-center py-2 relative">
-                <div className="flex flex-col items-center gap-0">
-                    <h1 className="text-2xl font-semibold leading-light">
-                        Welcome to Vinyl Collection
+        <div className="min-h-screen bg-[#f8f6f1] text-[#2e2e2e] font-serif">
+            {/* Header (copy from homepage) */}
+            <header className="bg-[#1a1a1a] text-white py-6 px-6 shadow-md border-b-4 border-[#c9b370] relative">
+                <div className="text-center space-y-1">
+                    <h1 className="text-3xl font-bold tracking-wide uppercase">
+                        {c('welcome')}
                     </h1>
-                    <p className="text-sm font-normal leading-none">
-                        Explore a collection of timeless vinyl records.
+                    <p className="text-sm italic text-[#e3e3e3] tracking-wide">
+                        {c('welcome_message')}
                     </p>
                 </div>
-            </div>
-            <div className="flex flex-col items-center justify-center min-h-screen">
-                <h1 className="text-2xl mb-4">Login</h1>
-                <form onSubmit={handleSubmit} className="flex flex-col gap-4 w-80">
-                    <input
-                        type="text"
-                        placeholder="Username"
-                        className="border p-2 rounded"
-                        value={username}
-                        onChange={(e) => setUsername(e.target.value)}
-                    />
-                    <input
-                        type="password"
-                        placeholder="Password"
-                        className="border p-2 rounded"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                    />
-                    <button
-                        className="bg-black text-white p-2 rounded hover:bg-gray-700 transition-colors duration-200"
-                        type="submit"
+
+                {/* Right side controls */}
+                <div className="absolute right-6 top-1/2 -translate-y-1/2 flex items-center gap-3">
+                    {/* Always show Home link on login page */}
+                    <Link
+                        href="/"
+                        className="bg-[#c9b370] text-black px-4 py-2 rounded-full text-sm font-medium tracking-wide shadow hover:bg-[#b89f56] transition"
                     >
-                        Login
-                    </button>
-                    {error && <p className="text-red-500 text-center">{error}</p>}
-                </form>
+                        {c('homepage')}
+                    </Link>
+                    <LanguageSwitcher />
+                </div>
+            </header>
+
+            {/* Login form */}
+            <div className="flex flex-col items-center justify-center min-h-[60vh] px-4">
+                <div className="bg-white/90 shadow-2xl rounded-2xl p-8 w-full max-w-sm border border-[#c9b370] flex flex-col items-center mt-16">
+                    <h2 className="text-2xl font-bold text-[#1a1a1a] mb-4 tracking-wider font-serif text-center">
+                        {l('login_to_account')}
+                    </h2>
+                    <form onSubmit={handleSubmit} className="flex flex-col gap-4 w-full">
+                        <input
+                            type="text"
+                            placeholder={c('username') || 'Username'}
+                            className="bg-[#f5f2ec] border border-[#c9b370] px-4 py-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#c9b370] transition"
+                            value={username}
+                            onChange={(e) => setUsername(e.target.value)}
+                            autoFocus
+                        />
+                        <input
+                            type="password"
+                            placeholder={c('password') || 'Password'}
+                            className="bg-[#f5f2ec] border border-[#c9b370] px-4 py-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#c9b370] transition"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                        />
+                        <button
+                            className="bg-[#c9b370] text-[#1a1a1a] font-bold px-4 py-2 rounded-full shadow hover:bg-[#b89f56] transition tracking-wide"
+                            type="submit"
+                        >
+                            {c('login')}
+                        </button>
+                        {error && (
+                            <p className="text-red-500 text-center mt-2">{error}</p>
+                        )}
+                    </form>
+                </div>
             </div>
         </div>
     );

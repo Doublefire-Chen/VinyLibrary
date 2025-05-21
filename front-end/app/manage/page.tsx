@@ -162,7 +162,9 @@ export default function ManagePage() {
                     credentials: 'include',
                 });
                 if (res.ok) {
-                    alert('Restore successful! Please refresh the page.');
+                    alert('Restore successful!');
+                    // Refresh the page automatically
+                    window.location.reload();
                 } else {
                     const data = await res.json();
                     alert('Restore failed: ' + (data?.error || 'Unknown error'));
@@ -254,24 +256,30 @@ export default function ManagePage() {
             </div>
 
             <div className="flex flex-wrap gap-6 justify-center">
-                {vinyls.map((vinyl) => (
-                    <div
-                        key={vinyl.id}
-                        onClick={() => !selectionMode && handleVinylClick(vinyl)}
-                        className="cursor-pointer"
-                    >
-                        <VinylItem
-                            vinyl={vinyl}
-                            isSelected={selectedVinyls.includes(vinyl.id)}
-                            onToggleSelect={() => toggleSelectVinyl(vinyl.id)}
-                            selectionMode={selectionMode}
-                            onClickPlay={(e) => {
-                                e.stopPropagation();
-                                handlePlay(parseInt(localStorage.getItem('user_id') || '0'), vinyl.id);
-                            }}
-                        />
+                {vinyls && vinyls.length > 0 ? (
+                    vinyls.map((vinyl) => (
+                        <div
+                            key={vinyl.id}
+                            onClick={() => !selectionMode && handleVinylClick(vinyl)}
+                            className="cursor-pointer"
+                        >
+                            <VinylItem
+                                vinyl={vinyl}
+                                isSelected={selectedVinyls.includes(vinyl.id)}
+                                onToggleSelect={() => toggleSelectVinyl(vinyl.id)}
+                                selectionMode={selectionMode}
+                                onClickPlay={(e) => {
+                                    e.stopPropagation();
+                                    handlePlay(parseInt(localStorage.getItem('user_id') || '0'), vinyl.id);
+                                }}
+                            />
+                        </div>
+                    ))
+                ) : (
+                    <div className="text-center py-6 text-gray-500">
+                        {c('no_vinyls_found')}
                     </div>
-                ))}
+                )}
             </div>
 
             {selectedVinylForEdit && (

@@ -23,5 +23,6 @@
   "loading": "Loading...",
   "username": "Username",
   "played": "Played",
-  "times": "Times"
+  "times": "Times",
+  "no_vinyls_found": "No vinyls found"
 }

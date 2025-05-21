@@ -124,7 +124,7 @@ export default function Page() {
             <>
               <Link
                 href="/login"
-                className="bg-[#c9b370] text-black px-4 py-1.5 rounded-full text-sm font-medium tracking-wide shadow hover:bg-[#b89f56] transition"
+                className="bg-[#c9b370] text-black px-4 py-2 rounded-full text-sm font-medium tracking-wide shadow hover:bg-[#b89f56] transition"
               >
                 {c('login')}
               </Link>
@@ -137,11 +137,17 @@ export default function Page() {
       {/* Vinyl Grid */}
       <main className="px-6 py-10 bg-[#f8f6f1]">
         <div className="flex flex-wrap justify-center gap-6">
-          {vinyls.map((vinyl) => (
-            <Link href={`/${vinyl.id}`} key={vinyl.id}>
-              <VinylCard vinyl={vinyl} />
-            </Link>
-          ))}
+          {vinyls?.length > 0 ? (
+            vinyls.map((vinyl) => (
+              <Link href={`/${vinyl.id}`} key={vinyl.id}>
+                <VinylCard vinyl={vinyl} />
+              </Link>
+            ))
+          ) : (
+            <div className="text-center w-full py-10">
+              <p className="text-lg text-gray-600">{c('no_vinyls_found')}</p>
+            </div>
+          )}
         </div>
       </main>
     </div>
