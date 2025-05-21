@@ -223,13 +223,13 @@ export default function ManagePage() {
                                 onClick={handleBackup}
                                 className="bg-[#445a7c] text-white px-4 py-1.5 rounded-full text-sm font-medium tracking-wide shadow hover:bg-[#394e6b] transition-all outline-none focus:ring-2 focus:ring-[#445a7c] focus:ring-offset-2"
                             >
-                                {c('backup')}
+                                {m('backup')}
                             </button>
                             <button
                                 onClick={handleRestore}
                                 className="bg-[#aa4a44] text-white px-4 py-1.5 rounded-full text-sm font-medium tracking-wide shadow hover:bg-[#993d38] transition-all outline-none focus:ring-2 focus:ring-[#aa4a44] focus:ring-offset-2"
                             >
-                                {c('restore')}
+                                {m('restore')}
                             </button>
                             <LanguageSwitcher />
                         </>

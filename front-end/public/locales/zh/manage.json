@@ -26,5 +26,7 @@
     "backup_failed": "备份创建失败",
     "restore": "恢复",
     "restore_success": "恢复成功",
-    "restore_failed": "恢复失败"
+    "restore_failed": "恢复失败",
+    "edit_vinyl": "编辑黑胶唱片",
+    "edit_vinyl_info": "编辑黑胶唱片信息"
 }

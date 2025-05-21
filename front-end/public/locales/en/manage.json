@@ -26,5 +26,7 @@
     "backup_failed": "Backup creation failed",
     "restore": "Restore",
     "restore_success": "Restore completed successfully",
-    "restore_failed": "Restore failed"
+    "restore_failed": "Restore failed",
+    "edit_vinyl": "Edit Vinyl",
+    "edit_vinyl_info": "Edit Vinyl Information"
 }

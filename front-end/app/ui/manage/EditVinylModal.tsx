@@ -2,6 +2,7 @@ import { Vinyl } from '@/app/lib/definitions';
 import { useState, ChangeEvent } from 'react';
 import MacOSTrafficLights from '@/app/ui/MacOSTrafficLights';
 import { Track } from '@/app/lib/definitions';
+import { useTranslation } from 'react-i18next';
 
 interface EditVinylModalProps {
     vinyl: Vinyl;
@@ -12,6 +13,8 @@ interface EditVinylModalProps {
 export default function EditVinylModal({ vinyl, onClose, onSave }: EditVinylModalProps) {
     const [editedVinyl, setEditedVinyl] = useState<Vinyl>({ ...vinyl });
     const [isHovered, setIsHovered] = useState(false); // Shared hover state
+    const { t: c } = useTranslation('common');
+    const { t: m } = useTranslation('manage');
 
     const handleChange = (field: keyof Vinyl, value: any) => {
         setEditedVinyl((prev) => ({ ...prev, [field]: value }));
@@ -77,7 +80,7 @@ export default function EditVinylModal({ vinyl, onClose, onSave }: EditVinylModa
             >
                 {/* Tab bar */}
                 <div className="absolute top-0 left-0 right-0 h-10 bg-blue-100 rounded-t-xl flex items-center px-24">
-                    <div className="text-gray-700 font-medium truncate">Edit Vinyl: {editedVinyl.title}</div>
+                    <div className="text-gray-700 font-medium truncate">{m('edit_vinyl')}: {editedVinyl.title}</div>
                 </div>
 
                 {/* macOS 红绿灯 */}
@@ -90,7 +93,7 @@ export default function EditVinylModal({ vinyl, onClose, onSave }: EditVinylModa
                     <MacOSTrafficLights type="maximize" isHovered={isHovered} />
                 </div>
 
-                <h2 className="text-xl font-bold mb-4 mt-4 text-center">Edit Vinyl Info</h2>
+                <h2 className="text-xl font-bold mb-4 mt-4 text-center">{m('edit_vinyl_info')}</h2>
                 <div className="flex justify-center items-center mb-4 gap-4">
                     <img
                         src={editedVinyl.album_picture_url}
@@ -99,7 +102,7 @@ export default function EditVinylModal({ vinyl, onClose, onSave }: EditVinylModa
                     />
                     <div className="flex items-end h-40">
                         <label className="bg-blue-600 text-white px-4 py-2 rounded-lg cursor-pointer hover:bg-blue-700">
-                            Choose File
+                            {m('choose_file')}
                             <input type="file" className="hidden" onChange={handleFileChange} />
                         </label>
                     </div>
@@ -109,63 +112,63 @@ export default function EditVinylModal({ vinyl, onClose, onSave }: EditVinylModa
                 <div className="max-h-[50vh] overflow-auto mb-4">
                     <div className="grid grid-cols-2 gap-4 text-sm">
                         <div>
-                            <p className="mb-1 text-gray-500">Title</p>
+                            <p className="mb-1 text-gray-500">{c('title')}</p>
                             <input type="text" value={editedVinyl.title} onChange={(e) => handleChange('title', e.target.value)} className="border p-2 rounded-lg w-full" />
                         </div>
                         <div>
-                            <p className="mb-1 text-gray-500">Artist</p>
+                            <p className="mb-1 text-gray-500">{c('artist')}</p>
                             <input type="text" value={editedVinyl.artist} onChange={(e) => handleChange('artist', e.target.value)} className="border p-2 rounded-lg w-full" />
                         </div>
                         <div>
-                            <p className="mb-1 text-gray-500">Year</p>
+                            <p className="mb-1 text-gray-500">{c('year')}</p>
                             <input type="number" value={editedVinyl.year} onChange={(e) => handleChange('year', parseInt(e.target.value) || 0)} className="border p-2 rounded-lg w-full" />
                         </div>
                         <div>
-                            <p className="mb-1 text-gray-500">Vinyl Type</p>
+                            <p className="mb-1 text-gray-500">{c('vinyl_type')}</p>
                             <input type="text" value={editedVinyl.vinyl_type} onChange={(e) => handleChange('vinyl_type', e.target.value)} className="border p-2 rounded-lg w-full" />
                         </div>
                         <div>
-                            <p className="mb-1 text-gray-500">Vinyl Number</p>
+                            <p className="mb-1 text-gray-500">{c('vinyl_number')}</p>
                             <input type="number" value={editedVinyl.vinyl_number} onChange={(e) => handleChange('vinyl_number', parseInt(e.target.value) || 0)} className="border p-2 rounded-lg w-full" />
                         </div>
                         <div>
-                            <p className="mb-1 text-gray-500">Play Count</p>
+                            <p className="mb-1 text-gray-500">{c('play_count')}</p>
                             <input type="number" value={editedVinyl.play_num} onChange={(e) => handleChange('play_num', parseInt(e.target.value) || 0)} className="border p-2 rounded-lg w-full" />
                         </div>
                         <div>
-                            <p className="mb-1 text-gray-500">Time Bought</p>
+                            <p className="mb-1 text-gray-500">{c('time_bought')}</p>
                             <input type="text" value={editedVinyl.timebought} onChange={(e) => handleChange('timebought', e.target.value)} className="border p-2 rounded-lg w-full" />
                         </div>
                         <div>
-                            <p className="mb-1 text-gray-500">Price</p>
+                            <p className="mb-1 text-gray-500">{c('price')}</p>
                             <input type="number" value={editedVinyl.price} onChange={(e) => handleChange('price', parseFloat(e.target.value) || 0)} className="border p-2 rounded-lg w-full" />
                         </div>
                         <div>
-                            <p className="mb-1 text-gray-500">Currency</p>
+                            <p className="mb-1 text-gray-500">{c('currency')}</p>
                             <input type="text" value={editedVinyl.currency} onChange={(e) => handleChange('currency', e.target.value)} className="border p-2 rounded-lg w-full" />
                         </div>
                         <div className="col-span-2">
-                            <p className="mb-1 text-gray-500">Description</p>
+                            <p className="mb-1 text-gray-500">{c('description')}</p>
                             <textarea value={editedVinyl.description} onChange={(e) => handleChange('description', e.target.value)} className="border p-2 rounded-lg w-full" rows={3} />
                         </div>
                         {/* Tracklist Section */}
                         <div className="col-span-2 mt-4">
                             <div className="flex justify-between items-center mb-2">
-                                <p className="font-medium text-gray-700">Tracklist</p>
+                                <p className="font-medium text-gray-700">{c('track_list')}</p>
                                 <button
                                     onClick={addTrack}
                                     className="bg-blue-600 text-white px-3 py-1 text-sm rounded-lg hover:bg-blue-700"
                                 >
-                                    Add Track
+                                    {m('add_track')}
                                 </button>
                             </div>
 
                             {/* Column Headers */}
                             <div className="flex gap-2 mb-1 items-center text-sm text-gray-600 font-medium">
-                                <div className="w-1/6 px-2">Side</div>
-                                <div className="w-1/6 px-2">Order</div>
-                                <div className="w-1/2 px-2">Title</div>
-                                <div className="w-1/6 px-2">Length</div>
+                                <div className="w-1/6 px-2">{c('side')}</div>
+                                <div className="w-1/6 px-2">{c('order')}</div>
+                                <div className="w-1/2 px-2">{c('title')}</div>
+                                <div className="w-1/6 px-2">{c('length')}</div>
                                 <div className="w-[28px]"></div>
                             </div>
 
@@ -182,7 +185,7 @@ export default function EditVinylModal({ vinyl, onClose, onSave }: EditVinylModa
                                         <div className="w-1/6">
                                             <input
                                                 type="text"
-                                                placeholder="Side"
+                                                placeholder={c('side')}
                                                 value={track.side}
                                                 onChange={(e) => handleTrackChange(index, 'side', e.target.value)}
                                                 className="border p-2 rounded-lg w-full text-sm"
@@ -191,7 +194,7 @@ export default function EditVinylModal({ vinyl, onClose, onSave }: EditVinylModa
                                         <div className="w-1/6">
                                             <input
                                                 type="number"
-                                                placeholder="Order"
+                                                placeholder={c('order')}
                                                 value={track.order}
                                                 onChange={(e) => handleTrackChange(index, 'order', parseInt(e.target.value) || 0)}
                                                 className="border p-2 rounded-lg w-full text-sm"
@@ -200,7 +203,7 @@ export default function EditVinylModal({ vinyl, onClose, onSave }: EditVinylModa
                                         <div className="w-1/2">
                                             <input
                                                 type="text"
-                                                placeholder="Title"
+                                                placeholder={c('title')}
                                                 value={track.title}
                                                 onChange={(e) => handleTrackChange(index, 'title', e.target.value)}
                                                 className="border p-2 rounded-lg w-full text-sm"
