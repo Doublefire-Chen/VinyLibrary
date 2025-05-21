@@ -3,9 +3,11 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
+import LoadingMessage from '@/app/ui/LoadingMessage';
 
 export default function ProfilePage() {
-    const username = localStorage.getItem('username');
+    const [isLoading, setIsLoading] = useState(true);
+    const [username, setUsername] = useState('');
     const [oldPassword, setOldPassword] = useState('');
     const [newPassword, setNewPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
@@ -20,17 +22,14 @@ export default function ProfilePage() {
             alert('Please fill in all fields');
             return;
         }
-
         if (newPassword === oldPassword) {
             alert('New password must be different from old password');
             return;
         }
-
         if (newPassword !== confirmPassword) {
             alert("New passwords don't match");
             return;
         }
-
         try {
             const res = await fetch(`${backendUrl}/api/changepwd`, {
                 method: 'POST',
@@ -41,7 +40,6 @@ export default function ProfilePage() {
                     new_password: newPassword,
                 }),
             });
-
             if (res.ok) {
                 setOldPassword('');
                 setNewPassword('');
@@ -57,44 +55,57 @@ export default function ProfilePage() {
             console.error('Error changing password:', err);
         }
     };
+    useEffect(() => {
+        setUsername(localStorage.getItem('username') || '');
+        setIsLoading(false);
+    }, []);
 
+    if (isLoading) {
+        return <LoadingMessage />;
+    }
     return (
-        <div className="max-w-md mx-auto mt-10 p-6 bg-white shadow-lg rounded-lg">
-            <h1 className="text-2xl font-bold mb-4">{c("profile")}</h1>
-            <p className="mb-6">{c("username")}: <strong>{username}</strong></p>
-            <h2 className="text-xl font-semibold mb-2">{p("change_password")}</h2>
-            <form onSubmit={handleChangePassword} className="space-y-4">
-                <input
-                    type="password"
-                    placeholder={p("current_password")}
-                    value={oldPassword}
-                    onChange={(e) => setOldPassword(e.target.value)}
-                    className="w-full border p-2 rounded"
-                    required
-                />
-                <input
-                    type="password"
-                    placeholder={p("new_password")}
-                    value={newPassword}
-                    onChange={(e) => setNewPassword(e.target.value)}
-                    className="w-full border p-2 rounded"
-                    required
-                />
-                <input
-                    type="password"
-                    placeholder={p("confirm_password")}
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                    className="w-full border p-2 rounded"
-                    required
-                />
-                <button
-                    type="submit"
-                    className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700"
-                >
-                    {p("change_password")}
-                </button>
-            </form>
+        <div className="min-h-screen bg-[#f8f6f1] font-serif flex flex-col items-center justify-center px-4">
+            <div className="w-full max-w-md bg-white rounded-2xl shadow-xl border border-[#c9b370] py-8 px-7">
+                <h1 className="text-3xl font-bold tracking-wide uppercase text-[#1a1a1a] mb-2">{c("profile")}</h1>
+                <div className="h-[2px] bg-[#c9b370] w-12 mb-4 rounded-full"></div>
+                <p className="mb-7 text-[#2e2e2e] text-base">
+                    <span className="font-medium">{c("username")}: </span>
+                    <span className="font-bold">{username}</span>
+                </p>
+                <h2 className="text-xl font-semibold tracking-wide text-[#445a7c] mb-3">{p("change_password")}</h2>
+                <form onSubmit={handleChangePassword} className="space-y-5">
+                    <input
+                        type="password"
+                        placeholder={p("current_password")}
+                        value={oldPassword}
+                        onChange={(e) => setOldPassword(e.target.value)}
+                        className="w-full border border-[#c9b370] bg-[#f8f6f1] p-3 rounded-full focus:outline-none focus:ring-2 focus:ring-[#c9b370] text-base"
+                        required
+                    />
+                    <input
+                        type="password"
+                        placeholder={p("new_password")}
+                        value={newPassword}
+                        onChange={(e) => setNewPassword(e.target.value)}
+                        className="w-full border border-[#c9b370] bg-[#f8f6f1] p-3 rounded-full focus:outline-none focus:ring-2 focus:ring-[#c9b370] text-base"
+                        required
+                    />
+                    <input
+                        type="password"
+                        placeholder={p("confirm_password")}
+                        value={confirmPassword}
+                        onChange={(e) => setConfirmPassword(e.target.value)}
+                        className="w-full border border-[#c9b370] bg-[#f8f6f1] p-3 rounded-full focus:outline-none focus:ring-2 focus:ring-[#c9b370] text-base"
+                        required
+                    />
+                    <button
+                        type="submit"
+                        className="w-full bg-[#c9b370] text-black font-semibold py-2.5 rounded-full tracking-wide shadow hover:bg-[#b89f56] transition-all outline-none focus:ring-2 focus:ring-[#c9b370] focus:ring-offset-2 vinyl-glossy"
+                    >
+                        {p("change_password")}
+                    </button>
+                </form>
+            </div>
         </div>
     );
 }
