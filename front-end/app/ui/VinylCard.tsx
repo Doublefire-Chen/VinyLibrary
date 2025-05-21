@@ -24,13 +24,13 @@ const VinylCard: React.FC<{ vinyl: Vinyl }> = ({ vinyl }) => {
     const { t: c } = useTranslation('common');
 
     return (
-        <div className="w-64 h-[520px] flex flex-col rounded-lg overflow-hidden shadow-lg bg-white border border-[#ddd] hover:shadow-xl transition-shadow duration-200">
+        <div className="w-80 h-[580px] flex flex-col rounded-lg overflow-hidden shadow-lg bg-white border border-[#ddd] hover:shadow-xl transition-shadow duration-200">
             {/* Album Cover */}
-            <div className="bg-white h-64 flex items-center justify-center px-2 py-2">
+            <div className="bg-white h-72 w-full flex items-center justify-center">
                 <img
                     src={vinyl.album_picture_url}
                     alt={vinyl.title}
-                    className="max-h-full max-w-full object-contain"
+                    className="w-full h-full object-cover"
                 />
             </div>
 
@@ -40,10 +40,10 @@ const VinylCard: React.FC<{ vinyl: Vinyl }> = ({ vinyl }) => {
                     <h2 className="font-bold text-lg tracking-wide mb-1">{vinyl.title}</h2>
                     <p className="text-sm text-gray-700 italic">{vinyl.artist}</p>
                     <p className="text-sm text-gray-500">{vinyl.year}</p>
-                    <p className="text-sm mt-1 text-gray-800 line-clamp-3">{vinyl.description}</p>
+                    <p className="text-sm mt-2 text-gray-800">{vinyl.description}</p>
                     <p className="text-sm text-gray-500 mt-2">{c('played')}: {vinyl.play_num} {c('times')}</p>
                 </div>
-                <div className="mt-2 pt-2 border-t text-sm">
+                <div className="mt-3 pt-2 border-t text-sm">
                     <p className="text-gray-700">{formatTime(vinyl.timebought)}</p>
                     <p className="font-bold text-black mt-1">{vinyl.price} {vinyl.currency}</p>
                 </div>

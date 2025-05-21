@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
+import Link from 'next/link';
 import LoadingMessage from '@/app/ui/LoadingMessage';
 
 export default function ProfilePage() {
@@ -55,6 +56,7 @@ export default function ProfilePage() {
             console.error('Error changing password:', err);
         }
     };
+
     useEffect(() => {
         setUsername(localStorage.getItem('username') || '');
         setIsLoading(false);
@@ -63,8 +65,39 @@ export default function ProfilePage() {
     if (isLoading) {
         return <LoadingMessage />;
     }
+
     return (
-        <div className="min-h-screen bg-[#f8f6f1] font-serif flex flex-col items-center justify-center px-4">
+        <div className="min-h-screen bg-[#f8f6f1] font-serif flex flex-col items-center px-4">
+            {/* --- Menu Bar --- */}
+            <nav className="w-full bg-[#1a1a1a] border-b-4 border-[#c9b370] shadow-sm py-2 px-6 mb-8 flex justify-between items-center">
+                <div className="flex items-center gap-4">
+                    <Link href="/" className="text-[#c9b370] text-lg font-bold tracking-wide uppercase hover:underline">
+                        {c('homepage')}
+                    </Link>
+                    <Link href="/manage" className="text-white text-base font-medium tracking-wide hover:text-[#c9b370] transition">
+                        {c('manage')}
+                    </Link>
+                    <Link href="/profile" className="text-white text-base font-medium tracking-wide hover:text-[#c9b370] transition">
+                        {c('profile')}
+                    </Link>
+                </div>
+                <div className="flex items-center gap-3">
+                    <span className="text-[#c9b370] text-base tracking-wide">{username}</span>
+                    <button
+                        className="bg-[#c9b370] text-black px-3 py-1 rounded-full text-sm font-medium tracking-wide shadow hover:bg-[#b89f56] transition-all"
+                        onClick={() => {
+                            localStorage.setItem('isLoggedIn', 'false');
+                            localStorage.removeItem('username');
+                            localStorage.removeItem('user_id');
+                            router.push('/login');
+                        }}
+                    >
+                        {c('logout')}
+                    </button>
+                </div>
+            </nav>
+
+            {/* --- Profile Card --- */}
             <div className="w-full max-w-md bg-white rounded-2xl shadow-xl border border-[#c9b370] py-8 px-7">
                 <h1 className="text-3xl font-bold tracking-wide uppercase text-[#1a1a1a] mb-2">{c("profile")}</h1>
                 <div className="h-[2px] bg-[#c9b370] w-12 mb-4 rounded-full"></div>
