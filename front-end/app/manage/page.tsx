@@ -194,48 +194,47 @@ export default function ManagePage() {
                         <>
                             <button
                                 onClick={() => setSelectionMode(true)}
-                                className="bg-[#c9b370] text-black px-4 py-1.5 rounded-full hover:bg-[#b89f56] transition"
+                                className="bg-[#c9b370] text-black px-4 py-1.5 rounded-full text-sm font-medium tracking-wide shadow hover:bg-[#b89f56] transition-all outline-none focus:ring-2 focus:ring-[#c9b370] focus:ring-offset-2 vinyl-glossy"
                             >
                                 {m('select')}
                             </button>
                             <button
                                 onClick={() => setAddNewVinyl(true)}
-                                className="bg-[#5a8f66] text-white px-4 py-1.5 rounded-full hover:bg-[#497a55] transition"
+                                className="bg-[#c9b370] text-black px-4 py-1.5 rounded-full text-sm font-medium tracking-wide shadow hover:bg-[#b89f56] transition-all outline-none focus:ring-2 focus:ring-[#c9b370] focus:ring-offset-2 vinyl-glossy"
                             >
                                 {m('add_new_vinyl')}
                             </button>
                             <Link
                                 href="/profile"
-                                className="bg-[#445a7c] text-white px-4 py-1.5 rounded-full hover:bg-[#394e6b] transition"
+                                className="bg-[#445a7c] text-white px-4 py-1.5 rounded-full text-sm font-medium tracking-wide shadow hover:bg-[#394e6b] transition-all outline-none focus:ring-2 focus:ring-[#445a7c] focus:ring-offset-2"
                             >
                                 {c('profile')}
                             </Link>
                             <Link
                                 href="/"
-                                className="bg-[#666] text-white px-4 py-1.5 rounded-full hover:bg-[#555] transition"
+                                className="bg-[#445a7c] text-white px-4 py-1.5 rounded-full text-sm font-medium tracking-wide shadow hover:bg-[#394e6b] transition-all outline-none focus:ring-2 focus:ring-[#445a7c] focus:ring-offset-2"
                             >
                                 {c('homepage')}
                             </Link>
                             <button
                                 onClick={handleBackup}
-                                className="bg-[#5a8f66] text-white px-4 py-1.5 rounded-full hover:bg-[#497a55] transition"
+                                className="bg-[#445a7c] text-white px-4 py-1.5 rounded-full text-sm font-medium tracking-wide shadow hover:bg-[#394e6b] transition-all outline-none focus:ring-2 focus:ring-[#445a7c] focus:ring-offset-2"
                             >
                                 {c('backup')}
                             </button>
                             <button
                                 onClick={handleRestore}
-                                className="bg-[#aa4a44] text-white px-4 py-1.5 rounded-full hover:bg-[#993d38] transition"
+                                className="bg-[#aa4a44] text-white px-4 py-1.5 rounded-full text-sm font-medium tracking-wide shadow hover:bg-[#993d38] transition-all outline-none focus:ring-2 focus:ring-[#aa4a44] focus:ring-offset-2"
                             >
                                 {c('restore')}
                             </button>
-
                         </>
                     ) : (
                         <>
                             {selectedVinyls.length > 0 && (
                                 <button
                                     onClick={handleDeleteSelected}
-                                    className="bg-[#aa4a44] text-white px-4 py-1.5 rounded-full hover:bg-[#993d38] transition"
+                                    className="bg-[#aa4a44] text-white px-4 py-1.5 rounded-full text-sm font-medium tracking-wide shadow hover:bg-[#993d38] transition-all outline-none focus:ring-2 focus:ring-[#aa4a44] focus:ring-offset-2"
                                 >
                                     {m('delete_selected')}
                                 </button>
@@ -245,7 +244,7 @@ export default function ManagePage() {
                                     setSelectionMode(false);
                                     setSelectedVinyls([]);
                                 }}
-                                className="bg-[#888] text-white px-4 py-1.5 rounded-full hover:bg-[#777] transition"
+                                className="bg-[#888] text-white px-4 py-1.5 rounded-full text-sm font-medium tracking-wide shadow hover:bg-[#777] transition-all outline-none focus:ring-2 focus:ring-[#888] focus:ring-offset-2"
                             >
                                 {m('cancel')}
                             </button>
