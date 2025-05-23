@@ -128,6 +128,12 @@ export default function Page() {
               >
                 {c('login')}
               </Link>
+              <Link
+                href="/register"
+                className="bg-[#c9b370] text-black px-4 py-2 rounded-full text-sm font-medium tracking-wide shadow hover:bg-[#b89f56] transition"
+              >
+                {c('register')}
+              </Link>
               <LanguageSwitcher />
             </>
           )}

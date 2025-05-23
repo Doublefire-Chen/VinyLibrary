@@ -24,5 +24,7 @@
   "username": "Username",
   "played": "Played",
   "times": "Times",
-  "no_vinyls_found": "No vinyls found"
+  "no_vinyls_found": "No vinyls found",
+  "register": "Register",
+  "already_have_account": "Already have an account?"
 }

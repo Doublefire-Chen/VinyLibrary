@@ -24,5 +24,7 @@
     "username": "用户名",
     "played": "已播放",
     "times": "次",
-    "no_vinyls_found": "未找到黑胶唱片"
+    "no_vinyls_found": "未找到黑胶唱片",
+    "register": "注册",
+    "already_have_account": "已经有账户？"
 }
