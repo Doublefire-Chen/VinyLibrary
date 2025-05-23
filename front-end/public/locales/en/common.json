@@ -26,5 +26,6 @@
   "times": "Times",
   "no_vinyls_found": "No vinyls found",
   "register": "Register",
-  "already_have_account": "Already have an account?"
+  "already_have_account": "Already have an account?",
+  "no_account": "Don't have an account?"
 }

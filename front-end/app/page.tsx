@@ -9,6 +9,8 @@ import LanguageSwitcher from '@/app/ui/LanguageSwitcher';
 import { useTranslation } from 'react-i18next';
 import { UserIcon } from 'lucide-react';
 import LoadingMessage from '@/app/ui/LoadingMessage';
+import WelcomeBan from '@/app/ui/WelcomeBan';
+import ButtonLink from '@/app/ui/ButtonLink';
 
 export default function Page() {
   const [vinyls, setVinyls] = useState<Vinyl[]>([]);
@@ -70,24 +72,17 @@ export default function Page() {
     <div className="min-h-screen bg-[#f8f6f1] text-[#2e2e2e] font-serif">
       {/* Header */}
       <header className="bg-[#1a1a1a] text-white py-6 px-6 shadow-md border-b-4 border-[#c9b370] relative">
-        <div className="text-center space-y-1">
-          <h1 className="text-3xl font-bold tracking-wide uppercase">
-            {c('welcome')}
-          </h1>
-          <p className="text-sm italic text-[#e3e3e3] tracking-wide">
-            {c('welcome_message')}
-          </p>
-        </div>
+        <WelcomeBan />
 
         <div className="absolute right-6 top-1/2 -translate-y-1/2 flex items-center gap-3">
           {isLoggedIn ? (
             <>
-              <Link
-                href="/manage"
-                className="bg-[#c9b370] text-black px-4 py-2 rounded-full text-sm font-medium tracking-wide shadow hover:bg-[#b89f56] transition"
-              >
+              <ButtonLink href="/" variant="current">
+                {c('homepage')}
+              </ButtonLink>
+              <ButtonLink href="/manage" variant="notcurrent">
                 {c('manage')}
-              </Link>
+              </ButtonLink>
 
               <div className="relative group">
                 <button className="flex items-center gap-1 bg-[#c9b370] text-black px-4 py-2 rounded-full text-sm tracking-wide font-medium shadow hover:bg-[#b89f56] transition">
@@ -122,18 +117,15 @@ export default function Page() {
             </>
           ) : (
             <>
-              <Link
-                href="/login"
-                className="bg-[#c9b370] text-black px-4 py-2 rounded-full text-sm font-medium tracking-wide shadow hover:bg-[#b89f56] transition"
-              >
+              <ButtonLink href="/" variant="current">
+                {c('homepage')}
+              </ButtonLink>
+              <ButtonLink href="/login" variant="notcurrent">
                 {c('login')}
-              </Link>
-              <Link
-                href="/register"
-                className="bg-[#c9b370] text-black px-4 py-2 rounded-full text-sm font-medium tracking-wide shadow hover:bg-[#b89f56] transition"
-              >
+              </ButtonLink>
+              <ButtonLink href="/register" variant="notcurrent">
                 {c('register')}
-              </Link>
+              </ButtonLink>
               <LanguageSwitcher />
             </>
           )}
@@ -155,7 +147,7 @@ export default function Page() {
             </div>
           )}
         </div>
-      </main>
-    </div>
+      </main >
+    </div >
   );
 }

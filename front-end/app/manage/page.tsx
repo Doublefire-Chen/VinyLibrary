@@ -10,6 +10,7 @@ import AddVinylModal from '@/app/ui/manage/AddVinylModal';
 import { format } from 'date-fns';
 import { useTranslation } from 'react-i18next';
 import LanguageSwitcher from '@/app/ui/LanguageSwitcher';
+import WelcomeBan from '@/app/ui/WelcomeBan';
 
 export default function ManagePage() {
     const [vinyls, setVinyls] = useState<Vinyl[]>([]);
@@ -189,7 +190,9 @@ export default function ManagePage() {
                     {error}
                 </div>
             )}
-
+            <div className="mb-2">
+                <WelcomeBan />
+            </div>
             <div className="flex justify-between items-center mb-6 pb-2 border-b border-[#c9b370]">
                 <h1 className="text-3xl font-bold tracking-wide uppercase">{m('manage')}</h1>
                 <div className="flex flex-wrap gap-3">
