@@ -27,5 +27,10 @@
   "no_vinyls_found": "No vinyls found",
   "register": "Register",
   "already_have_account": "Already have an account?",
-  "no_account": "Don't have an account?"
+  "no_account": "Don't have an account?",
+  "login_required": "Login Required",
+  "login_required_message": "You need to be logged in to access this page.",
+  "redirecting_in": "Redirecting to login page in",
+  "go_to_login": "Go to Login Now",
+  "seconds": "seconds"
 }

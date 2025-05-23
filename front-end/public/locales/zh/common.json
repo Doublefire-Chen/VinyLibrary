@@ -27,5 +27,10 @@
     "no_vinyls_found": "未找到黑胶唱片",
     "register": "注册",
     "already_have_account": "已经有账户？",
-    "no_account": "没有账户？"
+    "no_account": "没有账户？",
+    "login_required": "需要登录",
+    "login_required_message": "您需要登录才能访问此页面。",
+    "redirecting_in": "正在重定向到登录页面，还有",
+    "go_to_login": "立即转到登录",
+    "seconds": "秒"
 }

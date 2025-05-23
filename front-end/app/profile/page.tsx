@@ -9,6 +9,7 @@ import LoadingMessage from '@/app/ui/LoadingMessage';
 import WelcomeBan from '@/app/ui/WelcomeBan';
 import ButtonLink from '@/app/ui/ButtonLink';
 import LanguageSwitcher from '@/app/ui/LanguageSwitcher';
+import LoginRequired from '@/app/ui/LoginRequired';
 
 export default function ProfilePage() {
     const [isLoading, setIsLoading] = useState(true);
@@ -17,6 +18,7 @@ export default function ProfilePage() {
     const [newPassword, setNewPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const [showLoginWarning, setShowLoginWarning] = useState(false);
     const router = useRouter();
     const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
     const { t: c } = useTranslation('common');
@@ -50,7 +52,7 @@ export default function ProfilePage() {
                 setOldPassword('');
                 setNewPassword('');
                 setConfirmPassword('');
-                alert('Password changed successfully, please log in again');
+                alert(p('password_changed'));
                 localStorage.removeItem('username');
                 router.push('/login');
             } else {
@@ -89,25 +91,35 @@ export default function ProfilePage() {
         const loginStatus = localStorage.getItem('isLoggedIn');
         const storedUsername = localStorage.getItem('username');
 
+        // Always set loading to false first
+        setIsLoading(false);
+
         // Check if user is logged in
         if (loginStatus !== 'true' || !storedUsername) {
-            // User is not logged in, redirect to login page
-            router.push('/login');
-            return;
+            // User is not logged in, show warning and redirect after delay
+            setShowLoginWarning(true);
+            const redirectTimer = setTimeout(() => {
+                router.push('/login');
+            }, 5000); // 5 second delay
+
+            return () => clearTimeout(redirectTimer);
         }
 
-        setIsLoggedIn(true);
         setUsername(storedUsername);
-        setIsLoading(false);
+        setIsLoggedIn(true);
     }, [router]);
 
     if (isLoading) {
         return <LoadingMessage />;
     }
 
-    // Don't render anything if user is not logged in (will redirect)
-    if (!isLoggedIn) {
-        return <LoadingMessage />;
+    // Show login warning if user is not authenticated
+    if (showLoginWarning) {
+        return (
+            <LoginRequired
+                redirectDelay={5000}
+            />
+        );
     }
 
     return (

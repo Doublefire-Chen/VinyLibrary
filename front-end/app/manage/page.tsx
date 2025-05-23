@@ -13,6 +13,7 @@ import LanguageSwitcher from '@/app/ui/LanguageSwitcher';
 import WelcomeBan from '@/app/ui/WelcomeBan';
 import { UserIcon } from 'lucide-react';
 import { BACKEND_URL } from '@/app/lib/config';
+import LoginRequired from '@/app/ui/LoginRequired';
 
 export default function ManagePage() {
     const [vinyls, setVinyls] = useState<Vinyl[]>([]);
@@ -27,8 +28,8 @@ export default function ManagePage() {
     const { t: c } = useTranslation('common');
     const [username, setUsername] = useState('');
     const [isLoggedIn, setIsLoggedIn] = useState(false);
-
     const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
+    const [showLoginWarning, setShowLoginWarning] = useState(false);
 
     useEffect(() => {
         const fetchVinyls = async () => {
@@ -50,15 +51,37 @@ export default function ManagePage() {
             }
         };
 
-        fetchVinyls();
-
         const loginStatus = localStorage.getItem('isLoggedIn');
-        setIsLoggedIn(loginStatus === 'true');
+        const storedUsername = localStorage.getItem('username');
+
         if (loginStatus) {
             const storedUsername = localStorage.getItem('username') || 'User';
             setUsername(storedUsername);
+            fetchVinyls();
         }
+
+        // Check if user is logged in
+        if (loginStatus !== 'true' || !storedUsername) {
+            // User is not logged in, show warning and redirect after delay
+            setShowLoginWarning(true);
+            const redirectTimer = setTimeout(() => {
+                router.push('/login');
+            }, 5000); // 5 second delay
+
+            return () => clearTimeout(redirectTimer);
+        }
+
     }, [backendUrl, router]);
+
+    if (showLoginWarning) {
+        return (
+            <LoginRequired
+                message={c('login_required_message')}
+                redirectDelay={5000}
+                onRedirect={() => router.push('/login')}
+            />
+        );
+    }
 
     const handleDeleteSelected = async () => {
         if (!confirm('Are you sure you want to delete the selected vinyls?')) return;
@@ -212,7 +235,9 @@ export default function ManagePage() {
         }
     };
 
-    if (isLoading) {
+
+
+    if (isLoading && !showLoginWarning) {
         return <div className="text-center py-8">{m("loading")}</div>;
     }
 
