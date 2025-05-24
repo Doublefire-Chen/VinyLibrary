@@ -44,7 +44,7 @@ export default function Page() {
               <ButtonLink href="/manage" variant="notcurrent">
                 {c('manage')}
               </ButtonLink>
-              <UserDropdown username={username} onLogout={handleLogout} />
+              <UserDropdown username={username} onLogout={handleLogout} variant='notcurrent' />
               <LanguageSwitcher />
             </>
           ) : (

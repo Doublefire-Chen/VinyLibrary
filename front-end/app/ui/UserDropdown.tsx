@@ -4,18 +4,28 @@ import React from 'react';
 import Link from 'next/link';
 import { UserIcon } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import clsx from 'clsx';
 
 interface UserDropdownProps {
     username: string;
     onLogout: () => void;
+    variant?: 'current' | 'notcurrent';
+    className?: string;
+    [x: string]: any; // Allow other props (e.g. onClick, etc.)
 }
 
-export default function UserDropdown({ username, onLogout }: UserDropdownProps) {
+export default function UserDropdown({ username, onLogout, className = '', variant = 'notcurrent', ...props }: UserDropdownProps) {
     const { t: c } = useTranslation('common');
-
+    const baseStyle = "flex items-center gap-1 px-4 py-2 rounded-full text-sm tracking-wide font-medium shadow transition";
+    const styles = {
+        notcurrent:
+            'bg-[#c9b370] text-black hover:bg-[#b89f56]',
+        current:
+            'bg-[#445a7c] text-white hover:bg-[#394e6a]',
+    };
     return (
         <div className="relative group">
-            <button className="flex items-center gap-1 bg-[#c9b370] text-black px-4 py-2 rounded-full text-sm tracking-wide font-medium shadow hover:bg-[#b89f56] transition">
+            <button className={clsx(baseStyle, styles[variant], className)} {...props}>
                 <UserIcon className="w-4 h-4" />
                 {username}
             </button>
