@@ -9,7 +9,7 @@ const languages = [
   { code: 'zh', label: '中文', flag: '🇨🇳' },
 ];
 
-export default function LanguageSwitcher() {
+export default function LanguageSwitcher({ className = "" }: { className?: string }) {
   const [open, setOpen] = useState(false);
   const { i18n: i18next } = useTranslation();
   const currentLang = languages.find((lang) => lang.code === i18next.language) || languages[0];
@@ -24,7 +24,7 @@ export default function LanguageSwitcher() {
 
   return (
     <div
-      className="relative z-30"
+      className="relative z-30 ${className}`"
       tabIndex={0}
       onBlur={handleBlur}
       onMouseEnter={() => setOpen(true)}
