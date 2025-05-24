@@ -5,9 +5,8 @@ import { useTranslation } from 'react-i18next';
 import { useState, useRef } from 'react';
 
 interface MenuDropdownItem {
-  label: React.ReactNode;
+  title?: string;
   onClick: () => void;
-  icon?: React.ReactNode;
   className?: string;
 }
 
@@ -33,6 +32,7 @@ export default function MenuDropdown({ title, items, className = '' }: MenuDropd
       onMouseEnter={() => setOpen(true)}
       onMouseLeave={() => setOpen(false)}
     >
+      {/* Main Button */}
       <button
         ref={buttonRef}
         type="button"
@@ -46,25 +46,36 @@ export default function MenuDropdown({ title, items, className = '' }: MenuDropd
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
         </svg>
       </button>
-      {
-        open && (
-          <div className="absolute top-full left-0 mt-1 bg-white border border-gray-200 rounded-md shadow-lg min-w-full z-40">
-            {items.map((item, idx) => (
-              <button
-                key={idx}
-                onClick={() => {
-                  setOpen(false);
-                  item.onClick();
-                }}
-                className={`block w-full text-left px-4 py-2 text-sm hover:bg-[#f5f0e6] ${item.className ?? ''}`}
-              >
-                {item.icon && <span className="mr-2">{item.icon}</span>}
-                {item.label}
-              </button>
-            ))}
-          </div>
-        )
-      }
+
+      {/* Dropdown */}
+      <div
+        className={`absolute right-0 mt-1 bg-white font-serif rounded-xl border border-[#c9b370] shadow-2xl py-1 z-40
+      transition-all duration-150 ${open ? 'opacity-100 visible translate-y-0' : 'opacity-0 invisible -translate-y-2'}`}
+        style={{
+          boxShadow: '0 4px 20px 0 rgba(201,179,112,0.13)',
+          minWidth: buttonRef.current ? buttonRef.current.offsetWidth + 'px' : '120px'
+        }}
+        role="listbox"
+      >
+        {
+          open && (
+            <div>
+              {items.map((item, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => {
+                    setOpen(false);
+                    item.onClick();
+                  }}
+                  className={`block w-full text-left px-4 py-2 text-sm hover:bg-[#f5f0e6] ${item.className ?? ''}`}
+                >
+                  {item.title}
+                </button>
+              ))}
+            </div>
+          )
+        }
+      </div>
     </div>
   );
 }

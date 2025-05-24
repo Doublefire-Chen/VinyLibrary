@@ -218,14 +218,12 @@ function AuthenticatedManageContent() {
                                 title={m('vinyl_actions') || 'Vinyl Actions'}
                                 items={[
                                     {
-                                        label: m('select'),
+                                        title: m('select'),
                                         onClick: () => setSelectionMode(true),
-                                        icon: <span>🎯</span>,
                                     },
                                     {
-                                        label: m('add_new_vinyl'),
+                                        title: m('add_new_vinyl'),
                                         onClick: () => setAddNewVinyl(true),
-                                        icon: <span>➕</span>,
                                     },
                                 ]}
                             />
@@ -235,14 +233,12 @@ function AuthenticatedManageContent() {
                                 title={m('backup_restore') || 'Backup & Restore'}
                                 items={[
                                     {
-                                        label: m('backup'),
+                                        title: m('backup'),
                                         onClick: handleBackup,
-                                        icon: <span>💾</span>,
                                     },
                                     {
-                                        label: m('restore'),
+                                        title: m('restore'),
                                         onClick: handleRestore,
-                                        icon: <span>⚠️</span>,
                                     },
                                 ]}
                             />
