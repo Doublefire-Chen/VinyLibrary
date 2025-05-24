@@ -21,10 +21,10 @@ func main() {
 
 	// CORS configuration
 	corsConfig := cors.Config{
-		AllowOrigins:     []string{"http://127.0.0.1:3000", "http://example.com"}, // 允许的来源
-		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE"},                // 允许的请求方法
-		AllowHeaders:     []string{"Content-Type", "Authorization"},               // 允许的请求头
-		AllowCredentials: true,                                                    // 允许发送带有认证信息的请求
+		AllowOrigins:     []string{"http://127.0.0.1:3000", "http://192.168.5.152:3000", "http://example.com"}, // 允许的来源
+		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE"},                                             // 允许的请求方法
+		AllowHeaders:     []string{"Content-Type", "Authorization"},                                            // 允许的请求头
+		AllowCredentials: true,                                                                                 // 允许发送带有认证信息的请求
 	}
 
 	router.Use(cors.New(corsConfig))
