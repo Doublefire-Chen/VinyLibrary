@@ -1,4 +1,4 @@
-// Refactored Manage Page (page.tsx)
+// Refactored Manage Page (page.tsx) with organized dropdown menus
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -15,6 +15,79 @@ import LoginRequired from '@/app/ui/LoginRequired';
 import UserDropdown from '@/app/ui/UserDropdown';
 import { useAuth } from '@/app/hooks/useAuth';
 import LoadingMessage from '@/app/ui/LoadingMessage';
+import MenuDropdown from '@/app/ui/MenuDropdown';
+
+// Dropdown menu component for actions
+function ActionDropdown({
+    title,
+    children,
+    buttonClassName = "bg-[#c9b370] text-black px-4 py-1.5 rounded-full text-sm font-medium tracking-wide shadow hover:bg-[#b89f56] transition-all outline-none focus:ring-2 focus:ring-[#c9b370] focus:ring-offset-2 vinyl-glossy"
+}: {
+    title: string;
+    children: React.ReactNode;
+    buttonClassName?: string;
+}) {
+    const [isOpen, setIsOpen] = useState(false);
+
+    return (
+        <div className="relative">
+            <button
+                onClick={() => setIsOpen(!isOpen)}
+                className={`${buttonClassName} flex items-center gap-1`}
+            >
+                {title}
+                <svg
+                    className={`w-4 h-4 transition-transform ${isOpen ? 'rotate-180' : ''}`}
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+            </button>
+
+            {isOpen && (
+                <>
+                    {/* Backdrop to close dropdown */}
+                    <div
+                        className="fixed inset-0 z-10"
+                        onClick={() => setIsOpen(false)}
+                    />
+
+                    {/* Dropdown menu */}
+                    <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg border border-gray-200 z-20">
+                        <div className="py-1">
+                            {children}
+                        </div>
+                    </div>
+                </>
+            )}
+        </div>
+    );
+}
+
+// Dropdown menu item component
+function DropdownItem({
+    onClick,
+    children,
+    className = "text-gray-700 hover:bg-gray-100",
+    icon
+}: {
+    onClick: () => void;
+    children: React.ReactNode;
+    className?: string;
+    icon?: React.ReactNode;
+}) {
+    return (
+        <button
+            onClick={onClick}
+            className={`w-full text-left px-4 py-2 text-sm ${className} flex items-center gap-2`}
+        >
+            {icon}
+            {children}
+        </button>
+    );
+}
 
 // Separate component that only renders when authenticated
 function AuthenticatedManageContent() {
@@ -137,56 +210,57 @@ function AuthenticatedManageContent() {
             </div>
             <div className="flex justify-between items-center mb-6 pb-2 border-b border-[#c9b370]">
                 <h1 className="text-3xl font-bold tracking-wide uppercase">{m('manage')}</h1>
-                <div className="flex flex-wrap gap-3">
+                <div className="flex flex-wrap gap-3 items-center">
                     {!selectionMode ? (
                         <>
-                            <button
-                                onClick={() => setSelectionMode(true)}
-                                className="bg-[#c9b370] text-black px-4 py-1.5 rounded-full text-sm font-medium tracking-wide shadow hover:bg-[#b89f56] transition-all outline-none focus:ring-2 focus:ring-[#c9b370] focus:ring-offset-2 vinyl-glossy"
-                            >
-                                {m('select')}
-                            </button>
-                            <button
-                                onClick={() => setAddNewVinyl(true)}
-                                className="bg-[#c9b370] text-black px-4 py-1.5 rounded-full text-sm font-medium tracking-wide shadow hover:bg-[#b89f56] transition-all outline-none focus:ring-2 focus:ring-[#c9b370] focus:ring-offset-2 vinyl-glossy"
-                            >
-                                {m('add_new_vinyl')}
-                            </button>
-                            <Link
-                                href="/profile"
-                                className="bg-[#445a7c] text-white px-4 py-1.5 rounded-full text-sm font-medium tracking-wide shadow hover:bg-[#394e6b] transition-all outline-none focus:ring-2 focus:ring-[#445a7c] focus:ring-offset-2"
-                            >
-                                {c('profile')}
-                            </Link>
-                            <Link
-                                href="/"
-                                className="bg-[#445a7c] text-white px-4 py-1.5 rounded-full text-sm font-medium tracking-wide shadow hover:bg-[#394e6b] transition-all outline-none focus:ring-2 focus:ring-[#445a7c] focus:ring-offset-2"
-                            >
-                                {c('homepage')}
-                            </Link>
-                            <button
-                                onClick={handleBackup}
-                                className="bg-[#445a7c] text-white px-4 py-1.5 rounded-full text-sm font-medium tracking-wide shadow hover:bg-[#394e6b] transition-all outline-none focus:ring-2 focus:ring-[#445a7c] focus:ring-offset-2"
-                            >
-                                {m('backup')}
-                            </button>
-                            <button
-                                onClick={handleRestore}
-                                className="bg-[#aa4a44] text-white px-4 py-1.5 rounded-full text-sm font-medium tracking-wide shadow hover:bg-[#993d38] transition-all outline-none focus:ring-2 focus:ring-[#aa4a44] focus:ring-offset-2"
-                            >
-                                {m('restore')}
-                            </button>
+                            {/* Vinyl Actions Dropdown */}
+                            <MenuDropdown
+                                title={m('vinyl_actions') || 'Vinyl Actions'}
+                                items={[
+                                    {
+                                        label: m('select'),
+                                        onClick: () => setSelectionMode(true),
+                                        icon: <span>🎯</span>,
+                                    },
+                                    {
+                                        label: m('add_new_vinyl'),
+                                        onClick: () => setAddNewVinyl(true),
+                                        icon: <span>➕</span>,
+                                    },
+                                ]}
+                            />
+
+                            {/* Backup & Restore Dropdown */}
+                            <MenuDropdown
+                                title={m('backup_restore') || 'Backup & Restore'}
+                                items={[
+                                    {
+                                        label: m('backup'),
+                                        onClick: handleBackup,
+                                        icon: <span>💾</span>,
+                                    },
+                                    {
+                                        label: m('restore'),
+                                        onClick: handleRestore,
+                                        icon: <span>⚠️</span>,
+                                    },
+                                ]}
+                            />
+
+                            {/* User & Settings */}
                             <UserDropdown username={username} onLogout={handleLogout} />
                             <LanguageSwitcher />
                         </>
                     ) : (
                         <>
+                            {/* Selection Mode Actions */}
                             {selectedVinyls.length > 0 && (
                                 <button
                                     onClick={handleDeleteSelected}
-                                    className="bg-[#aa4a44] text-white px-4 py-1.5 rounded-full text-sm font-medium tracking-wide shadow hover:bg-[#993d38] transition-all outline-none focus:ring-2 focus:ring-[#aa4a44] focus:ring-offset-2"
+                                    className="bg-[#aa4a44] text-white px-4 py-1.5 rounded-full text-sm font-medium tracking-wide shadow hover:bg-[#993d38] transition-all outline-none focus:ring-2 focus:ring-[#aa4a44] focus:ring-offset-2 flex items-center gap-2"
                                 >
-                                    {m('delete_selected')}
+                                    <span>🗑️</span>
+                                    {m('delete_selected')} ({selectedVinyls.length})
                                 </button>
                             )}
                             <button
@@ -194,8 +268,9 @@ function AuthenticatedManageContent() {
                                     setSelectionMode(false);
                                     setSelectedVinyls([]);
                                 }}
-                                className="bg-[#888] text-white px-4 py-1.5 rounded-full text-sm font-medium tracking-wide shadow hover:bg-[#777] transition-all outline-none focus:ring-2 focus:ring-[#888] focus:ring-offset-2"
+                                className="bg-[#888] text-white px-4 py-1.5 rounded-full text-sm font-medium tracking-wide shadow hover:bg-[#777] transition-all outline-none focus:ring-2 focus:ring-[#888] focus:ring-offset-2 flex items-center gap-2"
                             >
+                                <span>✖️</span>
                                 {m('cancel')}
                             </button>
                         </>
@@ -230,21 +305,25 @@ function AuthenticatedManageContent() {
                 )}
             </div>
 
-            {selectedVinylForEdit && (
-                <EditVinylModal
-                    vinyl={selectedVinylForEdit}
-                    onClose={() => setSelectedVinylForEdit(null)}
-                    onSave={handleUpdateVinyl}
-                />
-            )}
+            {
+                selectedVinylForEdit && (
+                    <EditVinylModal
+                        vinyl={selectedVinylForEdit}
+                        onClose={() => setSelectedVinylForEdit(null)}
+                        onSave={handleUpdateVinyl}
+                    />
+                )
+            }
 
-            {addNewVinyl && (
-                <AddVinylModal
-                    onClose={() => setAddNewVinyl(false)}
-                    onSave={handleAddVinyl}
-                />
-            )}
-        </div>
+            {
+                addNewVinyl && (
+                    <AddVinylModal
+                        onClose={() => setAddNewVinyl(false)}
+                        onSave={handleAddVinyl}
+                    />
+                )
+            }
+        </div >
     );
 }
 

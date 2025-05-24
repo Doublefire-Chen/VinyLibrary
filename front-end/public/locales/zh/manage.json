@@ -28,5 +28,7 @@
     "restore_success": "恢复成功",
     "restore_failed": "恢复失败",
     "edit_vinyl": "编辑黑胶唱片",
-    "edit_vinyl_info": "编辑黑胶唱片信息"
+    "edit_vinyl_info": "编辑黑胶唱片信息",
+    "vinyl_actions": "黑胶唱片操作",
+    "backup_restore": "备份/恢复"
 }

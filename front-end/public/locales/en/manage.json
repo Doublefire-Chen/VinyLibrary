@@ -28,5 +28,7 @@
     "restore_success": "Restore completed successfully",
     "restore_failed": "Restore failed",
     "edit_vinyl": "Edit Vinyl",
-    "edit_vinyl_info": "Edit Vinyl Information"
+    "edit_vinyl_info": "Edit Vinyl Information",
+    "vinyl_actions": "Vinyl Actions",
+    "backup_restore": "Backup/Restore"
 }
