@@ -14,6 +14,7 @@ import WelcomeBan from '@/app/ui/WelcomeBan';
 import LoginRequired from '@/app/ui/LoginRequired';
 import UserDropdown from '@/app/ui/UserDropdown';
 import { useAuth } from '@/app/hooks/useAuth';
+import LoadingMessage from '@/app/ui/LoadingMessage';
 
 // Separate component that only renders when authenticated
 function AuthenticatedManageContent() {
@@ -120,9 +121,7 @@ function AuthenticatedManageContent() {
     // Show loading state while vinyls are being fetched
     if (isLoading) {
         return (
-            <div className="min-h-screen bg-[#f8f6f1] p-6 font-serif text-[#2e2e2e]">
-                <div className="text-center py-8">{m("loading")}</div>
-            </div>
+            <LoadingMessage />
         );
     }
 
@@ -252,12 +251,19 @@ function AuthenticatedManageContent() {
 export default function ManagePage() {
     const router = useRouter();
     const { t: c } = useTranslation('common');
-    const { isLoggedIn, requireAuth } = useAuth();
+    const { isLoggedIn, isLoading, requireAuth } = useAuth();
 
     useEffect(() => {
         const authCheck = requireAuth('/login', 5000);
         return authCheck.cleanup;
     }, [isLoggedIn, requireAuth]);
+
+    // Show loading while authentication status is being determined
+    if (isLoading) {
+        return (
+            <LoadingMessage />
+        );
+    }
 
     // Only render the main content if user is logged in
     if (!isLoggedIn) {
