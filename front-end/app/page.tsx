@@ -1,66 +1,27 @@
+// Refactored Homepage (page.tsx)
 'use client';
 
-import { useEffect, useState } from 'react';
 import VinylCard from '@/app/ui/VinylCard';
-import type { Vinyl } from '@/app/lib/definitions';
-import { BACKEND_URL } from '@/app/lib/config';
 import Link from 'next/link';
 import LanguageSwitcher from '@/app/ui/LanguageSwitcher';
 import { useTranslation } from 'react-i18next';
-import { UserIcon } from 'lucide-react';
 import LoadingMessage from '@/app/ui/LoadingMessage';
 import WelcomeBan from '@/app/ui/WelcomeBan';
 import ButtonLink from '@/app/ui/ButtonLink';
+import UserDropdown from '@/app/ui/UserDropdown';
+import { useAuth } from '@/app/hooks/useAuth';
+import { useVinyls } from '@/app/hooks/useVinyls';
 
 export default function Page() {
-  const [vinyls, setVinyls] = useState<Vinyl[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [username, setUsername] = useState('');
+  const { isLoggedIn, username, logout } = useAuth();
+  const { vinyls, isLoading } = useVinyls();
   const { t: c } = useTranslation('common');
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await fetch(`${BACKEND_URL}/api/vinyls`);
-        const data = await response.json();
-        setVinyls(data);
-      } catch (error) {
-        console.error('Fetch error:', error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    fetchData();
-
-    const loginStatus = localStorage.getItem('isLoggedIn');
-    setIsLoggedIn(loginStatus === 'true');
-
-    if (loginStatus) {
-      const storedUsername = localStorage.getItem('username') || 'User';
-      setUsername(storedUsername);
-    }
-  }, []);
-
   const handleLogout = async () => {
-    try {
-      const response = await fetch(`${BACKEND_URL}/api/logout`, {
-        method: 'POST',
-        credentials: 'include',
-      });
-
-      if (!response.ok) {
-        console.error('Logout failed');
-        return;
-      }
-
-      localStorage.setItem('isLoggedIn', 'false');
-      localStorage.removeItem('username');
-      localStorage.removeItem('user_id');
-      setIsLoggedIn(false);
-      setUsername('');
-    } catch (error) {
-      console.error('Logout error:', error);
+    const success = await logout();
+    if (!success) {
+      // Handle logout error if needed
+      console.error('Logout failed');
     }
   };
 
@@ -83,36 +44,7 @@ export default function Page() {
               <ButtonLink href="/manage" variant="notcurrent">
                 {c('manage')}
               </ButtonLink>
-
-              <div className="relative group">
-                <button className="flex items-center gap-1 bg-[#c9b370] text-black px-4 py-2 rounded-full text-sm tracking-wide font-medium shadow hover:bg-[#b89f56] transition">
-                  <UserIcon className="w-4 h-4" />
-                  {username}
-                </button>
-                <div
-                  className="absolute right-0 top-full mt-1 
-                bg-white text-black rounded-md shadow-xl text-sm w-full whitespace-normal
-                invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 z-50 overflow-hidden border border-[#c9b370]"
-                  style={{
-                    boxShadow: "0 6px 24px 0 rgba(201,179,112,0.08), 0 1.5px 3px 0 rgba(0,0,0,0.06)",
-                    minWidth: "100%"
-                  }}
-                >
-                  <Link
-                    href="/profile"
-                    className="block px-4 py-2 hover:bg-[#f5f0e6] text-center w-full"
-                  >
-                    {c('profile')}
-                  </Link>
-                  <button
-                    onClick={handleLogout}
-                    className="w-full px-4 py-2 hover:bg-[#f5f0e6] text-center"
-                  >
-                    {c('logout')}
-                  </button>
-                </div>
-              </div>
-
+              <UserDropdown username={username} onLogout={handleLogout} />
               <LanguageSwitcher />
             </>
           ) : (
@@ -147,7 +79,7 @@ export default function Page() {
             </div>
           )}
         </div>
-      </main >
-    </div >
+      </main>
+    </div>
   );
 }

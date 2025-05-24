@@ -1,101 +1,56 @@
+// Refactored Manage Page (page.tsx)
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Vinyl } from '@/app/lib/definitions';
 import VinylItem from '@/app/ui/manage/VinylItem';
 import EditVinylModal from '@/app/ui/manage/EditVinylModal';
 import Link from 'next/link';
 import AddVinylModal from '@/app/ui/manage/AddVinylModal';
-import { format } from 'date-fns';
 import { useTranslation } from 'react-i18next';
 import LanguageSwitcher from '@/app/ui/LanguageSwitcher';
 import WelcomeBan from '@/app/ui/WelcomeBan';
-import { UserIcon } from 'lucide-react';
-import { BACKEND_URL } from '@/app/lib/config';
 import LoginRequired from '@/app/ui/LoginRequired';
+import UserDropdown from '@/app/ui/UserDropdown';
+import { useAuth } from '@/app/hooks/useAuth';
 
-export default function ManagePage() {
-    const [vinyls, setVinyls] = useState<Vinyl[]>([]);
+// Separate component that only renders when authenticated
+function AuthenticatedManageContent() {
     const [selectedVinyls, setSelectedVinyls] = useState<number[]>([]);
     const [selectedVinylForEdit, setSelectedVinylForEdit] = useState<Vinyl | null>(null);
-    const [isLoading, setIsLoading] = useState(true);
     const [selectionMode, setSelectionMode] = useState(false);
-    const [error, setError] = useState('');
-    const router = useRouter();
     const [addNewVinyl, setAddNewVinyl] = useState(false);
+
     const { t: m } = useTranslation('manage');
     const { t: c } = useTranslation('common');
-    const [username, setUsername] = useState('');
-    const [isLoggedIn, setIsLoggedIn] = useState(false);
-    const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
-    const [showLoginWarning, setShowLoginWarning] = useState(false);
+    const { username, logout } = useAuth();
 
-    useEffect(() => {
-        const fetchVinyls = async () => {
-            try {
-                const res = await fetch(`${backendUrl}/api/vinyls`, { credentials: 'include' });
+    // Import hooks here so they only run when component is mounted (user is authenticated)
+    const { useVinyls } = require('@/app/hooks/useVinyls');
+    const { useBackup } = require('@/app/hooks/useBackup');
 
-                if (res.status === 401) {
-                    router.push('/login');
-                    return;
-                }
+    const {
+        vinyls,
+        isLoading,
+        error,
+        deleteVinyls,
+        addVinyl,
+        updateVinyl,
+        recordPlay
+    } = useVinyls(true);
 
-                const data = await res.json();
-                setVinyls(data);
-            } catch (error) {
-                console.error('Error fetching vinyls:', error);
-                setError('Failed to load vinyls. Please try again later.');
-            } finally {
-                setIsLoading(false);
-            }
-        };
-
-        const loginStatus = localStorage.getItem('isLoggedIn');
-        const storedUsername = localStorage.getItem('username');
-
-        if (loginStatus) {
-            const storedUsername = localStorage.getItem('username') || 'User';
-            setUsername(storedUsername);
-            fetchVinyls();
-        }
-
-        // Check if user is logged in
-        if (loginStatus !== 'true' || !storedUsername) {
-            // User is not logged in, show warning and redirect after delay
-            setShowLoginWarning(true);
-            const redirectTimer = setTimeout(() => {
-                router.push('/login');
-            }, 5000); // 5 second delay
-
-            return () => clearTimeout(redirectTimer);
-        }
-
-    }, [backendUrl, router]);
-
-    if (showLoginWarning) {
-        return (
-            <LoginRequired
-                message={c('login_required_message')}
-                redirectDelay={5000}
-                onRedirect={() => router.push('/login')}
-            />
-        );
-    }
+    const { createBackup, restoreBackup } = useBackup();
 
     const handleDeleteSelected = async () => {
         if (!confirm('Are you sure you want to delete the selected vinyls?')) return;
 
-        try {
-            for (const id of selectedVinyls) {
-                await fetch(`${backendUrl}/api/vinyls/${id}`, { method: 'DELETE', credentials: 'include' });
-            }
-            setVinyls(vinyls.filter((v) => !selectedVinyls.includes(v.id)));
+        const result = await deleteVinyls(selectedVinyls);
+        if (result.success) {
             setSelectedVinyls([]);
             setSelectionMode(false);
-        } catch (err) {
-            console.error('Error deleting vinyls:', err);
-            setError('Failed to delete selected vinyls.');
+        } else {
+            alert('Failed to delete selected vinyls.');
         }
     };
 
@@ -111,134 +66,64 @@ export default function ManagePage() {
         }
     };
 
-    const handleVinylUpdate = (updatedVinyl: Vinyl) => {
-        setVinyls(vinyls.map((v) => (v.id === updatedVinyl.id ? updatedVinyl : v)));
-        setSelectedVinylForEdit(null);
-    };
-
-    const handlePlay = async (user_id: number, vinyl_id: number) => {
-        const now = new Date();
-        const now_date = format(now, "yyyy-MM-dd'T'HH:mm:ssxxx");
-        console.log(now_date); // Will output like: 2024-09-20T10:30:00+02:00
-
-        try {
-            await fetch(`${backendUrl}/api/vinyls/play`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                credentials: 'include',
-                body: JSON.stringify({
-                    user_id,
-                    vinyl_id,
-                    play_time: now_date
-                }),
-            });
-
-            // Refresh vinyl data after play
-            const res = await fetch(`${backendUrl}/api/vinyls`, { credentials: 'include' });
-            if (res.ok) {
-                const updatedVinyls = await res.json();
-                setVinyls(updatedVinyls);
-            }
-        } catch (err) {
-            console.error('Error recording play:', err);
+    const handlePlay = async (userId: number, vinylId: number) => {
+        const result = await recordPlay(userId, vinylId);
+        if (!result.success) {
+            console.error('Error recording play:', result.error);
         }
     };
 
     const handleBackup = async () => {
-        try {
-            const res = await fetch(`${backendUrl}/api/backup`, {
-                method: 'GET',
-                credentials: 'include'
-            });
-
-            if (!res.ok) {
-                alert('Backup failed');
-                return;
-            }
-
-            const blob = await res.blob();
-            let filename = "backup.zip";
-            const disposition = res.headers.get('Content-Disposition');
-            if (disposition) {
-                const match = disposition.match(/filename="?([^"]+)"?/);
-                if (match && match[1]) {
-                    filename = match[1];
-                }
-            }
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = filename;
-            document.body.appendChild(a);
-            a.click();
-            a.remove();
-            window.URL.revokeObjectURL(url);
-        } catch (err) {
+        const result = await createBackup();
+        if (!result.success) {
             alert('Backup failed');
         }
     };
 
     const handleRestore = async () => {
-        // Create file input dynamically
-        const input = document.createElement('input');
-        input.type = 'file';
-        input.accept = '.zip';
-
-        input.onchange = async (e: any) => {
-            const file = e.target.files[0];
-            if (!file) return;
-
-            const formData = new FormData();
-            formData.append('backup', file);
-
-            try {
-                const res = await fetch(`${backendUrl}/api/restore`, {
-                    method: 'POST',
-                    body: formData,
-                    credentials: 'include',
-                });
-                if (res.ok) {
-                    alert('Restore successful!');
-                    // Refresh the page automatically
-                    window.location.reload();
-                } else {
-                    const data = await res.json();
-                    alert('Restore failed: ' + (data?.error || 'Unknown error'));
-                }
-            } catch (err) {
-                alert('Restore failed.');
-            }
-        };
-
-        input.click();
-    };
-
-    const handleLogout = async () => {
-        try {
-            const response = await fetch(`${BACKEND_URL}/api/logout`, {
-                method: 'POST',
-                credentials: 'include',
-            });
-
-            if (!response.ok) {
-                console.error('Logout failed');
-                return;
-            }
-
-            localStorage.setItem('isLoggedIn', 'false');
-            localStorage.removeItem('username');
-            localStorage.removeItem('user_id');
-            setIsLoggedIn(false);
-            setUsername('');
-        } catch (error) {
-            console.error('Logout error:', error);
+        const result = await restoreBackup();
+        if (result.success) {
+            alert('Restore successful!');
+            window.location.reload();
+        } else {
+            alert('Restore failed: ' + (result.error || 'Unknown error'));
         }
     };
 
+    const handleLogout = async () => {
+        const success = await logout();
+        if (!success) {
+            console.error('Logout failed');
+        }
+    };
 
+    const handleAddVinyl = async (newVinyl: Omit<Vinyl, 'id'>) => {
+        const result = await addVinyl(newVinyl);
+        if (result.success) {
+            setAddNewVinyl(false);
+            alert('Vinyl added successfully.');
+        } else {
+            alert('Failed to add vinyl.');
+        }
+    };
 
-    if (isLoading && !showLoginWarning) {
-        return <div className="text-center py-8">{m("loading")}</div>;
+    const handleUpdateVinyl = async (updatedVinyl: Vinyl) => {
+        const result = await updateVinyl(updatedVinyl);
+        if (result.success) {
+            setSelectedVinylForEdit(null);
+            alert('Vinyl updated successfully.');
+        } else {
+            alert('Failed to update vinyl.');
+        }
+    };
+
+    // Show loading state while vinyls are being fetched
+    if (isLoading) {
+        return (
+            <div className="min-h-screen bg-[#f8f6f1] p-6 font-serif text-[#2e2e2e]">
+                <div className="text-center py-8">{m("loading")}</div>
+            </div>
+        );
     }
 
     return (
@@ -292,34 +177,7 @@ export default function ManagePage() {
                             >
                                 {m('restore')}
                             </button>
-                            <div className="relative group">
-                                <button className="flex items-center gap-1 bg-[#c9b370] text-black px-4 py-2 rounded-full text-sm tracking-wide font-medium shadow hover:bg-[#b89f56] transition">
-                                    <UserIcon className="w-4 h-4" />
-                                    {username}
-                                </button>
-                                <div
-                                    className="absolute right-0 top-full mt-1 
-                bg-white text-black rounded-md shadow-xl text-sm w-full whitespace-normal
-                invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 z-50 overflow-hidden border border-[#c9b370]"
-                                    style={{
-                                        boxShadow: "0 6px 24px 0 rgba(201,179,112,0.08), 0 1.5px 3px 0 rgba(0,0,0,0.06)",
-                                        minWidth: "100%"
-                                    }}
-                                >
-                                    <Link
-                                        href="/profile"
-                                        className="block px-4 py-2 hover:bg-[#f5f0e6] text-center w-full"
-                                    >
-                                        {c('profile')}
-                                    </Link>
-                                    <button
-                                        onClick={handleLogout}
-                                        className="w-full px-4 py-2 hover:bg-[#f5f0e6] text-center"
-                                    >
-                                        {c('logout')}
-                                    </button>
-                                </div>
-                            </div>
+                            <UserDropdown username={username} onLogout={handleLogout} />
                             <LanguageSwitcher />
                         </>
                     ) : (
@@ -348,7 +206,7 @@ export default function ManagePage() {
 
             <div className="flex flex-wrap gap-6 justify-center">
                 {vinyls && vinyls.length > 0 ? (
-                    vinyls.map((vinyl) => (
+                    vinyls.map((vinyl: Vinyl) => (
                         <div
                             key={vinyl.id}
                             onClick={() => !selectionMode && handleVinylClick(vinyl)}
@@ -377,47 +235,41 @@ export default function ManagePage() {
                 <EditVinylModal
                     vinyl={selectedVinylForEdit}
                     onClose={() => setSelectedVinylForEdit(null)}
-                    onSave={async (updatedVinyl) => {
-                        try {
-                            await fetch(`${backendUrl}/api/vinyls/${updatedVinyl.id}`, {
-                                method: 'PUT',
-                                headers: { 'Content-Type': 'application/json' },
-                                credentials: 'include',
-                                body: JSON.stringify(updatedVinyl),
-                            });
-                            setVinyls(vinyls.map((v) => (v.id === updatedVinyl.id ? updatedVinyl : v)));
-                            setSelectedVinylForEdit(null);
-                            alert('Vinyl updated successfully.');
-                        } catch (err) {
-                            console.error('Error updating vinyl:', err);
-                            alert('Failed to update vinyl.');
-                        }
-                    }}
+                    onSave={handleUpdateVinyl}
                 />
             )}
 
             {addNewVinyl && (
                 <AddVinylModal
                     onClose={() => setAddNewVinyl(false)}
-                    onSave={async (newVinyl) => {
-                        try {
-                            const res = await fetch(`${backendUrl}/api/vinyls`, {
-                                method: 'POST',
-                                headers: { 'Content-Type': 'application/json' },
-                                credentials: 'include',
-                                body: JSON.stringify(newVinyl),
-                            });
-                            const data = await res.json();
-                            setVinyls([...vinyls, data]);
-                            setAddNewVinyl(false);
-                            alert('Vinyl added successfully.');
-                        } catch (err) {
-                            console.error('Error adding vinyl:', err);
-                            alert('Failed to add vinyl.');
-                        }
-                    }}
+                    onSave={handleAddVinyl}
                 />
             )}
         </div>
     );
+}
+
+export default function ManagePage() {
+    const router = useRouter();
+    const { t: c } = useTranslation('common');
+    const { isLoggedIn, requireAuth } = useAuth();
+
+    useEffect(() => {
+        const authCheck = requireAuth('/login', 5000);
+        return authCheck.cleanup;
+    }, [isLoggedIn, requireAuth]);
+
+    // Only render the main content if user is logged in
+    if (!isLoggedIn) {
+        return (
+            <LoginRequired
+                message={c('login_required_message')}
+                redirectDelay={5000}
+                onRedirect={() => router.push('/login')}
+            />
+        );
+    }
+
+    // User is authenticated, render the main manage content
+    return <AuthenticatedManageContent />;
 }
