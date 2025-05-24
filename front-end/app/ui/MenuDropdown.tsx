@@ -67,7 +67,7 @@ export default function MenuDropdown({ title, items, className = '' }: MenuDropd
                     setOpen(false);
                     item.onClick();
                   }}
-                  className={`block w-full text-left px-4 py-2 text-sm hover:bg-[#f5f0e6] ${item.className ?? ''}`}
+                  className={`block rounded-xl w-full text-left px-4 py-2 text-sm hover:bg-[#f5f0e6] ${item.className ?? ''}`}
                 >
                   {item.title}
                 </button>

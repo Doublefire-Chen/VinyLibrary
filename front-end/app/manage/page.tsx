@@ -157,10 +157,10 @@ function AuthenticatedManageContent() {
     const handleRestore = async () => {
         const result = await restoreBackup();
         if (result.success) {
-            alert('Restore successful!');
+            alert(m('restore_success') || 'Restore successful');
             window.location.reload();
         } else {
-            alert('Restore failed: ' + (result.error || 'Unknown error'));
+            alert(m('restore_failed') || 'Restore failed');
         }
     };
 
@@ -255,7 +255,6 @@ function AuthenticatedManageContent() {
                                     onClick={handleDeleteSelected}
                                     className="bg-[#aa4a44] text-white px-4 py-1.5 rounded-full text-sm font-medium tracking-wide shadow hover:bg-[#993d38] transition-all outline-none focus:ring-2 focus:ring-[#aa4a44] focus:ring-offset-2 flex items-center gap-2"
                                 >
-                                    <span>🗑️</span>
                                     {m('delete_selected')} ({selectedVinyls.length})
                                 </button>
                             )}
