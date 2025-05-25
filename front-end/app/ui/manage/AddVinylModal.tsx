@@ -95,27 +95,28 @@ export default function AddVinylModal({ onClose, onSave }: AddVinylModalProps) {
 
     return (
         <div
-            className="fixed inset-0 bg-transparent backdrop-blur-sm flex justify-center items-center z-50"
+            className="fixed inset-0 bg-transparent backdrop-blur-sm flex justify-center items-center z-[1100]"
             onClick={onClose}
         >
             <div
-                className="bg-white p-6 rounded-xl shadow-xl w-[600px] max-h-[90vh] relative"
-                onClick={(e) => e.stopPropagation()}
+                className="bg-white p-6 rounded-xl shadow-xl w-[600px]max - h - [90vh] relative"
+                onClick={(e) => e.stopPropagation()
+                }
             >
                 {/* Tab bar */}
-                <div className="absolute top-0 left-0 right-0 h-10 bg-blue-100 rounded-t-xl flex items-center px-24">
+                < div className="absolute top-0 left-0 right-0 h-10 bg-blue-100 rounded-t-xl flex items-center px-24" >
                     <div className="text-gray-700 font-medium truncate">{m('add_new_vinyl')}</div>
-                </div>
+                </div >
 
                 {/* macOS Traffic Lights */}
-                <div className="flex space-x-2 absolute top-4 left-4"
+                < div className="flex space-x-2 absolute top-4 left-4"
                     onMouseEnter={() => setIsHovered(true)}
                     onMouseLeave={() => setIsHovered(false)}
                 >
                     <MacOSTrafficLights type="close" isHovered={isHovered} onClick={onClose} />
                     <MacOSTrafficLights type="minimize" isHovered={isHovered} />
                     <MacOSTrafficLights type="maximize" isHovered={isHovered} />
-                </div>
+                </div >
 
                 <h2 className="text-xl font-bold mb-4 mt-4 text-center">{m('add_new_vinyl')}</h2>
                 <div className="flex justify-center items-center mb-4 gap-4">
@@ -571,7 +572,7 @@ export default function AddVinylModal({ onClose, onSave }: AddVinylModalProps) {
                     </button>
                     <button onClick={onClose} className="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600">{m("cancel")}</button>
                 </div>
-            </div>
+            </div >
         </div >
     );
 }

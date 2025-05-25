@@ -4,7 +4,7 @@ import { BACKEND_URL } from '@/app/lib/config';
 
 export function useVinyls(requireCredentials = false) {
     const [vinyls, setVinyls] = useState<Vinyl[]>([]);
-    const [isLoading, setIsLoading] = useState<boolean | undefined>(undefined);
+    const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState('');
 
     const fetchVinyls = async () => {
@@ -27,7 +27,7 @@ export function useVinyls(requireCredentials = false) {
             console.error('Fetch error:', error);
             setError(error.message || 'Failed to load vinyls');
         } finally {
-            //setIsLoading(false);
+            setIsLoading(false);
         }
     };
 
