@@ -204,7 +204,7 @@ const VinylItem: React.FC<VinylItemProps> = ({
                     {/* finger lift tab */}
                     <rect
                         x="16"
-                        y="28"
+                        y="29.5"
                         width="4"
                         height="10"
                         rx="1.5"
