@@ -187,6 +187,7 @@ const VinylItem: React.FC<VinylItemProps> = ({
                 </div>
                 <div className="ml-3">
                     <button
+                        type="button"
                         onClick={handlePlayClick}
                         className="w-10 h-10 rounded-full bg-[#c9b370] text-black font-bold shadow hover:bg-[#b89f56] transition"
                         title={m('play')}
