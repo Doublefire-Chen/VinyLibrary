@@ -24,7 +24,7 @@ export default function LanguageSwitcher({ className = "" }: { className?: strin
 
   return (
     <div
-      className="relative z-30 ${className}`"
+      className={`relative z-30 ${className}`}
       tabIndex={0}
       onBlur={handleBlur}
       onMouseEnter={() => setOpen(true)}

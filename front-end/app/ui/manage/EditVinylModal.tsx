@@ -1,5 +1,6 @@
 import { Vinyl } from '@/app/lib/definitions';
 import { useState, ChangeEvent } from 'react';
+import Image from 'next/image';
 import MacOSTrafficLights from '@/app/ui/MacOSTrafficLights';
 import { Track } from '@/app/lib/definitions';
 import { useTranslation } from 'react-i18next';
@@ -16,7 +17,7 @@ export default function EditVinylModal({ vinyl, onClose, onSave }: EditVinylModa
     const { t: c } = useTranslation('common');
     const { t: m } = useTranslation('manage');
 
-    const handleChange = (field: keyof Vinyl, value: any) => {
+    const handleChange = (field: keyof Vinyl, value: string | number) => {
         setEditedVinyl((prev) => ({ ...prev, [field]: value }));
     };
 
@@ -95,9 +96,11 @@ export default function EditVinylModal({ vinyl, onClose, onSave }: EditVinylModa
 
                 <h2 className="text-xl font-bold mb-4 mt-4 text-center">{m('edit_vinyl_info')}</h2>
                 <div className="flex justify-center items-center mb-4 gap-4">
-                    <img
+                    <Image
                         src={editedVinyl.album_picture_url}
                         alt="Album Cover"
+                        width={160}
+                        height={160}
                         className="w-40 h-40 object-cover rounded-xl shadow"
                     />
                     <div className="flex items-end h-40">
@@ -238,7 +241,7 @@ export default function EditVinylModal({ vinyl, onClose, onSave }: EditVinylModa
                                                     placeholder="Sec"
                                                     value={(track.length.split(':')[1] || '00').padStart(2, '0')}
                                                     onChange={(e) => {
-                                                        let raw = e.target.value.replace(/\D/g, ''); // remove non-digit
+                                                        const raw = e.target.value.replace(/\D/g, ''); // remove non-digit
                                                         let num = parseInt(raw);
                                                         if (isNaN(num)) num = 0;
                                                         if (num > 59) num = 59;
@@ -247,7 +250,7 @@ export default function EditVinylModal({ vinyl, onClose, onSave }: EditVinylModa
                                                         handleTrackChange(index, 'length', `${min}:${formattedSec}`);
                                                     }}
                                                     onBlur={(e) => {
-                                                        let raw = e.target.value.replace(/\D/g, '');
+                                                        const raw = e.target.value.replace(/\D/g, '');
                                                         let num = parseInt(raw);
                                                         if (isNaN(num)) num = 0;
                                                         const formattedSec = num.toString().padStart(2, '0');

@@ -11,7 +11,7 @@ interface UserDropdownProps {
     onLogout: () => void;
     variant?: 'current' | 'notcurrent';
     className?: string;
-    [x: string]: any;
+    [x: string]: unknown;
 }
 
 export default function UserDropdown({

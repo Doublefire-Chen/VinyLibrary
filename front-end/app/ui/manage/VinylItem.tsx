@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import Image from 'next/image';
 import { Vinyl } from '@/app/lib/definitions';
 import { useTranslation } from 'react-i18next';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
@@ -77,9 +78,11 @@ const VinylItem: React.FC<VinylItemProps> = ({
                             height: 'min(70px, 35%)',
                             aspectRatio: '1'
                         }}>
-                        <img
+                        <Image
                             src={vinyl.album_picture_url}
                             alt={vinyl.title}
+                            width={70}
+                            height={70}
                             className="w-full h-full object-cover rounded-full"
                             draggable={false}
                         />

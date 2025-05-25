@@ -9,7 +9,7 @@ interface ButtonLinkProps {
     children: React.ReactNode;
     variant?: 'current' | 'notcurrent';
     className?: string;
-    [x: string]: any; // Allow other props (e.g. onClick, etc.)
+    [x: string]: unknown; // Allow other props (e.g. onClick, etc.)
 }
 
 export default function ButtonLink({

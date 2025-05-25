@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
+import Image from 'next/image';
 import { BACKEND_URL } from '@/app/lib/config';
 import type { Vinyl, PlayHistory } from '@/app/lib/definitions';
 import Link from 'next/link';
@@ -61,9 +62,11 @@ export default function VinylDetailPage() {
 
             {/* Vinyl Card */}
             <div className="rounded-2xl shadow-xl bg-gradient-to-br from-[#f5f2ec] to-[#ece7d8] border-2 border-[#c9b370] p-6 flex flex-col md:flex-row gap-6 items-center">
-                <img
+                <Image
                     src={vinyl.album_picture_url}
                     alt={vinyl.title}
+                    width={224}
+                    height={224}
                     className="w-56 h-56 object-cover rounded-xl border-4 border-[#c9b370] shadow"
                 />
                 <div className="flex-1 min-w-0">

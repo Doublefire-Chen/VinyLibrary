@@ -1,4 +1,5 @@
 import React from 'react';
+import Image from 'next/image';
 import { Vinyl } from '@/app/lib/definitions';
 import { useTranslation } from 'react-i18next';
 
@@ -27,9 +28,11 @@ const VinylCard: React.FC<{ vinyl: Vinyl }> = ({ vinyl }) => {
         <div className="w-80 h-[580px] flex flex-col rounded-lg overflow-hidden shadow-lg bg-white border border-[#ddd] hover:shadow-xl transition-shadow duration-200">
             {/* Album Cover */}
             <div className="bg-white h-72 w-full flex items-center justify-center">
-                <img
+                <Image
                     src={vinyl.album_picture_url}
                     alt={vinyl.title}
+                    width={320}
+                    height={288}
                     className="w-full h-full object-cover"
                 />
             </div>

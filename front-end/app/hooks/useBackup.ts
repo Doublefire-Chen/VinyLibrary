@@ -1,11 +1,16 @@
 import { BACKEND_URL } from '@/app/lib/config';
 
+interface BackupResult {
+    success: boolean;
+    error?: string;
+}
+
 export function useBackup() {
-    const createBackup = async () => {
+    const createBackup = async (): Promise<BackupResult> => {
         try {
             const res = await fetch(`${BACKEND_URL}/api/backup`, {
                 method: 'GET',
-                credentials: 'include'
+                credentials: 'include',
             });
 
             if (!res.ok) {
@@ -13,12 +18,12 @@ export function useBackup() {
             }
 
             const blob = await res.blob();
-            let filename = "backup.zip";
+            let filename = 'backup.zip';
 
             const disposition = res.headers.get('Content-Disposition');
             if (disposition) {
                 const match = disposition.match(/filename="?([^"]+)"?/);
-                if (match && match[1]) {
+                if (match?.[1]) {
                     filename = match[1];
                 }
             }
@@ -33,20 +38,23 @@ export function useBackup() {
             window.URL.revokeObjectURL(url);
 
             return { success: true };
-        } catch (err: any) {
-            console.error('Backup error:', err);
-            return { success: false, error: err.message };
+        } catch (error) {
+            const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+            console.error('Backup error:', error);
+            return { success: false, error: errorMessage };
         }
     };
 
-    const restoreBackup = async () => {
-        return new Promise<{ success: boolean; error?: string }>((resolve) => {
+    const restoreBackup = async (): Promise<BackupResult> => {
+        return new Promise<BackupResult>((resolve) => {
             const input = document.createElement('input');
             input.type = 'file';
             input.accept = '.zip';
 
-            input.onchange = async (e: any) => {
-                const file = e.target.files[0];
+            input.addEventListener('change', async (event: Event) => {
+                const target = event.target as HTMLInputElement;
+                const file = target.files?.[0];
+
                 if (!file) {
                     resolve({ success: false, error: 'No file selected' });
                     return;
@@ -66,12 +74,16 @@ export function useBackup() {
                         resolve({ success: true });
                     } else {
                         const data = await res.json();
-                        resolve({ success: false, error: data?.error || 'Unknown error' });
+                        resolve({
+                            success: false,
+                            error: data?.error || 'Unknown error',
+                        });
                     }
-                } catch (err: any) {
-                    resolve({ success: false, error: err.message });
+                } catch (error) {
+                    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+                    resolve({ success: false, error: errorMessage });
                 }
-            };
+            });
 
             input.click();
         });
@@ -79,6 +91,6 @@ export function useBackup() {
 
     return {
         createBackup,
-        restoreBackup
+        restoreBackup,
     };
 }
