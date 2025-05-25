@@ -98,19 +98,19 @@ const VinylItem: React.FC<VinylItemProps> = ({
                 <svg
                     className="absolute"
                     style={{
-                        top: '20%',
-                        right: '-2%',
-                        width: 'min(140px, 50%)',
-                        height: 'min(45px, 18%)',
+                        top: '16%',
+                        right: '4%',
+                        width: 'min(160px, 60%)',
+                        height: 'min(50px, 20%)',
                         pointerEvents: 'none',
                         zIndex: 10,
                         transform: isPlaying
                             ? 'rotate(-60deg)'
                             : 'rotate(-90deg)',
-                        transformOrigin: '65% 50%',
+                        transformOrigin: '75% 50%',
                         transition: 'transform 0.7s cubic-bezier(0.4,0,0.2,1)',
                     }}
-                    viewBox="0 0 140 45"
+                    viewBox="0 0 170 50"
                     preserveAspectRatio="xMidYMid meet"
                 >
                     <defs>
@@ -118,7 +118,7 @@ const VinylItem: React.FC<VinylItemProps> = ({
                             <stop offset="0%" stopColor="#f0f0f0" />
                             <stop offset="100%" stopColor="#888" />
                         </radialGradient>
-                        <linearGradient id="armGradient" x1="100" y1="22.5" x2="15" y2="22.5" gradientUnits="userSpaceOnUse">
+                        <linearGradient id="armGradient" x1="120" y1="25" x2="5" y2="25" gradientUnits="userSpaceOnUse">
                             <stop offset="0%" stopColor="#ececec" />
                             <stop offset="100%" stopColor="#b0b0b0" />
                         </linearGradient>
@@ -129,38 +129,38 @@ const VinylItem: React.FC<VinylItemProps> = ({
                     {/* --- Counterweight and gap --- */}
                     {/* Short shaft ("gap") between pivot and counterweight */}
                     <rect
-                        x="100"
-                        y="19.5"
-                        width="14"
-                        height="6"
-                        rx="3"
+                        x="120"
+                        y="21.5"
+                        width="16"
+                        height="7"
+                        rx="3.5"
                         fill="#bbb"
                         stroke="#888"
-                        strokeWidth="0.7"
+                        strokeWidth="0.8"
                     />
                     {/* Counterweight at end */}
                     <circle
-                        cx="122"
-                        cy="22.5"
-                        r="9"
+                        cx="144"
+                        cy="25"
+                        r="10"
                         fill="url(#pivotGradient)"
                         stroke="#555"
                         strokeWidth="2"
                     />
                     {/* Pivot ring (bearing) */}
                     <circle
-                        cx="100"
-                        cy="22.5"
-                        r="4.5"
+                        cx="120"
+                        cy="25"
+                        r="5"
                         fill="#bbb"
                         stroke="#444"
-                        strokeWidth="1.2"
+                        strokeWidth="1.5"
                     />
                     {/* --- Main arm --- */}
                     <rect
-                        x="15"
-                        y="19"
-                        width="85"
+                        x="5"
+                        y="21.5"
+                        width="115"
                         height="7"
                         rx="3.5"
                         fill="url(#armGradient)"
@@ -171,9 +171,9 @@ const VinylItem: React.FC<VinylItemProps> = ({
                     {/* --- Headshell/Cartridge --- */}
                     <rect
                         x="2"
-                        y="15"
-                        width="16"
-                        height="15"
+                        y="17"
+                        width="18"
+                        height="16"
                         rx="3"
                         fill="#191919"
                         stroke="#333"
@@ -182,11 +182,20 @@ const VinylItem: React.FC<VinylItemProps> = ({
                     {/* Stylus tip */}
                     <circle
                         cx="2"
-                        cy="22.5"
+                        cy="25"
                         r="2.5"
-                        fill="#e3e300"
+                        fill="#ff0000"
                         stroke="#555"
                         strokeWidth="0.8"
+                    />
+                    {/* Red needle point */}
+                    <circle
+                        cx="-1"
+                        cy="25"
+                        r="1.2"
+                        fill="#ff0000"
+                        stroke="#cc0000"
+                        strokeWidth="0.4"
                     />
                 </svg>
             </div>
