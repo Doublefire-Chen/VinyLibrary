@@ -98,10 +98,10 @@ const VinylItem: React.FC<VinylItemProps> = ({
                 <svg
                     className="absolute"
                     style={{
-                        top: '16%',
+                        top: '18%',
                         right: '4%',
-                        width: 'min(160px, 60%)',
-                        height: 'min(50px, 20%)',
+                        width: 'min(180px, 60%)',
+                        height: 'min(100px, 30%)',
                         pointerEvents: 'none',
                         zIndex: 10,
                         transform: isPlaying
@@ -110,7 +110,7 @@ const VinylItem: React.FC<VinylItemProps> = ({
                         transformOrigin: '75% 50%',
                         transition: 'transform 0.7s cubic-bezier(0.4,0,0.2,1)',
                     }}
-                    viewBox="0 0 170 50"
+                    viewBox="0 0 200 50"
                     preserveAspectRatio="xMidYMid meet"
                 >
                     <defs>
@@ -118,7 +118,7 @@ const VinylItem: React.FC<VinylItemProps> = ({
                             <stop offset="0%" stopColor="#f0f0f0" />
                             <stop offset="100%" stopColor="#888" />
                         </radialGradient>
-                        <linearGradient id="armGradient" x1="120" y1="25" x2="5" y2="25" gradientUnits="userSpaceOnUse">
+                        <linearGradient id="armGradient" x1="120" y1="25" x2="-5" y2="25" gradientUnits="userSpaceOnUse">
                             <stop offset="0%" stopColor="#ececec" />
                             <stop offset="100%" stopColor="#b0b0b0" />
                         </linearGradient>
@@ -129,7 +129,7 @@ const VinylItem: React.FC<VinylItemProps> = ({
                     {/* --- Counterweight and gap --- */}
                     {/* Short shaft ("gap") between pivot and counterweight */}
                     <rect
-                        x="120"
+                        x="160"
                         y="21.5"
                         width="16"
                         height="7"
@@ -140,7 +140,7 @@ const VinylItem: React.FC<VinylItemProps> = ({
                     />
                     {/* Counterweight at end */}
                     <circle
-                        cx="144"
+                        cx="184"
                         cy="25"
                         r="10"
                         fill="url(#pivotGradient)"
@@ -149,7 +149,7 @@ const VinylItem: React.FC<VinylItemProps> = ({
                     />
                     {/* Pivot ring (bearing) */}
                     <circle
-                        cx="120"
+                        cx="160"
                         cy="25"
                         r="5"
                         fill="#bbb"
@@ -158,9 +158,9 @@ const VinylItem: React.FC<VinylItemProps> = ({
                     />
                     {/* --- Main arm --- */}
                     <rect
-                        x="5"
+                        x="-5"
                         y="21.5"
-                        width="115"
+                        width="165"
                         height="7"
                         rx="3.5"
                         fill="url(#armGradient)"
@@ -170,7 +170,7 @@ const VinylItem: React.FC<VinylItemProps> = ({
                     />
                     {/* --- Headshell/Cartridge --- */}
                     <rect
-                        x="2"
+                        x="-10"
                         y="17"
                         width="18"
                         height="16"
@@ -187,15 +187,6 @@ const VinylItem: React.FC<VinylItemProps> = ({
                         fill="#ff0000"
                         stroke="#555"
                         strokeWidth="0.8"
-                    />
-                    {/* Red needle point */}
-                    <circle
-                        cx="-1"
-                        cy="25"
-                        r="1.2"
-                        fill="#ff0000"
-                        stroke="#cc0000"
-                        strokeWidth="0.4"
                     />
                 </svg>
             </div>
