@@ -39,6 +39,7 @@ export function useAuth() {
             localStorage.removeItem('user_id');
             setIsLoggedIn(false);
             setUsername('');
+            router.push('/');
             return true;
         } catch (error) {
             console.error('Logout error:', error);
