@@ -124,7 +124,7 @@ export default function AddVinylModal({ onClose, onSave }: AddVinylModalProps) {
                         <img
                             src={newVinyl.album_picture_url}
                             alt="Album Cover"
-                            className="w-40 h-40 object-cover rounded-lg"
+                            className="w-36 h-36 object-cover rounded-lg"
                         />
                     </div>
                     <div className="flex flex-col items-start gap-2 mt-auto">
