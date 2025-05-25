@@ -1,4 +1,4 @@
-// Refactored Manage Page (page.tsx) with organized dropdown menus
+// Mobile Responsive Refactored Manage Page (page.tsx)
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -21,7 +21,7 @@ import MenuDropdown from '@/app/ui/MenuDropdown';
 function ActionDropdown({
     title,
     children,
-    buttonClassName = "bg-[#c9b370] text-black px-4 py-1.5 rounded-full text-sm font-medium tracking-wide shadow hover:bg-[#b89f56] transition-all outline-none focus:ring-2 focus:ring-[#c9b370] focus:ring-offset-2 vinyl-glossy"
+    buttonClassName = "bg-[#c9b370] text-black px-4 py-2 rounded-full text-sm font-medium tracking-wide shadow hover:bg-[#b89f56] transition-all outline-none focus:ring-2 focus:ring-[#c9b370] focus:ring-offset-2 vinyl-glossy min-w-[120px]"
 }: {
     title: string;
     children: React.ReactNode;
@@ -30,14 +30,14 @@ function ActionDropdown({
     const [isOpen, setIsOpen] = useState(false);
 
     return (
-        <div className="relative">
+        <div className="relative z-50">
             <button
                 onClick={() => setIsOpen(!isOpen)}
-                className={`${buttonClassName} flex items-center gap-1`}
+                className={`${buttonClassName} flex items-center justify-center gap-2`}
             >
-                {title}
+                <span className="text-center">{title}</span>
                 <svg
-                    className={`w-4 h-4 transition-transform ${isOpen ? 'rotate-180' : ''}`}
+                    className={`w-4 h-4 transition-transform flex-shrink-0 ${isOpen ? 'rotate-180' : ''}`}
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -50,12 +50,12 @@ function ActionDropdown({
                 <>
                     {/* Backdrop to close dropdown */}
                     <div
-                        className="fixed inset-0 z-10"
+                        className="fixed inset-0 z-40"
                         onClick={() => setIsOpen(false)}
                     />
 
-                    {/* Dropdown menu */}
-                    <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg border border-gray-200 z-20">
+                    {/* Dropdown menu - improved mobile positioning */}
+                    <div className="absolute left-1/2 transform -translate-x-1/2 mt-2 w-48 bg-white rounded-md shadow-xl border border-gray-200 z-50 max-h-60 overflow-y-auto sm:left-0 sm:transform-none">
                         <div className="py-1">
                             {children}
                         </div>
@@ -84,7 +84,7 @@ function DropdownItem({
             className={`w-full text-left px-4 py-2 text-sm ${className} flex items-center gap-2`}
         >
             {icon}
-            {children}
+            <span>{children}</span>
         </button>
     );
 }
@@ -199,107 +199,136 @@ function AuthenticatedManageContent() {
     }
 
     return (
-        <div className="min-h-screen bg-[#f8f6f1] p-6 font-serif text-[#2e2e2e]">
+        <div className="min-h-screen bg-[#f8f6f1] p-3 sm:p-6 font-serif text-[#2e2e2e]">
             {error && (
-                <div className="bg-red-100 text-red-700 p-3 mb-4 rounded border border-red-300">
+                <div className="bg-red-100 text-red-700 p-3 mb-4 rounded border border-red-300 text-sm">
                     {error}
                 </div>
             )}
             <div className="mb-2">
                 <WelcomeBan />
             </div>
-            <div className="flex justify-between items-center mb-6 pb-2 border-b border-[#c9b370]">
-                <h1 className="text-3xl font-bold tracking-wide uppercase">{m('manage')}</h1>
-                <div className="flex flex-wrap gap-3 items-center">
-                    {!selectionMode ? (
-                        <>
-                            {/* Vinyl Actions Dropdown */}
-                            <MenuDropdown
-                                title={m('vinyl_actions') || 'Vinyl Actions'}
-                                items={[
-                                    {
-                                        title: m('select'),
-                                        onClick: () => setSelectionMode(true),
-                                    },
-                                    {
-                                        title: m('add_new_vinyl'),
-                                        onClick: () => setAddNewVinyl(true),
-                                    },
-                                ]}
-                            />
 
-                            {/* Backup & Restore Dropdown */}
-                            <MenuDropdown
-                                title={m('backup_restore') || 'Backup & Restore'}
-                                items={[
-                                    {
-                                        title: m('backup'),
-                                        onClick: handleBackup,
-                                    },
-                                    {
-                                        title: m('restore'),
-                                        onClick: handleRestore,
-                                    },
-                                ]}
-                            />
+            {/* Mobile-first header layout with improved z-index management */}
+            <div className="mb-6 pb-4 border-b border-[#c9b370] relative">
+                <div className="flex flex-col gap-6">
+                    <h1 className="text-2xl sm:text-3xl font-bold tracking-wide uppercase text-center">
+                        {m('manage')}
+                    </h1>
 
-                            {/* User & Settings */}
-                            <UserDropdown username={username} onLogout={handleLogout} />
-                            <LanguageSwitcher />
-                        </>
-                    ) : (
-                        <>
-                            {/* Selection Mode Actions */}
-                            {selectedVinyls.length > 0 && (
-                                <button
-                                    onClick={handleDeleteSelected}
-                                    className="bg-[#aa4a44] text-white px-4 py-1.5 rounded-full text-sm font-medium tracking-wide shadow hover:bg-[#993d38] transition-all outline-none focus:ring-2 focus:ring-[#aa4a44] focus:ring-offset-2 flex items-center gap-2"
-                                >
-                                    {m('delete_selected')} ({selectedVinyls.length})
-                                </button>
-                            )}
-                            <button
-                                onClick={() => {
-                                    setSelectionMode(false);
-                                    setSelectedVinyls([]);
-                                }}
-                                className="bg-[#888] text-white px-4 py-1.5 rounded-full text-sm font-medium tracking-wide shadow hover:bg-[#777] transition-all outline-none focus:ring-2 focus:ring-[#888] focus:ring-offset-2 flex items-center gap-2"
+                    {/* Action buttons - responsive layout with proper spacing for dropdowns */}
+                    <div className="flex flex-col gap-6 items-center justify-center">
+                        {!selectionMode ? (
+                            <>
+                                {/* Top row - main actions with extra spacing for mobile dropdowns */}
+                                <div className="flex flex-col gap-6 items-center justify-center w-full max-w-md sm:max-w-none sm:flex-row sm:gap-6">
+                                    {/* Vinyl Actions Dropdown */}
+                                    <div className="w-full sm:w-auto flex justify-center relative" style={{ zIndex: 1000 }}>
+                                        <MenuDropdown
+                                            title={m('vinyl_actions') || 'Vinyl Actions'}
+                                            items={[
+                                                {
+                                                    title: m('select'),
+                                                    onClick: () => setSelectionMode(true),
+                                                },
+                                                {
+                                                    title: m('add_new_vinyl'),
+                                                    onClick: () => setAddNewVinyl(true),
+                                                },
+                                            ]}
+                                        />
+                                    </div>
+
+                                    {/* Backup & Restore Dropdown */}
+                                    <div className="w-full sm:w-auto flex justify-center relative" style={{ zIndex: 999 }}>
+                                        <MenuDropdown
+                                            title={m('backup_restore') || 'Backup & Restore'}
+                                            items={[
+                                                {
+                                                    title: m('backup'),
+                                                    onClick: handleBackup,
+                                                },
+                                                {
+                                                    title: m('restore'),
+                                                    onClick: handleRestore,
+                                                },
+                                            ]}
+                                        />
+                                    </div>
+                                </div>
+
+                                {/* Bottom row - user settings with spacing */}
+                                <div className="flex flex-col gap-6 items-center justify-center w-full max-w-md sm:max-w-none sm:flex-row sm:gap-6">
+                                    <div className="w-full sm:w-auto flex justify-center relative" style={{ zIndex: 998 }}>
+                                        <UserDropdown username={username} onLogout={handleLogout} />
+                                    </div>
+                                    <div className="w-full sm:w-auto flex justify-center relative" style={{ zIndex: 997 }}>
+                                        <LanguageSwitcher />
+                                    </div>
+                                </div>
+                            </>
+                        ) : (
+                            <>
+                                {/* Selection Mode Actions - centered with proper spacing */}
+                                <div className="flex flex-col sm:flex-row gap-4 items-center justify-center w-full">
+                                    {selectedVinyls.length > 0 && (
+                                        <button
+                                            onClick={handleDeleteSelected}
+                                            className="bg-[#aa4a44] text-white px-4 py-2 rounded-full text-sm font-medium tracking-wide shadow hover:bg-[#993d38] transition-all outline-none focus:ring-2 focus:ring-[#aa4a44] focus:ring-offset-2 flex items-center gap-2 w-full sm:w-auto justify-center"
+                                        >
+                                            <span>
+                                                {m('delete_selected')} ({selectedVinyls.length})
+                                            </span>
+                                        </button>
+                                    )}
+                                    <button
+                                        onClick={() => {
+                                            setSelectionMode(false);
+                                            setSelectedVinyls([]);
+                                        }}
+                                        className="bg-[#888] text-white px-4 py-2 rounded-full text-sm font-medium tracking-wide shadow hover:bg-[#777] transition-all outline-none focus:ring-2 focus:ring-[#888] focus:ring-offset-2 flex items-center gap-2 w-full sm:w-auto justify-center"
+                                    >
+                                        <span>✖️</span>
+                                        <span>{m('cancel')}</span>
+                                    </button>
+                                </div>
+                            </>
+                        )}
+                    </div>
+                </div>
+            </div>
+
+            {/* Responsive vinyl grid - centered with extra top margin for dropdown clearance */}
+            <div className="flex justify-center mt-16 sm:mt-6">
+                <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 sm:gap-6 max-w-7xl">
+                    {vinyls && vinyls.length > 0 ? (
+                        vinyls.map((vinyl: Vinyl) => (
+                            <div
+                                key={vinyl.id}
+                                onClick={() => !selectionMode && handleVinylClick(vinyl)}
+                                className="cursor-pointer flex justify-center"
                             >
-                                <span>✖️</span>
-                                {m('cancel')}
-                            </button>
-                        </>
+                                <VinylItem
+                                    vinyl={vinyl}
+                                    isSelected={selectedVinyls.includes(vinyl.id)}
+                                    onToggleSelect={() => toggleSelectVinyl(vinyl.id)}
+                                    selectionMode={selectionMode}
+                                    onClickPlay={(e) => {
+                                        e.stopPropagation();
+                                        handlePlay(parseInt(localStorage.getItem('user_id') || '0'), vinyl.id);
+                                    }}
+                                />
+                            </div>
+                        ))
+                    ) : (
+                        <div className="col-span-full text-center py-8 text-gray-500">
+                            <p className="text-base sm:text-lg">{c('no_vinyls_found')}</p>
+                        </div>
                     )}
                 </div>
             </div>
 
-            <div className="flex flex-wrap gap-6 justify-center">
-                {vinyls && vinyls.length > 0 ? (
-                    vinyls.map((vinyl: Vinyl) => (
-                        <div
-                            key={vinyl.id}
-                            onClick={() => !selectionMode && handleVinylClick(vinyl)}
-                            className="cursor-pointer"
-                        >
-                            <VinylItem
-                                vinyl={vinyl}
-                                isSelected={selectedVinyls.includes(vinyl.id)}
-                                onToggleSelect={() => toggleSelectVinyl(vinyl.id)}
-                                selectionMode={selectionMode}
-                                onClickPlay={(e) => {
-                                    e.stopPropagation();
-                                    handlePlay(parseInt(localStorage.getItem('user_id') || '0'), vinyl.id);
-                                }}
-                            />
-                        </div>
-                    ))
-                ) : (
-                    <div className="text-center py-6 text-gray-500">
-                        {c('no_vinyls_found')}
-                    </div>
-                )}
-            </div>
-
+            {/* Modals remain the same */}
             {
                 selectedVinylForEdit && (
                     <EditVinylModal
