@@ -136,7 +136,7 @@ function AuthenticatedManageContent() {
             </div>
 
             {/* Compact header with single-line action bar */}
-            <div className="mb-4 pb-3 border-b border-[#c9b370]">
+            <div className="mb-6 pb-4 border-b border-[#c9b370]">
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 sm:gap-6">
                     {/* Title */}
                     <h1 className="text-2xl sm:text-3xl font-bold tracking-wide uppercase text-center sm:text-left">
@@ -218,11 +218,16 @@ function AuthenticatedManageContent() {
                 </div>
             </div>
 
-            {/* Responsive vinyl grid */}
-            <div className="flex justify-center mt-16 sm:mt-6">
-                <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 sm:gap-6 max-w-7xl">
-                    {vinyls && vinyls.length > 0 ? (
-                        vinyls.map((vinyl: Vinyl) => (
+            {/* Improved responsive vinyl grid */}
+            <div className="w-full">
+                {vinyls && vinyls.length > 0 ? (
+                    <div className="grid gap-6 justify-center
+                        grid-cols-1 
+                        sm:grid-cols-2 sm:gap-8
+                        lg:grid-cols-3 
+                        xl:grid-cols-4
+                        2xl:grid-cols-5">
+                        {vinyls.map((vinyl: Vinyl) => (
                             <div
                                 key={vinyl.id}
                                 onClick={() => !selectionMode && handleVinylClick(vinyl)}
@@ -239,13 +244,13 @@ function AuthenticatedManageContent() {
                                     }}
                                 />
                             </div>
-                        ))
-                    ) : (
-                        <div className="col-span-full text-center py-8 text-gray-500">
-                            <p className="text-base sm:text-lg">{c('no_vinyls_found')}</p>
-                        </div>
-                    )}
-                </div>
+                        ))}
+                    </div>
+                ) : (
+                    <div className="text-center py-12 text-gray-500">
+                        <p className="text-base sm:text-lg">{c('no_vinyls_found')}</p>
+                    </div>
+                )}
             </div>
 
             {/* Modals */}
