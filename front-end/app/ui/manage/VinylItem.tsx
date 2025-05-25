@@ -179,6 +179,39 @@ const VinylItem: React.FC<VinylItemProps> = ({
                         stroke="#333"
                         strokeWidth="1.2"
                     />
+                    {/* Connection between arm and headshell */}
+                    <rect
+                        x="8"
+                        y="20"
+                        width="12"
+                        height="10"
+                        rx="2"
+                        fill="#2a2a2a"
+                        stroke="#444"
+                        strokeWidth="0.8"
+                    />
+
+                    <rect
+                        x="10"
+                        y="22"
+                        width="8"
+                        height="6"
+                        rx="1"
+                        fill="#333"
+                        stroke="#555"
+                        strokeWidth="0.5"
+                    />
+                    {/* finger lift tab */}
+                    <rect
+                        x="16"
+                        y="28"
+                        width="4"
+                        height="10"
+                        rx="1.5"
+                        fill="#333"
+                        stroke="#666"
+                        strokeWidth="0.5"
+                    />
                     {/* Stylus tip */}
                     <circle
                         cx="2"
