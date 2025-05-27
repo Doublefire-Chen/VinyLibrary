@@ -33,12 +33,15 @@ export function useAuth(): AuthReturn {
     const router = useRouter();
 
     useEffect(() => {
-        const loginStatus = localStorage.getItem('isLoggedIn');
-        const storedUsername = localStorage.getItem('username');
+        // Only access localStorage in the browser
+        if (typeof window !== 'undefined') {
+            const loginStatus = localStorage.getItem('isLoggedIn');
+            const storedUsername = localStorage.getItem('username');
 
-        setIsLoggedIn(loginStatus === 'true');
-        if (loginStatus === 'true' && storedUsername) {
-            setUsername(storedUsername);
+            setIsLoggedIn(loginStatus === 'true');
+            if (loginStatus === 'true' && storedUsername) {
+                setUsername(storedUsername);
+            }
         }
         setIsLoading(false);
     }, []);
@@ -55,9 +58,12 @@ export function useAuth(): AuthReturn {
                 return false;
             }
 
-            localStorage.setItem('isLoggedIn', 'false');
-            localStorage.removeItem('username');
-            localStorage.removeItem('user_id');
+            // Only access localStorage in the browser
+            if (typeof window !== 'undefined') {
+                localStorage.setItem('isLoggedIn', 'false');
+                localStorage.removeItem('username');
+                localStorage.removeItem('user_id');
+            }
             setIsLoggedIn(false);
             setUsername('');
             router.push('/');
@@ -93,15 +99,21 @@ export function useAuth(): AuthReturn {
 
             if (response.ok) {
                 const data = await response.json();
-                localStorage.setItem('username', username);
-                localStorage.setItem('user_id', data.user_id);
-                localStorage.setItem('isLoggedIn', 'true');
+                // Only access localStorage in the browser
+                if (typeof window !== 'undefined') {
+                    localStorage.setItem('username', username);
+                    localStorage.setItem('user_id', data.user_id);
+                    localStorage.setItem('isLoggedIn', 'true');
+                }
                 router.refresh();
                 router.push('/manage');
             } else {
-                localStorage.setItem('isLoggedIn', 'false');
-                localStorage.removeItem('username');
-                localStorage.removeItem('user_id');
+                // Only access localStorage in the browser
+                if (typeof window !== 'undefined') {
+                    localStorage.setItem('isLoggedIn', 'false');
+                    localStorage.removeItem('username');
+                    localStorage.removeItem('user_id');
+                }
                 const responseData = await response.json();
                 setError(responseData.message || 'Login failed');
             }
@@ -144,7 +156,10 @@ export function useAuth(): AuthReturn {
                 });
 
                 if (response.ok) {
-                    localStorage.removeItem('username');
+                    // Only access localStorage in the browser
+                    if (typeof window !== 'undefined') {
+                        localStorage.removeItem('username');
+                    }
                     onSuccess();
                 } else {
                     const errorMessage = await response.text();

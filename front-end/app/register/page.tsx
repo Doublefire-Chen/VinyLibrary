@@ -25,10 +25,13 @@ export default function RegisterPage() {
     const router = useRouter();
 
     useEffect(() => {
-        const loginStatus = localStorage.getItem('isLoggedIn');
-        setIsLoggedIn(loginStatus === 'true');
-        if (loginStatus) {
-            setUser(localStorage.getItem('username') || 'User');
+        // Only access localStorage in the browser
+        if (typeof window !== 'undefined') {
+            const loginStatus = localStorage.getItem('isLoggedIn');
+            setIsLoggedIn(loginStatus === 'true');
+            if (loginStatus) {
+                setUser(localStorage.getItem('username') || 'User');
+            }
         }
     }, []);
 
