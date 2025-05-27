@@ -1,19 +1,25 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { useParams } from 'next/navigation';
+import { useEffect, useState, Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 import { BACKEND_URL } from '@/app/lib/config';
 import type { Vinyl, PlayHistory } from '@/app/lib/definitions';
 import Link from 'next/link';
 
-export default function VinylDetailPage() {
-    const { id } = useParams();
+function VinylDetailContent() {
+    const searchParams = useSearchParams();
+    const id = searchParams.get('id');
     const [vinyl, setVinyl] = useState<Vinyl | null>(null);
     const [playHistory, setPlayHistory] = useState<PlayHistory[]>([]);
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
+        if (!id) {
+            setIsLoading(false);
+            return;
+        }
+
         const fetchVinylData = async () => {
             try {
                 const res = await fetch(`${BACKEND_URL}/api/history/${id}`);
@@ -30,11 +36,18 @@ export default function VinylDetailPage() {
         fetchVinylData();
     }, [id]);
 
+    if (!id) return (
+        <div className="flex items-center justify-center min-h-[300px] text-[#e14a4a] text-lg font-mono bg-[#f5f2ec]">
+            No vinyl ID provided
+        </div>
+    );
+
     if (isLoading) return (
         <div className="flex items-center justify-center min-h-[300px] text-[#b89f56] text-lg font-mono bg-[#f5f2ec]">
             Loading...
         </div>
     );
+
     if (!vinyl) return (
         <div className="flex items-center justify-center min-h-[300px] text-[#e14a4a] text-lg font-mono bg-[#f5f2ec]">
             Vinyl not found
@@ -138,5 +151,17 @@ export default function VinylDetailPage() {
                 )}
             </div>
         </div>
+    );
+}
+
+export default function VinylDetailPage() {
+    return (
+        <Suspense fallback={
+            <div className="flex items-center justify-center min-h-[300px] text-[#b89f56] text-lg font-mono bg-[#f5f2ec]">
+                Loading...
+            </div>
+        }>
+            <VinylDetailContent />
+        </Suspense>
     );
 }

@@ -166,7 +166,7 @@ export default function Page() {
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 sm:gap-6 justify-items-center">
           {vinyls?.length > 0 ? (
             vinyls.map((vinyl) => (
-              <Link href={`/${vinyl.id}`} key={vinyl.id} className="w-full max-w-xs">
+              <Link href={`/vinyl?id=${vinyl.id}`} key={vinyl.id} className="w-full max-w-xs">
                 <VinylCard vinyl={vinyl} />
               </Link>
             ))
