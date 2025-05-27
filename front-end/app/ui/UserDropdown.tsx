@@ -32,11 +32,13 @@ export default function UserDropdown({
     };
 
     return (
-        <div className="relative">
+        <div
+            className="relative"
+            onMouseEnter={() => setMenuOpen(true)}
+            onMouseLeave={() => setMenuOpen(false)}
+        >
             <button
                 className={clsx(baseStyle, styles[variant], className)}
-                onClick={() => setMenuOpen((prev) => !prev)}
-                onBlur={() => setTimeout(() => setMenuOpen(false), 150)} // allow time for menu click
                 {...props}
             >
                 <UserIcon className="w-4 h-4" />
