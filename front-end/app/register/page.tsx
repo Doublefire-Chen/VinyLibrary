@@ -1,17 +1,22 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { BACKEND_URL } from '@/app/lib/config';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
 import LanguageSwitcher from '@/app/ui/LanguageSwitcher';
-import { UserIcon } from 'lucide-react';
 import WelcomeBan from '@/app/ui/WelcomeBan';
 import ButtonLink from '@/app/ui/ButtonLink';
+import UserDropdown from '@/app/ui/UserDropdown';
+import LoadingMessage from '@/app/ui/LoadingMessage';
+import { useAuth } from '@/app/hooks/useAuth';
 
 export default function RegisterPage() {
     const { t: c } = useTranslation('common');
+    const { isLoggedIn, username: authUsername, isLoading, logout } = useAuth();
+
+    // Register form state
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [confirm, setConfirm] = useState('');
@@ -19,42 +24,12 @@ export default function RegisterPage() {
     const [success, setSuccess] = useState('');
     const [loading, setLoading] = useState(false);
 
-    // Auth status for showing Manage/Profile or Login/Register
-    const [isLoggedIn, setIsLoggedIn] = useState(false);
-    const [user, setUser] = useState('');
     const router = useRouter();
 
-    useEffect(() => {
-        // Only access localStorage in the browser
-        if (typeof window !== 'undefined') {
-            const loginStatus = localStorage.getItem('isLoggedIn');
-            setIsLoggedIn(loginStatus === 'true');
-            if (loginStatus) {
-                setUser(localStorage.getItem('username') || 'User');
-            }
-        }
-    }, []);
-
     const handleLogout = async () => {
-        try {
-            const response = await fetch(`${BACKEND_URL}/api/logout`, {
-                method: 'POST',
-                credentials: 'include',
-            });
-
-            if (!response.ok) {
-                console.error('Logout failed');
-                return;
-            }
-
-            localStorage.setItem('isLoggedIn', 'false');
-            localStorage.removeItem('username');
-            localStorage.removeItem('user_id');
-            setIsLoggedIn(false);
-            setUser('');
-            router.push('/');
-        } catch (error) {
-            console.error('Logout error:', error);
+        const success = await logout();
+        if (!success) {
+            console.error('Logout failed');
         }
     };
 
@@ -98,48 +73,23 @@ export default function RegisterPage() {
         setLoading(false);
     };
 
+    if (isLoading) return <LoadingMessage />;
+
     return (
         <div className="min-h-screen bg-[#f8f6f1] text-[#2e2e2e] font-serif">
-            {/* Header (copied from homepage) */}
+            {/* Header */}
             <header className="bg-[#1a1a1a] text-white py-6 px-6 shadow-md border-b-4 border-[#c9b370] relative">
                 <WelcomeBan />
                 <div className="absolute right-6 top-1/2 -translate-y-1/2 flex items-center gap-3">
                     {isLoggedIn ? (
                         <>
-                            <Link
-                                href="/manage"
-                                className="bg-[#c9b370] text-black px-4 py-2 rounded-full text-sm font-medium tracking-wide shadow hover:bg-[#b89f56] transition"
-                            >
+                            <ButtonLink href="/" variant="notcurrent">
+                                {c('homepage')}
+                            </ButtonLink>
+                            <ButtonLink href="/manage" variant="notcurrent">
                                 {c('manage')}
-                            </Link>
-                            <div className="relative group">
-                                <button className="flex items-center gap-1 bg-[#c9b370] text-black px-4 py-2 rounded-full text-sm tracking-wide font-medium shadow hover:bg-[#b89f56] transition">
-                                    <UserIcon className="w-4 h-4" />
-                                    {user}
-                                </button>
-                                <div
-                                    className="absolute right-0 top-full mt-1 bg-white text-black rounded-md shadow-xl text-sm w-full whitespace-normal
-                  invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 z-50 overflow-hidden border border-[#c9b370]"
-                                    style={{
-                                        boxShadow:
-                                            "0 6px 24px 0 rgba(201,179,112,0.08), 0 1.5px 3px 0 rgba(0,0,0,0.06)",
-                                        minWidth: "100%",
-                                    }}
-                                >
-                                    <Link
-                                        href="/profile"
-                                        className="block px-4 py-2 hover:bg-[#f5f0e6] text-center w-full"
-                                    >
-                                        {c('profile')}
-                                    </Link>
-                                    <button
-                                        onClick={handleLogout}
-                                        className="w-full px-4 py-2 hover:bg-[#f5f0e6] text-center"
-                                    >
-                                        {c('logout')}
-                                    </button>
-                                </div>
-                            </div>
+                            </ButtonLink>
+                            <UserDropdown username={authUsername} onLogout={handleLogout} variant='notcurrent' />
                             <LanguageSwitcher />
                         </>
                     ) : (
@@ -209,8 +159,6 @@ export default function RegisterPage() {
                         >
                             {loading ? 'Registering...' : c('register')}
                         </button>
-
-
                     </form>
                     <div className="text-sm text-center mt-4">
                         {c('already_have_account') || 'Already have an account?'}{' '}
