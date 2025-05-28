@@ -72,12 +72,9 @@ func connectDB() (*sql.DB, error) {
 	dbName := os.Getenv("DB_NAME")
 	dbSslMode := os.Getenv("DB_SSLMODE")
 
-	// 对密码进行URL编码，以处理特殊字符
-	encodedPassword := url.QueryEscape(dbPassword)
-
 	// 构造连接字符串（PostgreSQL URL）
-	connStr := fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=%s",
-		dbUser, encodedPassword, dbHost, dbPort, dbName, dbSslMode)
+	connStr := fmt.Sprintf("user=%s password=%s dbname=%s host=%s port=%s sslmode=%s",
+		dbUser, dbPassword, dbName, dbHost, dbPort, dbSslMode)
 
 	// 打开数据库连接
 	return sql.Open("postgres", connStr)
