@@ -14,6 +14,7 @@ import { useAuth } from '@/app/hooks/useAuth';
 
 export default function RegisterPage() {
     const { t: c } = useTranslation('common');
+    const { t: r } = useTranslation('register');
     const { isLoggedIn, username: authUsername, isLoading, logout } = useAuth();
 
     // Register form state
@@ -39,15 +40,15 @@ export default function RegisterPage() {
         setSuccess('');
 
         if (!username.trim() || !password) {
-            setError('Username and password are required.');
+            setError(r('usernamePasswordRequired'));
             return;
         }
         if (password.length < 6) {
-            setError('Password must be at least 6 characters.');
+            setError(r('passwordMinLength'));
             return;
         }
         if (password !== confirm) {
-            setError('Passwords do not match.');
+            setError(r('passwordsDoNotMatch'));
             return;
         }
 
@@ -117,7 +118,7 @@ export default function RegisterPage() {
                     </h2>
                     <form onSubmit={handleRegister} className="space-y-4">
                         <div>
-                            <label className="block font-medium text-[#5a8f66] mb-1">Username</label>
+                            <label className="block font-medium text-[#5a8f66] mb-1">{c('username')}</label>
                             <input
                                 type="text"
                                 className="w-full px-4 py-2 border border-[#c9b370] rounded focus:outline-none focus:ring-2 focus:ring-[#c9b370]"
@@ -129,7 +130,7 @@ export default function RegisterPage() {
                             />
                         </div>
                         <div>
-                            <label className="block font-medium text-[#5a8f66] mb-1">Password</label>
+                            <label className="block font-medium text-[#5a8f66] mb-1">{c('password')}</label>
                             <input
                                 type="password"
                                 className="w-full px-4 py-2 border border-[#c9b370] rounded focus:outline-none focus:ring-2 focus:ring-[#c9b370]"
@@ -140,7 +141,7 @@ export default function RegisterPage() {
                             />
                         </div>
                         <div>
-                            <label className="block font-medium text-[#5a8f66] mb-1">Confirm Password</label>
+                            <label className="block font-medium text-[#5a8f66] mb-1">{r('confirmPassword')}</label>
                             <input
                                 type="password"
                                 className="w-full px-4 py-2 border border-[#c9b370] rounded focus:outline-none focus:ring-2 focus:ring-[#c9b370]"

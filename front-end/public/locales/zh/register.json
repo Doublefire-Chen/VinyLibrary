@@ -1,0 +1,6 @@
+{
+    "usernamePasswordRequired": "用户名和密码为必填项。",
+    "passwordMinLength": "密码长度至少为6个字符。",
+    "passwordsDoNotMatch": "两次输入的密码不一致。",
+    "confirmPassword": "确认密码"
+}

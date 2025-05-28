@@ -22,6 +22,7 @@
   "homepage": "Homepage",
   "loading": "Loading...",
   "username": "Username",
+  "password": "Password",
   "played": "Played",
   "times": "Times",
   "no_vinyls_found": "No vinyls found",

@@ -1,0 +1,6 @@
+{
+    "usernamePasswordRequired": "Username and password are required.",
+    "passwordMinLength": "Password must be at least 6 characters.",
+    "passwordsDoNotMatch": "Passwords do not match.",
+    "confirmPassword": "Confirm Password"
+}
