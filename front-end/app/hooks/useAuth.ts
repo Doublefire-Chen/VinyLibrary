@@ -48,7 +48,7 @@ export function useAuth(): AuthReturn {
 
     const logout = useCallback(async (): Promise<boolean> => {
         try {
-            const response = await fetch(`${BACKEND_URL}/api/logout`, {
+            const response = await fetch(`${BACKEND_URL}/api/auth/logout`, {
                 method: 'POST',
                 credentials: 'include',
             });
@@ -90,7 +90,7 @@ export function useAuth(): AuthReturn {
     const login = useCallback(async (): Promise<void> => {
         setError('');
         try {
-            const response = await fetch(`${BACKEND_URL}/login`, {
+            const response = await fetch(`${BACKEND_URL}/api/auth/login`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 credentials: 'include',
@@ -145,7 +145,7 @@ export function useAuth(): AuthReturn {
             }
 
             try {
-                const response = await fetch(`${BACKEND_URL}/api/changepwd`, {
+                const response = await fetch(`${BACKEND_URL}/api/auth/changepwd`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     credentials: 'include',
@@ -159,6 +159,11 @@ export function useAuth(): AuthReturn {
                     // Only access localStorage in the browser
                     if (typeof window !== 'undefined') {
                         localStorage.removeItem('username');
+                        localStorage.removeItem('user_id');
+                        localStorage.setItem('isLoggedIn', 'false');
+                        setIsLoggedIn(false);
+                        setUsername('');
+                        setPassword('');
                     }
                     onSuccess();
                 } else {

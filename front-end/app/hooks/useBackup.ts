@@ -8,7 +8,7 @@ interface BackupResult {
 export function useBackup() {
     const createBackup = async (): Promise<BackupResult> => {
         try {
-            const res = await fetch(`${BACKEND_URL}/api/backup`, {
+            const res = await fetch(`${BACKEND_URL}/api/system/backup`, {
                 method: 'GET',
                 credentials: 'include',
             });
@@ -64,7 +64,7 @@ export function useBackup() {
                 formData.append('backup', file);
 
                 try {
-                    const res = await fetch(`${BACKEND_URL}/api/restore`, {
+                    const res = await fetch(`${BACKEND_URL}/api/system/restore`, {
                         method: 'POST',
                         body: formData,
                         credentials: 'include',
