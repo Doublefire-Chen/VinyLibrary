@@ -105,7 +105,7 @@ func hashPassword(password string, salt []byte) string {
 }
 
 func Register(c *gin.Context) {
-	if os.Getenv("CAN_REGISTER") != "True" {
+	if strings.ToLower(os.Getenv("CAN_REGISTER")) != "true" {
 		c.JSON(http.StatusForbidden, gin.H{"error": "Registration is disabled"})
 		return
 	}
