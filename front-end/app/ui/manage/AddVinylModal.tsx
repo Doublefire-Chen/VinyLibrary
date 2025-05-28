@@ -313,6 +313,7 @@ export default function AddVinylModal({ onClose, onSave }: AddVinylModalProps) {
                             {m('choose_file')}
                             <input
                                 type="file"
+                                accept="image/*"
                                 className="hidden"
                                 onChange={handleFileChange}
                                 disabled={isUploadDisabled}
