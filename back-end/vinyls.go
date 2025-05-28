@@ -2,7 +2,10 @@ package main
 
 import (
 	"archive/zip"
+	"crypto/hmac"
+	"crypto/sha256"
 	"database/sql"
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -515,6 +518,13 @@ func GetPlayHistoryByID(c *gin.Context) {
 	})
 }
 
+// helper function to generate HMAC signature
+func generateSignature(data []byte, salt string) string {
+	h := hmac.New(sha256.New, []byte(salt))
+	h.Write(data)
+	return hex.EncodeToString(h.Sum(nil))
+}
+
 func Backup(c *gin.Context) {
 	now := time.Now()
 	zone, offset := now.Zone()
@@ -573,16 +583,95 @@ func Backup(c *gin.Context) {
 		return
 	}
 
-	// 5. Download the zip file and remove after sent
+	// 5. Generate HMAC signature for the zip file
+	// Read the BACKUP_SALT from environment
+	backupSalt := os.Getenv("BACKUP_SALT")
+	if backupSalt == "" {
+		os.RemoveAll(backupDir)
+		os.Remove(zipPath)
+		c.JSON(500, gin.H{"error": "BACKUP_SALT not configured"})
+		return
+	}
 
-	file, err := os.Open(zipPath)
+	// Read the zip file content to generate signature
+	zipContent, err := os.ReadFile(zipPath)
+	if err != nil {
+		os.RemoveAll(backupDir)
+		os.Remove(zipPath)
+		c.JSON(500, gin.H{"error": "Failed to read zip file for signing"})
+		return
+	}
+
+	// Generate signature
+	signature := generateSignature(zipContent, backupSalt)
+
+	// Create a new zip with signature file included
+	finalZipPath := strings.TrimSuffix(zipPath, ".zip") + "_signed.zip"
+	finalZip, err := os.Create(finalZipPath)
+	if err != nil {
+		os.RemoveAll(backupDir)
+		os.Remove(zipPath)
+		c.JSON(500, gin.H{"error": "Failed to create signed zip"})
+		return
+	}
+	defer finalZip.Close()
+
+	zipWriter := zip.NewWriter(finalZip)
+	defer zipWriter.Close()
+
+	// Add the original zip as "backup.zip" inside the final zip
+	backupEntry, err := zipWriter.Create("backup.zip")
+	if err != nil {
+		os.RemoveAll(backupDir)
+		os.Remove(zipPath)
+		os.Remove(finalZipPath)
+		c.JSON(500, gin.H{"error": "Failed to add backup to signed zip"})
+		return
+	}
+	if _, err := backupEntry.Write(zipContent); err != nil {
+		os.RemoveAll(backupDir)
+		os.Remove(zipPath)
+		os.Remove(finalZipPath)
+		c.JSON(500, gin.H{"error": "Failed to write backup to signed zip"})
+		return
+	}
+
+	// Add signature file
+	sigEntry, err := zipWriter.Create("signature.txt")
+	if err != nil {
+		os.RemoveAll(backupDir)
+		os.Remove(zipPath)
+		os.Remove(finalZipPath)
+		c.JSON(500, gin.H{"error": "Failed to add signature to zip"})
+		return
+	}
+	if _, err := sigEntry.Write([]byte(signature)); err != nil {
+		os.RemoveAll(backupDir)
+		os.Remove(zipPath)
+		os.Remove(finalZipPath)
+		c.JSON(500, gin.H{"error": "Failed to write signature"})
+		return
+	}
+
+	// Close the zip writer before serving
+	if err := zipWriter.Close(); err != nil {
+		os.RemoveAll(backupDir)
+		os.Remove(zipPath)
+		os.Remove(finalZipPath)
+		c.JSON(500, gin.H{"error": "Failed to finalize signed zip"})
+		return
+	}
+
+	// 5. Download the zip file and remove after sent
+	file, err := os.Open(finalZipPath)
 	if err != nil {
 		c.JSON(500, gin.H{"error": "Failed to open backup file"})
 		return
 	}
 	defer file.Close()
 	defer os.RemoveAll(backupDir) // Remove the unzipped backup directory
-	defer os.Remove(zipPath)
+	defer os.Remove(zipPath)      // Remove the unsigned zip
+	defer os.Remove(finalZipPath) // Remove the signed zip after serving
 
 	fi, err := file.Stat()
 	if err != nil {
@@ -590,8 +679,8 @@ func Backup(c *gin.Context) {
 		return
 	}
 	c.Writer.Header().Set("Access-Control-Expose-Headers", "Content-Disposition")
-	c.Writer.Header().Set("Content-Disposition", fmt.Sprintf(`attachment; filename="%s"`, filepath.Base(zipPath)))
-	http.ServeContent(c.Writer, c.Request, filepath.Base(zipPath), fi.ModTime(), file)
+	c.Writer.Header().Set("Content-Disposition", fmt.Sprintf(`attachment; filename="%s"`, strings.TrimSuffix(backupName, ".zip")+"_signed.zip"))
+	http.ServeContent(c.Writer, c.Request, filepath.Base(finalZipPath), fi.ModTime(), file)
 }
 
 // Helper: zip a directory
@@ -662,48 +751,101 @@ func Restore(c *gin.Context) {
 	}
 	defer os.RemoveAll(restoreDir)
 
-	// 3. Restore album folder
-	albumBackupDir := filepath.Join(restoreDir, "album")
-	albumDir := "./album"
-	if err := os.RemoveAll(albumDir); err != nil {
-		c.JSON(500, gin.H{"error": "Failed to clear album folder"})
-		return
-	}
-	if err := copyDir(albumBackupDir, albumDir); err != nil {
-		c.JSON(500, gin.H{"error": "Failed to restore album folder: " + err.Error()})
+	// 3. authorize the restore operation
+	backupSalt := os.Getenv("BACKUP_SALT")
+	if backupSalt == "" {
+		c.JSON(500, gin.H{"error": "BACKUP_SALT not configured"})
 		return
 	}
 
-	// 4. Drop and recreate schema BEFORE restoring the database
-	db, err := connectDB()
-	if err != nil {
-		c.JSON(500, gin.H{"error": "Failed to connect to database"})
-		return
-	}
-	defer db.Close()
-	_, err = db.Exec("DROP SCHEMA public CASCADE; CREATE SCHEMA public;")
-	if err != nil {
-		c.JSON(500, gin.H{"error": "Failed to drop/recreate schema: " + err.Error()})
+	// Check if this is a signed backup
+	signaturePath := filepath.Join(restoreDir, "signature.txt")
+	backupPath := filepath.Join(restoreDir, "backup.zip")
+
+	if _, err := os.Stat(signaturePath); err == nil {
+		// This is a signed backup, verify it
+		signatureBytes, err := os.ReadFile(signaturePath)
+		log.Println("Signature file read:", string(signatureBytes))
+		if err != nil || string(signatureBytes) == "" {
+			c.JSON(500, gin.H{"error": "Failed to read signature file"})
+			return
+		}
+
+		backupBytes, err := os.ReadFile(backupPath)
+		if err != nil || len(backupBytes) == 0 {
+			c.JSON(500, gin.H{"error": "Failed to read backup data"})
+			return
+		}
+
+		expectedSignature := generateSignature(backupBytes, backupSalt)
+		if string(signatureBytes) != expectedSignature {
+			c.JSON(400, gin.H{"error": "Invalid backup signature - backup may have been tampered with"})
+			return
+		}
+
+		// Extract the actual backup
+		actualRestoreDir := "./tmp_restore_actual"
+
+		if err := os.RemoveAll(actualRestoreDir); err != nil {
+			c.JSON(500, gin.H{"error": "Failed to clear actual restore dir"})
+			return
+		}
+		if err := unzipFile(backupPath, actualRestoreDir); err != nil {
+			c.JSON(500, gin.H{"error": "Failed to extract verified backup"})
+			return
+		}
+
+		defer os.RemoveAll(actualRestoreDir) // Clean up after restore
+
+		// 4. Restore album folder
+		albumBackupDir := filepath.Join(actualRestoreDir, "album")
+		albumDir := "./album"
+		if err := os.RemoveAll(albumDir); err != nil {
+			c.JSON(500, gin.H{"error": "Failed to clear album folder"})
+			return
+		}
+		if err := copyDir(albumBackupDir, albumDir); err != nil {
+			c.JSON(500, gin.H{"error": "Failed to restore album folder: " + err.Error()})
+			return
+		}
+
+		// 5. Drop and recreate schema BEFORE restoring the database
+		db, err := connectDB()
+		if err != nil {
+			c.JSON(500, gin.H{"error": "Failed to connect to database"})
+			return
+		}
+		defer db.Close()
+		_, err = db.Exec("DROP SCHEMA public CASCADE; CREATE SCHEMA public;")
+		if err != nil {
+			c.JSON(500, gin.H{"error": "Failed to drop/recreate schema: " + err.Error()})
+			return
+		}
+
+		// 6. Restore PostgreSQL database
+		dbUser := os.Getenv("DB_USER")
+		dbPassword := os.Getenv("DB_PASSWORD")
+		dbHost := os.Getenv("DB_HOST")
+		dbPort := os.Getenv("DB_PORT")
+		dbName := os.Getenv("DB_NAME")
+		dumpPath := filepath.Join(actualRestoreDir, "db_backup.sql")
+
+		psqlCmd := exec.Command("psql", "-U", dbUser, "-h", dbHost, "-p", dbPort, "-d", dbName, "-f", dumpPath)
+		psqlCmd.Env = append(os.Environ(), "PGPASSWORD="+dbPassword)
+		output, err := psqlCmd.CombinedOutput()
+		if err != nil {
+			c.JSON(500, gin.H{"error": "Failed to restore database", "details": string(output)})
+			return
+		}
+
+		c.JSON(200, gin.H{"message": "Restore completed successfully"})
+	} else {
+		// print error message on terminal
+		log.Println(err)
+		c.JSON(400, gin.H{"error": "Invalid backup file - please upload a signed backup file"})
 		return
 	}
 
-	// 5. Restore PostgreSQL database
-	dbUser := os.Getenv("DB_USER")
-	dbPassword := os.Getenv("DB_PASSWORD")
-	dbHost := os.Getenv("DB_HOST")
-	dbPort := os.Getenv("DB_PORT")
-	dbName := os.Getenv("DB_NAME")
-	dumpPath := filepath.Join(restoreDir, "db_backup.sql")
-
-	psqlCmd := exec.Command("psql", "-U", dbUser, "-h", dbHost, "-p", dbPort, "-d", dbName, "-f", dumpPath)
-	psqlCmd.Env = append(os.Environ(), "PGPASSWORD="+dbPassword)
-	output, err := psqlCmd.CombinedOutput()
-	if err != nil {
-		c.JSON(500, gin.H{"error": "Failed to restore database", "details": string(output)})
-		return
-	}
-
-	c.JSON(200, gin.H{"message": "Restore completed successfully"})
 }
 
 // Helper: unzip a zip file to target directory

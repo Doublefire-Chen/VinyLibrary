@@ -30,5 +30,6 @@
     "edit_vinyl": "编辑黑胶唱片",
     "edit_vinyl_info": "编辑黑胶唱片信息",
     "vinyl_actions": "黑胶唱片操作",
-    "backup_restore": "备份/恢复"
+    "backup_restore": "备份/恢复",
+    "invalid_backup_file": "无效的备份文件 - 请上传签名正确的备份文件"
 }

@@ -107,7 +107,13 @@ function AuthenticatedManageContent() {
             showAlert(m('restore_success') || 'Restore successful');
             window.location.reload();
         } else {
-            showAlert(m('restore_failed') || 'Restore failed');
+            // example error: {"error":"Invalid backup file - please upload a signed backup file"}
+            // show error message from the result
+            if (result.error == 'Invalid backup file - please upload a signed backup file') {
+                showAlert(m('invalid_backup_file') || 'Invalid backup file - please upload a signed backup file');
+            } else {
+                showAlert(m('restore_failed') || 'Restore failed');
+            }
         }
     }, [restoreBackup, m, showAlert]);
 
