@@ -94,6 +94,7 @@ func GetVinylInfo(c *gin.Context) {
 
 	rows, err := db.Query("SELECT id, title, artist, year, vinyl_type, vinyl_number, tracklist, album_picture_url, play_num, timebought, price, currency, description FROM vinyls where status = 'active' ORDER BY id ASC")
 	if err != nil {
+		log.Println("Error querying database:", err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve data"})
 		return
 	}
