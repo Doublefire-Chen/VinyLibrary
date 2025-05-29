@@ -731,7 +731,7 @@ func Restore(c *gin.Context) {
 
 	backupZipPath := "./tmp_restore_backup.zip"
 	if err := c.SaveUploadedFile(file, backupZipPath); err != nil {
-		c.JSON(500, gin.H{"error": "Failed to save uploaded backup"})
+		c.JSON(500, gin.H{"error": "Failed to save uploaded backup" + err.Error()})
 		return
 	}
 
@@ -740,7 +740,7 @@ func Restore(c *gin.Context) {
 	// 2. Unzip to temp directory
 	restoreDir := "./tmp_restore"
 	if err := os.RemoveAll(restoreDir); err != nil {
-		c.JSON(500, gin.H{"error": "Failed to clear previous temp restore dir"})
+		c.JSON(500, gin.H{"error": "Failed to clear previous temp restore dir" + err.Error()})
 		return
 	}
 	if err := unzipFile(backupZipPath, restoreDir); err != nil {
@@ -752,7 +752,7 @@ func Restore(c *gin.Context) {
 	// 3. authorize the restore operation
 	backupSalt := os.Getenv("BACKUP_SALT")
 	if backupSalt == "" {
-		c.JSON(500, gin.H{"error": "BACKUP_SALT not configured"})
+		c.JSON(500, gin.H{"error": "BACKUP_SALT not configured" + err.Error()})
 		return
 	}
 
@@ -765,13 +765,15 @@ func Restore(c *gin.Context) {
 		signatureBytes, err := os.ReadFile(signaturePath)
 		log.Println("Signature file read:", string(signatureBytes))
 		if err != nil || string(signatureBytes) == "" {
-			c.JSON(500, gin.H{"error": "Failed to read signature file"})
+			log.Println("Failed to read signature file:", err)
+			c.JSON(500, gin.H{"error": "Failed to read signature file" + err.Error()})
 			return
 		}
 
 		backupBytes, err := os.ReadFile(backupPath)
 		if err != nil || len(backupBytes) == 0 {
-			c.JSON(500, gin.H{"error": "Failed to read backup data"})
+			log.Println("Failed to read backup data:", err)
+			c.JSON(500, gin.H{"error": "Failed to read backup data" + err.Error()})
 			return
 		}
 
@@ -785,11 +787,13 @@ func Restore(c *gin.Context) {
 		actualRestoreDir := "./tmp_restore_actual"
 
 		if err := os.RemoveAll(actualRestoreDir); err != nil {
-			c.JSON(500, gin.H{"error": "Failed to clear actual restore dir"})
+			log.Println("Failed to clear actual restore dir:", err)
+			c.JSON(500, gin.H{"error": "Failed to clear actual restore dir" + err.Error()})
 			return
 		}
 		if err := unzipFile(backupPath, actualRestoreDir); err != nil {
-			c.JSON(500, gin.H{"error": "Failed to extract verified backup"})
+			log.Println("Failed to extract verified backup:", err)
+			c.JSON(500, gin.H{"error": "Failed to extract verified backup" + err.Error()})
 			return
 		}
 
@@ -799,10 +803,12 @@ func Restore(c *gin.Context) {
 		albumBackupDir := filepath.Join(actualRestoreDir, "album")
 		albumDir := "./album"
 		if err := os.RemoveAll(albumDir); err != nil {
-			c.JSON(500, gin.H{"error": "Failed to clear album folder"})
+			log.Println("Failed to clear album folder:", err)
+			c.JSON(500, gin.H{"error": "Failed to clear album folder" + err.Error()})
 			return
 		}
 		if err := copyDir(albumBackupDir, albumDir); err != nil {
+			log.Println("Failed to restore album folder:", err)
 			c.JSON(500, gin.H{"error": "Failed to restore album folder: " + err.Error()})
 			return
 		}
@@ -810,12 +816,14 @@ func Restore(c *gin.Context) {
 		// 5. Drop and recreate schema BEFORE restoring the database
 		db, err := connectDB()
 		if err != nil {
-			c.JSON(500, gin.H{"error": "Failed to connect to database"})
+			log.Println("Failed to connect to database:", err)
+			c.JSON(500, gin.H{"error": "Failed to connect to database: " + err.Error()})
 			return
 		}
 		defer db.Close()
 		_, err = db.Exec("DROP SCHEMA public CASCADE; CREATE SCHEMA public;")
 		if err != nil {
+			log.Println("Failed to drop/recreate schema:", err)
 			c.JSON(500, gin.H{"error": "Failed to drop/recreate schema: " + err.Error()})
 			return
 		}
