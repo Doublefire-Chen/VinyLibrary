@@ -68,7 +68,30 @@ export default function EditVinylModal({ vinyl, onClose, onSave }: EditVinylModa
     };
 
 
+    const formatOriginalTime = (time: string) => {
+        // If the time is already in the desired format, return as is
+        if (time.includes('UTC') || time.match(/\d{4}-\d{2}-\d{2},\s\d{2}:\d{2}:\d{2}\sUTC[+-]\d/)) {
+            return time;
+        }
 
+        // If it's an ISO string, convert to the original format
+        const date = new Date(time);
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        const hours = String(date.getHours()).padStart(2, '0');
+        const minutes = String(date.getMinutes()).padStart(2, '0');
+        const seconds = String(date.getSeconds()).padStart(2, '0');
+
+        // Get timezone offset
+        const offset = date.getTimezoneOffset();
+        const offsetHours = Math.abs(Math.floor(offset / 60));
+        const offsetMinutes = Math.abs(offset % 60);
+        const offsetSign = offset <= 0 ? '+' : '-';
+        const timezoneString = `UTC${offsetSign}${offsetHours}`;
+
+        return `${year}-${month}-${day}, ${hours}:${minutes}:${seconds} ${timezoneString}`;
+    };
 
     return (
         <div
@@ -140,7 +163,13 @@ export default function EditVinylModal({ vinyl, onClose, onSave }: EditVinylModa
                         </div>
                         <div>
                             <p className="mb-1 text-gray-500">{c('time_bought')}</p>
-                            <input type="text" value={editedVinyl.timebought} onChange={(e) => handleChange('timebought', e.target.value)} className="border p-2 rounded-lg w-full" />
+                            <input
+                                type="text"
+                                value={formatOriginalTime(editedVinyl.timebought)}
+                                onChange={(e) => handleChange('timebought', e.target.value)}
+                                className="border p-2 rounded-lg w-full"
+                                placeholder="YYYY-MM-DD, HH:MM:SS UTC+X"
+                            />
                         </div>
                         <div>
                             <p className="mb-1 text-gray-500">{c('price')}</p>
