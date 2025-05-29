@@ -4,26 +4,16 @@ A web application to display, track, and count plays of your vinyl record collec
 
 ## Features
 
-- 📀 Catalog your vinyl collection with detailed information
+- 📀 Display your vinyl collection with detailed information
 - 🎵 Track play counts and listening history
-- 🖼️ Upload album artwork and photos
 - 👤 User authentication and personal collections
-- 📊 View statistics and play analytics
 
 ## Tech Stack
 
-- **Backend**: Go with Gin framework
-- **Frontend**: Next.js with React
+- **Backend**: Go lang
+- **Frontend**: React (Next.js framework )
 - **Database**: PostgreSQL
-- **Web Server**: Nginx (recommended)
-
-## Prerequisites
-
-Before installing VinyLibrary, ensure you have the following installed:
-
-- Ubuntu/Debian-based Linux system (other distributions may work with modifications)
-- Root or sudo access
-- Internet connection for downloading dependencies
+- **Web Server**: Nginx
 
 ## Installation Guide
 
@@ -251,6 +241,15 @@ systemctl status vinyl-backend
 
 ```bash
 cd ~/VinyLibrary/front-end/
+vim .env
+```
+**Note**: Replace `your.domain` with your actual domain name throughout the configuration.
+
+```
+NEXT_PUBLIC_BACKEND_URL=https://your.domain
+```
+
+```bash
 pnpm install
 pnpm build
 ```
@@ -360,11 +359,7 @@ systemctl reload nginx
 certbot --nginx -d your.domain -d www.your.domain
 ```
 
-1. Test automatic renewal:
 
-```bash
-certbot renew --dry-run
-```
 
 ## Usage
 
@@ -377,84 +372,17 @@ certbot renew --dry-run
 
 ### Environment Variables
 
-| Variable       | Description             | Default     |
-| -------------- | ----------------------- | ----------- |
-| `DB_HOST`      | PostgreSQL host         | `localhost` |
-| `DB_PORT`      | PostgreSQL port         | `5432`      |
-| `DB_USER`      | Database username       | -           |
-| `DB_NAME`      | Database name           | -           |
-| `DB_PASSWORD`  | Database password       | -           |
-| `DOMAIN`       | Your domain URL         | -           |
-| `CAN_REGISTER` | Allow new registrations | `true`      |
-| `BACKUP_SALT`  | Salt for security       | -           |
-
-### Database Maintenance
-
-To backup your database:
-
-```bash
-sudo -u postgres pg_dump your_db_name > vinyl_backup.sql
-```
-
-To restore from backup:
-
-```bash
-sudo -u postgres psql your_db_name < vinyl_backup.sql
-```
-
-## Troubleshooting
-
-### Backend Issues
-
-Check backend logs:
-
-```bash
-journalctl -u vinyl-backend -f
-```
-
-Restart backend service:
-
-```bash
-systemctl restart vinyl-backend
-```
-
-### Frontend Issues
-
-Check Nginx logs:
-
-```bash
-tail -f /var/log/nginx/vinyl_error.log
-```
-
-### Database Issues
-
-Check PostgreSQL status:
-
-```bash
-systemctl status postgresql
-```
-
-Connect to database for debugging:
-
-```bash
-sudo -u postgres psql your_db_name
-```
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add some amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](https://claude.ai/chat/LICENSE) file for details.
-
-## Support
-
-If you encounter any issues or have questions, please [open an issue](https://github.com/Doublefire-Chen/VinyLibrary/issues) on GitHub.
+| Variable                | Description             | Default     |
+| ----------------------- | ----------------------- | ----------- |
+| `DB_HOST`               | PostgreSQL host         | `localhost` |
+| `DB_PORT`               | PostgreSQL port         | `5432`      |
+| `DB_USER`               | Database username       | -           |
+| `DB_NAME`               | Database name           | -           |
+| `DB_PASSWORD`           | Database password       | -           |
+| `DOMAIN`                | Your domain URL         | -           |
+| `CAN_REGISTER`          | Allow new registrations | `true`      |
+| `BACKUP_SALT`           | Salt for security       | -           |
+| NEXT_PUBLIC_BACKEND_URL | Backend URL             | -           |
 
 ------
 
