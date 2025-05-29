@@ -12,6 +12,7 @@ import UserDropdown from '@/app/ui/UserDropdown';
 import { useAuth } from '@/app/hooks/useAuth';
 import { useVinyls } from '@/app/hooks/useVinyls';
 import { useState } from 'react';
+import GithubIcon from '@/app/ui/GithubIcon';
 
 export default function Page() {
   const { isLoggedIn, username, logout } = useAuth();
@@ -54,6 +55,7 @@ export default function Page() {
                 </ButtonLink>
                 <UserDropdown username={username} onLogout={handleLogout} variant='notcurrent' />
                 <LanguageSwitcher />
+                <GithubIcon />
               </>
             ) : (
               <>
@@ -67,6 +69,7 @@ export default function Page() {
                   {c('register')}
                 </ButtonLink>
                 <LanguageSwitcher />
+                <GithubIcon />
               </>
             )}
           </div>
@@ -127,6 +130,9 @@ export default function Page() {
                   <div className="px-6 py-4 flex justify-center">
                     <LanguageSwitcher />
                   </div>
+                  <div className="px-6 py-4 flex justify-center border-t border-[#c9b370]/20">
+                    <GithubIcon />
+                  </div>
                 </nav>
               ) : (
                 <nav className="flex flex-col">
@@ -153,6 +159,9 @@ export default function Page() {
                   </Link>
                   <div className="px-6 py-4 flex justify-center">
                     <LanguageSwitcher />
+                  </div>
+                  <div className="px-6 py-4 flex justify-center border-t border-[#c9b370]/20">
+                    <GithubIcon />
                   </div>
                 </nav>
               )}
