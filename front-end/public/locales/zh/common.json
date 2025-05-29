@@ -8,6 +8,9 @@
     "title": "标题",
     "artist": "艺术家",
     "year": "年份",
+    "type": "类型",
+    "number": "编号",
+    "play_history": "播放历史",
     "vinyl_type": "黑胶类型",
     "vinyl_number": "黑胶编号",
     "play_count": "播放次数",
@@ -33,5 +36,7 @@
     "login_required_message": "您需要登录才能访问此页面。",
     "redirecting_in": "正在重定向到登录页面，还有",
     "go_to_login": "立即转到登录",
-    "seconds": "秒"
+    "seconds": "秒",
+    "no_play_records": "未找到播放记录",
+    "play_on": "播放于"
 }

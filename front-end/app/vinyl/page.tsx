@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { BACKEND_URL } from '@/app/lib/config';
 import type { Vinyl, PlayHistory } from '@/app/lib/definitions';
 import Link from 'next/link';
+import { useTranslation } from 'react-i18next';
 
 function VinylDetailContent() {
     const searchParams = useSearchParams();
@@ -13,6 +14,7 @@ function VinylDetailContent() {
     const [vinyl, setVinyl] = useState<Vinyl | null>(null);
     const [playHistory, setPlayHistory] = useState<PlayHistory[]>([]);
     const [isLoading, setIsLoading] = useState(true);
+    const { t: c } = useTranslation('common');
 
     useEffect(() => {
         if (!id) {
@@ -88,10 +90,10 @@ function VinylDetailContent() {
                     <p className="text-md text-[#445a7c] font-semibold mb-2">{vinyl.artist} ・ {vinyl.year}</p>
                     <p className="mb-4 text-gray-800">{vinyl.description}</p>
                     <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm text-[#2e2e2e] font-mono">
-                        <span><strong>Type:</strong> {vinyl.vinyl_type}</span>
-                        <span><strong>Number:</strong> {vinyl.vinyl_number}</span>
-                        <span><strong>Price:</strong> {vinyl.price} {vinyl.currency}</span>
-                        <span><strong>Times Played:</strong> {vinyl.play_num}</span>
+                        <span><strong>{c("type")}:</strong> {vinyl.vinyl_type}</span>
+                        <span><strong>{c("number")}:</strong> {vinyl.vinyl_number}</span>
+                        <span><strong>{c("price")}:</strong> {vinyl.price} {vinyl.currency}</span>
+                        <span><strong>{c("play_count")}:</strong> {vinyl.play_num}</span>
                     </div>
                 </div>
             </div>
@@ -122,9 +124,9 @@ function VinylDetailContent() {
 
             {/* Play History */}
             <div className="rounded-2xl shadow-lg bg-gradient-to-br from-[#f5f2ec] to-[#ece7d8] border border-[#c9b370] p-6">
-                <h3 className="text-xl font-bold tracking-wider uppercase text-[#445a7c] mb-4">Play History</h3>
+                <h3 className="text-xl font-bold tracking-wider uppercase text-[#445a7c] mb-4">{c("play_history")}</h3>
                 {!playHistory || playHistory.length === 0 ? (
-                    <p className="text-gray-500 font-mono">No play records yet.</p>
+                    <p className="text-gray-500 font-mono">{c("no_play_records")}</p>
                 ) : (
                     <ul className="space-y-3">
                         {playHistory.map((entry) => {
@@ -143,7 +145,7 @@ function VinylDetailContent() {
                             return (
                                 <li key={entry.id} className="border-b border-[#ece7d8] pb-1 last:border-none">
                                     <span className="font-semibold text-[#1a1a1a]">{entry.username}</span>
-                                    <span className="text-[#445a7c]"> played on </span>
+                                    <span className="text-[#445a7c]"> {c("play_on")} </span>
                                     <span className="font-mono">{localTime} {tzOffset}</span>
                                 </li>
                             );

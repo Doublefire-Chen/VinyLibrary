@@ -8,6 +8,9 @@
   "title": "Title",
   "artist": "Artist",
   "year": "Year",
+  "type": "Type",
+  "number": "Number",
+  "play_history": "Play History",
   "vinyl_type": "Vinyl Type",
   "vinyl_number": "Vinyl Number",
   "play_count": "Play Count",
@@ -33,5 +36,7 @@
   "login_required_message": "You need to be logged in to access this page.",
   "redirecting_in": "Redirecting to login page in",
   "go_to_login": "Go to Login Now",
-  "seconds": "seconds"
+  "seconds": "seconds",
+  "no_play_records": "No play records found",
+  "play_on": "Play on"
 }
