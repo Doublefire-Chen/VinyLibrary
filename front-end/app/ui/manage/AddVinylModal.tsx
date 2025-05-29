@@ -264,6 +264,11 @@ export default function AddVinylModal({ onClose, onSave }: AddVinylModalProps) {
         return a.order - b.order;
     });
 
+    const findOriginalTrackIndex = useCallback((sortedIndex: number) => {
+        const sortedTrack = sortedTracklist[sortedIndex];
+        return newVinyl.tracklist.findIndex(track => track === sortedTrack);
+    }, [sortedTracklist, newVinyl.tracklist]);
+
     const { date, time, timezone } = parseTimebought(newVinyl.timebought);
     const [year = '', month = '', day = ''] = date.split('-');
 
@@ -511,84 +516,85 @@ export default function AddVinylModal({ onClose, onSave }: AddVinylModalProps) {
                             <div className="w-[25%] px-2">{c('length')}</div>
                         </div>
 
-                        {sortedTracklist.map((track, index) => (
-                            <div key={index} className="flex gap-2 mb-2 items-center w-full">
-                                <div className="w-[12%]">
-                                    <input
-                                        type="text"
-                                        placeholder="Side"
-                                        value={track.side}
-                                        onChange={(e) => handleTrackChange(index, 'side', e.target.value)}
-                                        className="border p-2 rounded-lg w-full text-sm"
-                                    />
-                                </div>
-                                <div className="w-[12%]">
-                                    <input
-                                        type="number"
-                                        placeholder="Order"
-                                        value={track.order}
-                                        onChange={(e) => handleTrackChange(index, 'order', parseInt(e.target.value) || 0)}
-                                        className="border p-2 rounded-lg w-full text-sm"
-                                    />
-                                </div>
-                                <div className="w-[43%]">
-                                    <input
-                                        type="text"
-                                        placeholder="Title"
-                                        value={track.title}
-                                        onChange={(e) => handleTrackChange(index, 'title', e.target.value)}
-                                        className="border p-2 rounded-lg w-full text-sm"
-                                    />
-                                </div>
-                                <div className="w-[25%]">
-                                    <div className="flex items-center">
+                        {sortedTracklist.map((track, sortedIndex) => {
+                            const originalIndex = findOriginalTrackIndex(sortedIndex);
+                            return (
+                                <div key={originalIndex} className="flex gap-2 mb-2 items-center w-full">
+                                    <div className="w-[12%]">
                                         <input
-                                            type="number"
-                                            min="0"
-                                            max="999"
-                                            placeholder="Min"
-                                            value={track.length.split(':')[0] || ''}
-                                            onChange={(e) => handleTrackMinuteChange(index, e.target.value)}
-                                            onBlur={(e) => {
-                                                if (e.target.value === '') {
-                                                    handleTrackMinuteChange(index, '0');
-                                                }
-                                            }}
-                                            className="w-[45%] p-2 border rounded-lg text-sm text-center"
-                                        />
-                                        <span className="mx-1.5 text-gray-500">:</span>
-                                        <input
-                                            type="number"
-                                            min="0"
-                                            max="59"
-                                            placeholder="Sec"
-                                            value={track.length.split(':')[1] || ''}
-                                            onChange={(e) => handleTrackSecondChange(index, e.target.value)}
-                                            onBlur={(e) => {
-                                                if (e.target.value === '') {
-                                                    handleTrackSecondChange(index, '0');
-                                                } else {
-                                                    // Ensure proper formatting on blur
-                                                    const secValue = e.target.value;
-                                                    // Only pad with zeros if it's a single digit
-                                                    const formattedSec = secValue.length === 1 ? secValue.padStart(2, '0') : secValue;
-                                                    const minutes = track.length.split(':')[0] || '0';
-                                                    handleTrackChange(index, 'length', `${minutes}:${formattedSec}`);
-                                                }
-                                            }}
-                                            className="w-[45%] p-2 border rounded-lg text-sm text-center"
+                                            type="text"
+                                            placeholder="Side"
+                                            value={track.side}
+                                            onChange={(e) => handleTrackChange(originalIndex, 'side', e.target.value)}
+                                            className="border p-2 rounded-lg w-full text-sm"
                                         />
                                     </div>
+                                    <div className="w-[12%]">
+                                        <input
+                                            type="number"
+                                            placeholder="Order"
+                                            value={track.order}
+                                            onChange={(e) => handleTrackChange(originalIndex, 'order', parseInt(e.target.value) || 0)}
+                                            className="border p-2 rounded-lg w-full text-sm"
+                                        />
+                                    </div>
+                                    <div className="w-[43%]">
+                                        <input
+                                            type="text"
+                                            placeholder="Title"
+                                            value={track.title}
+                                            onChange={(e) => handleTrackChange(originalIndex, 'title', e.target.value)}
+                                            className="border p-2 rounded-lg w-full text-sm"
+                                        />
+                                    </div>
+                                    <div className="w-[25%]">
+                                        <div className="flex items-center">
+                                            <input
+                                                type="number"
+                                                min="0"
+                                                max="999"
+                                                placeholder="Min"
+                                                value={track.length.split(':')[0] || ''}
+                                                onChange={(e) => handleTrackMinuteChange(originalIndex, e.target.value)}
+                                                onBlur={(e) => {
+                                                    if (e.target.value === '') {
+                                                        handleTrackMinuteChange(originalIndex, '0');
+                                                    }
+                                                }}
+                                                className="w-[45%] p-2 border rounded-lg text-sm text-center"
+                                            />
+                                            <span className="mx-1.5 text-gray-500">:</span>
+                                            <input
+                                                type="number"
+                                                min="0"
+                                                max="59"
+                                                placeholder="Sec"
+                                                value={track.length.split(':')[1] || ''}
+                                                onChange={(e) => handleTrackSecondChange(originalIndex, e.target.value)}
+                                                onBlur={(e) => {
+                                                    if (e.target.value === '') {
+                                                        handleTrackSecondChange(originalIndex, '0');
+                                                    } else {
+                                                        const secValue = e.target.value;
+                                                        const formattedSec = secValue.length === 1 ? secValue.padStart(2, '0') : secValue;
+                                                        const minutes = track.length.split(':')[0] || '0';
+                                                        handleTrackChange(originalIndex, 'length', `${minutes}:${formattedSec}`);
+                                                    }
+                                                }}
+                                                className="w-[45%] p-2 border rounded-lg text-sm text-center"
+                                            />
+                                        </div>
+                                    </div>
+                                    <button
+                                        onClick={() => removeTrack(originalIndex)}
+                                        className="text-red-600 hover:text-red-800"
+                                        type="button"
+                                    >
+                                        ✕
+                                    </button>
                                 </div>
-                                <button
-                                    onClick={() => removeTrack(index)}
-                                    className="text-red-600 hover:text-red-800"
-                                    type="button"
-                                >
-                                    ✕
-                                </button>
-                            </div>
-                        ))}
+                            );
+                        })}
                     </div>
                 </div>
 
