@@ -215,8 +215,9 @@ func UploadAlbumPicture(c *gin.Context) {
 	}
 
 	// Escape filename for URL safety
+	album_base_url := os.Getenv("ALBUM_BASE_URL")
 	escapedFilename := url.PathEscape(filename)
-	fileURL := fmt.Sprintf("http://localhost:1234/api/album/%s", escapedFilename)
+	fileURL := fmt.Sprintf("%s/api/album/%s", album_base_url, escapedFilename)
 
 	c.JSON(http.StatusOK, gin.H{"message": "File uploaded successfully", "url": fileURL})
 }
