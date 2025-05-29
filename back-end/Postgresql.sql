@@ -17,7 +17,7 @@ CREATE TABLE vinyls (
 
 CREATE TABLE users (
     id SERIAL PRIMARY KEY,
-    username varchar(12) UNIQUE,
+    username varchar(20) UNIQUE,
     password TEXT
 );
 
