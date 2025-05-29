@@ -557,7 +557,8 @@ func Backup(c *gin.Context) {
 	dbPort := os.Getenv("DB_PORT")
 	dbName := os.Getenv("DB_NAME")
 	dumpPath := filepath.Join(backupDir, "db_backup.sql")
-	pgDumpCmd := exec.Command("pg_dump", "-U", dbUser, "-h", dbHost, "-p", dbPort, "-F", "p", "-d", dbName)
+	// option clean make sure to drop existing objects before creating new ones
+	pgDumpCmd := exec.Command("pg_dump", "-U", dbUser, "-h", dbHost, "-p", dbPort, "-F", "p", "--clean", "--if-exists", "-d", dbName)
 	pgDumpCmd.Env = append(os.Environ(), "PGPASSWORD="+dbPassword)
 	dumpFile, err := os.Create(dumpPath)
 	if err != nil {
@@ -752,7 +753,7 @@ func Restore(c *gin.Context) {
 	// 3. authorize the restore operation
 	backupSalt := os.Getenv("BACKUP_SALT")
 	if backupSalt == "" {
-		c.JSON(500, gin.H{"error": "BACKUP_SALT not configured" + err.Error()})
+		c.JSON(500, gin.H{"error": "BACKUP_SALT not configured"})
 		return
 	}
 
@@ -779,7 +780,8 @@ func Restore(c *gin.Context) {
 
 		expectedSignature := generateSignature(backupBytes, backupSalt)
 		if string(signatureBytes) != expectedSignature {
-			c.JSON(400, gin.H{"error": "Invalid backup signature - backup may have been tampered with"})
+			log.Println("Invalid backup file - please upload a signed backup file")
+			c.JSON(400, gin.H{"error": "Invalid backup file - please upload a signed backup file"})
 			return
 		}
 
@@ -788,12 +790,12 @@ func Restore(c *gin.Context) {
 
 		if err := os.RemoveAll(actualRestoreDir); err != nil {
 			log.Println("Failed to clear actual restore dir:", err)
-			c.JSON(500, gin.H{"error": "Failed to clear actual restore dir" + err.Error()})
+			c.JSON(500, gin.H{"error": "Failed to clear actual restore dir"})
 			return
 		}
 		if err := unzipFile(backupPath, actualRestoreDir); err != nil {
 			log.Println("Failed to extract verified backup:", err)
-			c.JSON(500, gin.H{"error": "Failed to extract verified backup" + err.Error()})
+			c.JSON(500, gin.H{"error": "Failed to extract verified backup"})
 			return
 		}
 
@@ -809,26 +811,11 @@ func Restore(c *gin.Context) {
 		}
 		if err := copyDir(albumBackupDir, albumDir); err != nil {
 			log.Println("Failed to restore album folder:", err)
-			c.JSON(500, gin.H{"error": "Failed to restore album folder: " + err.Error()})
+			c.JSON(500, gin.H{"error": "Failed to restore album folder: "})
 			return
 		}
 
-		// 5. Drop and recreate schema BEFORE restoring the database
-		db, err := connectDB()
-		if err != nil {
-			log.Println("Failed to connect to database:", err)
-			c.JSON(500, gin.H{"error": "Failed to connect to database: " + err.Error()})
-			return
-		}
-		defer db.Close()
-		_, err = db.Exec("DROP SCHEMA public CASCADE; CREATE SCHEMA public;")
-		if err != nil {
-			log.Println("Failed to drop/recreate schema:", err)
-			c.JSON(500, gin.H{"error": "Failed to drop/recreate schema: " + err.Error()})
-			return
-		}
-
-		// 6. Restore PostgreSQL database
+		// 5. Restore PostgreSQL database
 		dbUser := os.Getenv("DB_USER")
 		dbPassword := os.Getenv("DB_PASSWORD")
 		dbHost := os.Getenv("DB_HOST")
