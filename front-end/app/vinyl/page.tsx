@@ -100,15 +100,15 @@ function VinylDetailContent() {
             {vinyl.tracklist && vinyl.tracklist.length > 0 && (
                 <div className="rounded-2xl shadow-lg bg-gradient-to-br from-[#f5f2ec] to-[#ece7d8] border border-[#c9b370] p-6">
                     <h3 className="text-xl font-bold tracking-wider uppercase text-[#445a7c] mb-4">Tracklist</h3>
-                    <div className="flex flex-col md:flex-row gap-6">
+                    <div className="space-y-6">
                         {Object.keys(tracklistBySide).sort().map(side => (
-                            <div key={side} className="flex-1">
-                                <div className="text-lg font-semibold text-[#c9b370] mb-2">Side {side}</div>
+                            <div key={side}>
+                                <div className="text-lg font-semibold text-[#c9b370] mb-3">Side {side}</div>
                                 <ol className="list-decimal list-inside space-y-2">
                                     {tracklistBySide[side]
                                         .sort((a, b) => a.order - b.order)
                                         .map(track => (
-                                            <li key={track.order} className="flex justify-between items-center py-1 px-2 rounded-lg hover:bg-[#efe5c0]/60 transition">
+                                            <li key={track.order} className="flex justify-between items-center py-2 px-3 rounded-lg hover:bg-[#efe5c0]/60 transition">
                                                 <span className="truncate">{track.title}</span>
                                                 <span className="ml-4 text-sm font-mono text-[#445a7c]">{track.length}</span>
                                             </li>
