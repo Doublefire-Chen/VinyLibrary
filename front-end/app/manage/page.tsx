@@ -129,6 +129,7 @@ function AuthenticatedManageContent() {
         if (result.success) {
             setAddNewVinyl(false);
             showAlert('Vinyl added successfully.');
+            window.location.reload();
         } else {
             showAlert('Failed to add vinyl.');
         }
