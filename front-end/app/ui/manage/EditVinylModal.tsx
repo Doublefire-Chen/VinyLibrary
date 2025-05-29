@@ -24,7 +24,15 @@ export default function EditVinylModal({ vinyl, onClose, onSave }: EditVinylModa
     const handleFileChange = async (e: ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files.length > 0) {
             const formData = new FormData();
-            formData.append('file', e.target.files[0]);
+
+            // Use the correct field name that matches the backend expectation
+            formData.append('album_picture', e.target.files[0]);
+
+            // Add the required fields from the current edited vinyl data
+            formData.append('title', editedVinyl.title);
+            formData.append('artist', editedVinyl.artist);
+            formData.append('vinyl_type', editedVinyl.vinyl_type);
+            formData.append('vinyl_number', editedVinyl.vinyl_number.toString());
 
             try {
                 const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/upload`, {
@@ -34,10 +42,12 @@ export default function EditVinylModal({ vinyl, onClose, onSave }: EditVinylModa
                 });
 
                 const data = await res.json();
+                console.log(data); // For debugging
+
                 if (data.url) {
                     setEditedVinyl((prev) => ({ ...prev, album_picture_url: data.url }));
                 } else {
-                    alert('Upload failed');
+                    alert(`Upload failed: ${data.error || 'No URL returned'}`);
                 }
             } catch (err) {
                 console.error(err);
