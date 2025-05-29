@@ -25,7 +25,8 @@ function VinylDetailContent() {
                 const res = await fetch(`${BACKEND_URL}/api/history/${id}`);
                 const data = await res.json();
                 setVinyl(data.vinyl);
-                setPlayHistory(data.play_history);
+                // Handle null play_history from API
+                setPlayHistory(data.play_history || []);
             } catch (err) {
                 console.error("Error loading vinyl detail:", err);
             } finally {
@@ -122,7 +123,7 @@ function VinylDetailContent() {
             {/* Play History */}
             <div className="rounded-2xl shadow-lg bg-gradient-to-br from-[#f5f2ec] to-[#ece7d8] border border-[#c9b370] p-6">
                 <h3 className="text-xl font-bold tracking-wider uppercase text-[#445a7c] mb-4">Play History</h3>
-                {playHistory.length === 0 ? (
+                {!playHistory || playHistory.length === 0 ? (
                     <p className="text-gray-500 font-mono">No play records yet.</p>
                 ) : (
                     <ul className="space-y-3">
