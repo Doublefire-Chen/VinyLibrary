@@ -129,7 +129,7 @@ export default function EditVinylModal({ vinyl, onClose, onSave }: EditVinylModa
                     <div className="flex items-end h-40">
                         <label className="bg-blue-600 text-white px-4 py-2 rounded-lg cursor-pointer hover:bg-blue-700">
                             {m('choose_file')}
-                            <input type="file" className="hidden" onChange={handleFileChange} />
+                            <input type="file" accept="image/*" className="hidden" onChange={handleFileChange} />
                         </label>
                     </div>
                 </div>
