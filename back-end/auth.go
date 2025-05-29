@@ -122,6 +122,7 @@ func Register(c *gin.Context) {
 	// Generate salt
 	salt, err := generateSalt()
 	if err != nil {
+		fmt.Println(err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to generate salt"})
 		return
 	}
