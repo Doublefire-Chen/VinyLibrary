@@ -194,6 +194,8 @@ DOMAIN=https://your.domain
 CAN_REGISTER=true
 BACKUP_SALT="your_random_salt_string_here"
 GO_PORT="127.0.0.1:1234"
+NEXT_PUBLIC_PLAUSIBLE_DOMAIN=your.domain
+NEXT_PUBLIC_PLAUSIBLE_SRC=http://your.plausible/js/script.js
 ```
 
 1. Build the backend:
@@ -394,6 +396,9 @@ certbot --nginx -d your.domain -d www.your.domain
 | `BACKUP_SALT`           | Salt for security       | -           |
 | `GO_PORT`               | Go backend port         | `127.0.0.1:1234` |
 | `NEXT_PUBLIC_BACKEND_URL` | Backend URL             | -           |
+| `NEXT_PUBLIC_PLAUSIBLE_DOMAIN` | Plausible analytics domain | -           |
+| `NEXT_PUBLIC_PLAUSIBLE_SRC` | Plausible analytics script URL | -           |
+
 
 ------
 
