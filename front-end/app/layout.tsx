@@ -10,23 +10,27 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // Get environment variables
+  const plausibleDomain = process.env.NEXT_PUBLIC_PLAUSIBLE_DOMAIN || "";
+  const plausibleSrc = process.env.NEXT_PUBLIC_PLAUSIBLE_SRC || "";
+
+  // Check if both values are non-empty
+  const shouldLoadPlausible = plausibleDomain.trim() !== "" && plausibleSrc.trim() !== "";
+
   return (
     <html lang="en">
       <head>
         <title>Vinyl Library</title>
         <meta name="description" content="Vinyl Library" />
         {/* Plausible Analytics - Only loads if both variables have values */}
-        {process.env.NEXT_PUBLIC_PLAUSIBLE_DOMAIN &&
-          process.env.NEXT_PUBLIC_PLAUSIBLE_SRC &&
-          process.env.NEXT_PUBLIC_PLAUSIBLE_DOMAIN.trim() !== "" &&
-          process.env.NEXT_PUBLIC_PLAUSIBLE_SRC.trim() !== "" && (
-            <Script
-              defer
-              data-domain={process.env.NEXT_PUBLIC_PLAUSIBLE_DOMAIN}
-              src={process.env.NEXT_PUBLIC_PLAUSIBLE_SRC}
-              strategy="afterInteractive"
-            />
-          )}
+        {shouldLoadPlausible && (
+          <Script
+            defer
+            data-domain={plausibleDomain}
+            src={plausibleSrc}
+            strategy="afterInteractive"
+          />
+        )}
       </head>
       <body>
         <I18nextProvider i18n={i18n}>{children}</I18nextProvider>
