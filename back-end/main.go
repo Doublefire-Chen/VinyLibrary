@@ -9,10 +9,13 @@ import (
 	_ "github.com/lib/pq"
 )
 
+var listen_address string
+
 // initialize the variables
 func init() {
 	loadEnvVariables()
 	secretKey = []byte(os.Getenv("SECRET_KEY"))
+	listen_address = os.Getenv("GO_PORT")
 }
 
 func main() {
@@ -98,5 +101,5 @@ func main() {
 		c.JSON(200, gin.H{"status": "ok"})
 	})
 
-	log.Fatal(router.Run(":1234"))
+	log.Fatal(router.Run(listen_address))
 }
