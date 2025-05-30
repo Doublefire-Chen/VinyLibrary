@@ -4,7 +4,7 @@ GIT_HASH := $(shell git rev-parse HEAD 2>/dev/null | cut -c1-8 || echo "unknown"
 BUILD_TIME := $(shell date -u +%Y-%m-%dT%H:%M:%SZ)
 
 # Build configuration
-BINARY_NAME := back-end
+BINARY_NAME := backend
 OUTPUT_DIR := ./bin
 OUTPUT_PATH := $(OUTPUT_DIR)/$(BINARY_NAME)
 
