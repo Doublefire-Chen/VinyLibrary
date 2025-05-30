@@ -31,5 +31,6 @@
     "edit_vinyl_info": "编辑黑胶唱片信息",
     "vinyl_actions": "黑胶唱片操作",
     "backup_restore": "备份/恢复",
-    "invalid_backup_file": "无效的备份文件 - 请上传签名正确的备份文件"
+    "invalid_backup_file": "无效的备份文件 - 请上传签名正确的备份文件",
+    "restore_warning": "警告：这将完全替换您当前的所有数据（包括登录信息、黑胶唱片收藏和用户设置），并用备份文件中的数据替换。这一操作无法撤销。\n\n您确定要继续吗？"
 }

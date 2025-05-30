@@ -103,6 +103,14 @@ function AuthenticatedManageContent() {
     }, [createBackup, showAlert]);
 
     const handleRestore = useCallback(async () => {
+        // Show warning about data reset
+        const warningMessage = m('restore_warning') ||
+            'WARNING: This will completely replace ALL your current data (including login information, vinyl collection, and user settings) with the data from the backup file. This action cannot be undone.\n\nAre you sure you want to continue?';
+
+        if (!showConfirm(warningMessage)) {
+            return;
+        }
+
         const result = await restoreBackup();
         if (result.success) {
             showAlert(m('restore_success') || 'Restore successful');
@@ -116,7 +124,7 @@ function AuthenticatedManageContent() {
                 showAlert(m('restore_failed') || 'Restore failed');
             }
         }
-    }, [restoreBackup, m, showAlert]);
+    }, [restoreBackup, m, showAlert, showConfirm]);
 
     const handleLogout = useCallback(async () => {
         const success = await logout();

@@ -31,5 +31,6 @@
     "edit_vinyl_info": "Edit Vinyl Information",
     "vinyl_actions": "Vinyl Actions",
     "backup_restore": "Backup/Restore",
-    "invalid_backup_file": "Invalid backup file - please upload a signed backup file"
+    "invalid_backup_file": "Invalid backup file - please upload a signed backup file",
+    "restore_warning": "WARNING: This will completely replace ALL your current data (including login information, vinyl collection, and user settings) with the data from the backup file. This action cannot be undone.\n\nAre you sure you want to continue?"
 }
