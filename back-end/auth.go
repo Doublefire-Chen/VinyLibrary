@@ -119,6 +119,14 @@ func Register(c *gin.Context) {
 		return
 	}
 
+	// case insensitive username
+	username := strings.ToLower(strings.TrimSpace(registerReq.Username))
+
+	if username == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Username cannot be empty"})
+		return
+	}
+
 	// Generate salt
 	salt, err := generateSalt()
 	if err != nil {
@@ -141,7 +149,7 @@ func Register(c *gin.Context) {
 	// Store the username and hashed password
 	query := "INSERT INTO users (username, password) VALUES ($1, $2) RETURNING id"
 	var userID int
-	err = db.QueryRow(query, registerReq.Username, hashedPassword).Scan(&userID)
+	err = db.QueryRow(query, username, hashedPassword).Scan(&userID)
 	if err != nil {
 		if err.Error() == `pq: duplicate key value violates unique constraint "users_username_key"` {
 			c.JSON(http.StatusConflict, gin.H{"error": "Username already exists"})
@@ -209,6 +217,8 @@ func Login(c *gin.Context) {
 		return
 	}
 
+	username := strings.TrimSpace(loginReq.Username)
+
 	// Get user from the database
 	db, err := connectDB()
 	if err != nil {
@@ -217,10 +227,10 @@ func Login(c *gin.Context) {
 	}
 	defer db.Close()
 
-	query := "SELECT id, password FROM users WHERE username = $1"
 	var userID int
 	var storedHashedPassword string
-	err = db.QueryRow(query, loginReq.Username).Scan(&userID, &storedHashedPassword)
+	query := "SELECT id, password FROM users WHERE LOWER(username) = LOWER($1)"
+	err = db.QueryRow(query, username).Scan(&userID, &storedHashedPassword)
 	if err != nil {
 		if err.Error() == "sql: no rows in result set" {
 			c.JSON(http.StatusUnauthorized, gin.H{"error": "No user found in the database"})
