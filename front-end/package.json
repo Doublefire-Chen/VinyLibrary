@@ -1,12 +1,12 @@
 {
   "name": "front-end",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "private": true,
   "scripts": {
-    "prebuild": "node scripts/version.js",
-    "predev": "node scripts/version.js",
-    "build": "next build",
-    "dev": "next dev",
+    "build:actual": "next build",
+    "dev:actual": "next dev",
+    "build": "make build",
+    "dev": "make dev",
     "lint": "next lint"
   },
   "dependencies": {

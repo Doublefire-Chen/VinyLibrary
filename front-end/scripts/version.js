@@ -6,6 +6,17 @@ try {
     // Get the latest git tag
     const version = execSync('git describe --tags --abbrev=0', { encoding: 'utf8' }).trim();
 
+    // Update package.json version
+    const packageJsonPath = path.join(__dirname, '..', 'package.json');
+    const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
+
+    // Remove 'v' prefix if present (e.g., v1.0.0 -> 1.0.0)
+    const cleanVersion = version.startsWith('v') ? version.substring(1) : version;
+    packageJson.version = cleanVersion;
+
+    fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2) + '\n');
+    console.log(`✅ Updated package.json version to ${cleanVersion}`);
+
     // Ensure public directory exists
     const publicDir = path.join(__dirname, '..', 'public');
     if (!fs.existsSync(publicDir)) {
@@ -38,4 +49,5 @@ try {
     }, null, 2));
 
     console.log('📝 Fallback version file created');
+    console.log('📝 package.json version left unchanged due to git error');
 }
