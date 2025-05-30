@@ -8,6 +8,11 @@ A web application to display, track, and count plays of your vinyl record collec
 - 🎵 Track play counts and listening history
 - 👤 User authentication and personal collections
 
+# Demo
+website: https://demo.vinyl.aka.cy
+username: demo
+password: vkGU8$8c2si633H3%E%K!BVTpK55TVMQE9ufjgEA&Nz8p@3EPeQ6Mj^xu6wktYXM
+
 ## Tech Stack
 
 - **Backend**: Go lang
