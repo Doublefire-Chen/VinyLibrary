@@ -184,6 +184,7 @@ DB_SSLMODE=disable
 DOMAIN=https://your.domain
 CAN_REGISTER=true
 BACKUP_SALT="your_random_salt_string_here"
+GO_PORT="127.0.0.1:1234"
 ```
 
 1. Build the backend:
@@ -382,7 +383,8 @@ certbot --nginx -d your.domain -d www.your.domain
 | `DOMAIN`                | Your domain URL         | -           |
 | `CAN_REGISTER`          | Allow new registrations | `true`      |
 | `BACKUP_SALT`           | Salt for security       | -           |
-| NEXT_PUBLIC_BACKEND_URL | Backend URL             | -           |
+| `GO_PORT`               | Go backend port         | `127.0.0.1:1234` |
+| `NEXT_PUBLIC_BACKEND_URL` | Backend URL             | -           |
 
 ------
 
