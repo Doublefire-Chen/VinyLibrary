@@ -189,7 +189,7 @@ BACKUP_SALT="your_random_salt_string_here"
 1. Build the backend:
 
 ```bash
-go build -ldflags "-X main.Version=$(git describe --tags --abbrev=0 --match 'backend-v*')" -o bin/backend
+make build
 ```
 
 1. Create systemd service:
