@@ -38,5 +38,6 @@
   "go_to_login": "Go to Login Now",
   "seconds": "seconds",
   "no_play_records": "No play records found",
-  "play_on": "Play on"
+  "play_on": "Play on",
+  "app_name": "VinyLibrary"
 }

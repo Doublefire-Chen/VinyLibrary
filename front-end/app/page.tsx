@@ -1,4 +1,4 @@
-// Mobile-Responsive Homepage (page.tsx)
+// Updated page.tsx with Footer
 'use client';
 
 import VinylCard from '@/app/ui/VinylCard';
@@ -9,6 +9,7 @@ import LoadingMessage from '@/app/ui/LoadingMessage';
 import WelcomeBan from '@/app/ui/WelcomeBan';
 import ButtonLink from '@/app/ui/ButtonLink';
 import UserDropdown from '@/app/ui/UserDropdown';
+import Footer from '@/app/ui/Footer';
 import { useAuth } from '@/app/hooks/useAuth';
 import { useVinyls } from '@/app/hooks/useVinyls';
 import { useState } from 'react';
@@ -36,10 +37,18 @@ export default function Page() {
     return <LoadingMessage />;
   }
 
+  // Footer links for your vinyl app
+  const footerLinks = [
+    { href: '/about', label: c('about') || 'About' },
+    { href: '/privacy', label: c('privacy') || 'Privacy' },
+    { href: '/terms', label: c('terms') || 'Terms' },
+    { href: '/contact', label: c('contact') || 'Contact' }
+  ];
+
   return (
-    <div className="min-h-screen bg-[#f8f6f1] text-[#2e2e2e] font-serif">
+    <div className="min-h-screen bg-[#f8f6f1] text-[#2e2e2e] font-serif flex flex-col">
       {/* Header */}
-      <header className="bg-[#1a1a1a] text-white shadow-md border-b-4 border-[#c9b370] relative">
+      <header className="bg-[#1a1a1a] text-white shadow-md border-b-4 border-[#c9b370] relative flex-shrink-0">
         {/* Desktop Header */}
         <div className="hidden md:block py-6 px-6">
           <WelcomeBan />
@@ -170,9 +179,9 @@ export default function Page() {
         </div>
       </header>
 
-      {/* Vinyl Grid */}
-      <main className="px-3 sm:px-6 py-6 sm:py-10 bg-[#f8f6f1]">
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 sm:gap-6 justify-items-center">
+      {/* Vinyl Grid - Main Content Area */}
+      <main className="flex-1 px-3 sm:px-6 py-6 sm:py-10 bg-[#f8f6f1] min-h-0">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 sm:gap-6 justify-items-center min-h-[400px]">
           {vinyls?.length > 0 ? (
             vinyls.map((vinyl) => (
               <Link href={`/vinyl?id=${vinyl.id}`} key={vinyl.id} className="w-full max-w-xs">
@@ -180,12 +189,15 @@ export default function Page() {
               </Link>
             ))
           ) : (
-            <div className="col-span-full text-center w-full py-10">
+            <div className="col-span-full text-center w-full py-10 flex items-center justify-center">
               <p className="text-base sm:text-lg text-gray-600 px-4">{c('no_vinyls_found')}</p>
             </div>
           )}
         </div>
       </main>
+
+      {/* Footer - Always at bottom */}
+      <Footer className="mt-auto flex-shrink-0" />
     </div>
   );
 }

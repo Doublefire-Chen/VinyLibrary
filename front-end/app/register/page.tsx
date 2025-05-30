@@ -11,6 +11,7 @@ import ButtonLink from '@/app/ui/ButtonLink';
 import UserDropdown from '@/app/ui/UserDropdown';
 import LoadingMessage from '@/app/ui/LoadingMessage';
 import GithubIcon from '@/app/ui/GithubIcon';
+import Footer from '@/app/ui/Footer';
 import { useAuth } from '@/app/hooks/useAuth';
 
 export default function RegisterPage() {
@@ -83,9 +84,9 @@ export default function RegisterPage() {
     if (isLoading) return <LoadingMessage />;
 
     return (
-        <div className="min-h-screen bg-[#f8f6f1] text-[#2e2e2e] font-serif">
+        <div className="min-h-screen bg-[#f8f6f1] text-[#2e2e2e] font-serif flex flex-col">
             {/* Header */}
-            <header className="bg-[#1a1a1a] text-white shadow-md border-b-4 border-[#c9b370] relative">
+            <header className="bg-[#1a1a1a] text-white shadow-md border-b-4 border-[#c9b370] relative flex-shrink-0">
                 {/* Desktop Header */}
                 <div className="hidden md:block py-6 px-6">
                     <WelcomeBan />
@@ -215,8 +216,8 @@ export default function RegisterPage() {
                 </div>
             </header>
 
-            {/* Register Form */}
-            <main className="flex justify-center items-start min-h-[60vh] py-6 sm:py-12 px-4">
+            {/* Register Form - Main Content */}
+            <main className="flex-1 flex justify-center items-start py-6 sm:py-12 px-4 min-h-0">
                 <div className="w-full max-w-md bg-white rounded-2xl shadow-xl border border-[#c9b370] p-6 sm:p-8 mt-4 sm:mt-6">
                     <h2 className="text-xl sm:text-2xl font-bold mb-6 text-center text-[#1a1a1a] uppercase">
                         {c('register')}
@@ -280,6 +281,9 @@ export default function RegisterPage() {
                     </div>
                 </div>
             </main>
+
+            {/* Footer - Always at bottom */}
+            <Footer className="mt-auto flex-shrink-0" />
         </div>
     );
 }

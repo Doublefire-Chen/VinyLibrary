@@ -13,6 +13,7 @@ import ButtonLink from '@/app/ui/ButtonLink';
 import LanguageSwitcher from '@/app/ui/LanguageSwitcher';
 import LoginRequired from '@/app/ui/LoginRequired';
 import UserDropdown from '@/app/ui/UserDropdown';
+import Footer from '@/app/ui/Footer';
 
 export default function ProfilePage() {
     const {
@@ -57,11 +58,11 @@ export default function ProfilePage() {
     if (!isLoggedIn) return <LoginRequired redirectDelay={5000} />;
 
     return (
-        <div className="min-h-screen bg-[#f8f6f1] text-[#2e2e2e] font-serif">
+        <div className="min-h-screen bg-[#f8f6f1] text-[#2e2e2e] font-serif flex flex-col">
             {/* Header Section */}
             {/* Mobile: py-4 px-4, text-center for WelcomeBan. Nav items flow below. */}
             {/* Desktop (md+): py-6 px-6, WelcomeBan aligns left. Nav items absolutely positioned. */}
-            <header className="bg-[#1a1a1a] text-white py-4 px-4 md:py-6 md:px-6 shadow-md border-b-4 border-[#c9b370] relative text-center md:text-left">
+            <header className="bg-[#1a1a1a] text-white py-4 px-4 md:py-6 md:px-6 shadow-md border-b-4 border-[#c9b370] relative text-center md:text-left flex-shrink-0">
                 <WelcomeBan /> {/* On mobile, centered due to header's text-center. On md+, aligns left naturally. */}
 
                 {/* Navigation Links Container */}
@@ -90,7 +91,7 @@ export default function ProfilePage() {
             {/* Main Content Section */}
             {/* Mobile: smaller padding. */}
             {/* Desktop (md+): Reverts to original padding px-6 py-10. */}
-            <main className="px-4 py-8 md:px-6 md:py-10 bg-[#f8f6f1] flex flex-col items-center">
+            <main className="flex-1 px-4 py-8 md:px-6 md:py-10 bg-[#f8f6f1] flex flex-col items-center justify-center min-h-0">
                 {/* Profile Card */}
                 {/* Mobile: smaller padding. */}
                 {/* Desktop (md+): Reverts to original padding py-8 px-7. */}
@@ -143,6 +144,9 @@ export default function ProfilePage() {
                     </form>
                 </div>
             </main>
+
+            {/* Footer - Always at bottom */}
+            <Footer className="mt-auto flex-shrink-0" />
         </div>
     );
 }

@@ -7,6 +7,7 @@ import WelcomeBan from '@/app/ui/WelcomeBan';
 import ButtonLink from '@/app/ui/ButtonLink';
 import LoadingMessage from '@/app/ui/LoadingMessage';
 import GithubIcon from '@/app/ui/GithubIcon';
+import Footer from '@/app/ui/Footer';
 import Link from 'next/link';
 import { useState } from 'react';
 
@@ -31,9 +32,9 @@ export default function LoginPage() {
     if (isLoading) return <LoadingMessage />;
 
     return (
-        <div className="min-h-screen bg-[#f8f6f1] text-[#2e2e2e] font-serif">
+        <div className="min-h-screen bg-[#f8f6f1] text-[#2e2e2e] font-serif flex flex-col">
             {/* Header */}
-            <header className="bg-[#1a1a1a] text-white shadow-md border-b-4 border-[#c9b370] relative">
+            <header className="bg-[#1a1a1a] text-white shadow-md border-b-4 border-[#c9b370] relative flex-shrink-0">
                 {/* Desktop Header */}
                 <div className="hidden md:block py-6 px-6">
                     <WelcomeBan />
@@ -112,9 +113,9 @@ export default function LoginPage() {
                 </div>
             </header>
 
-            {/* Login Form */}
-            <div className="flex flex-col items-center justify-center min-h-[60vh] px-4 py-6">
-                <div className="bg-white/90 shadow-2xl rounded-2xl p-6 sm:p-8 w-full max-w-sm border border-[#c9b370] flex flex-col items-center mt-8 sm:mt-16">
+            {/* Login Form - Main Content */}
+            <main className="flex-1 flex flex-col items-center justify-center px-4 py-6 min-h-0">
+                <div className="bg-white/90 shadow-2xl rounded-2xl p-6 sm:p-8 w-full max-w-sm border border-[#c9b370] flex flex-col items-center">
                     <h2 className="text-xl sm:text-2xl font-bold text-[#1a1a1a] mb-4 tracking-wider font-serif text-center">
                         {l('login_to_account')}
                     </h2>
@@ -151,7 +152,10 @@ export default function LoginPage() {
                         </Link>
                     </div>
                 </div>
-            </div>
+            </main>
+
+            {/* Footer - Always at bottom */}
+            <Footer className="mt-auto flex-shrink-0" />
         </div>
     );
 }

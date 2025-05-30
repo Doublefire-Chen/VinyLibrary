@@ -3,9 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "prebuild": "node scripts/version.js",
+    "predev": "node scripts/version.js",
     "build": "next build",
-    "start": "next start",
+    "dev": "next dev",
     "lint": "next lint"
   },
   "dependencies": {
