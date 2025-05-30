@@ -17,6 +17,7 @@ password: vkGU8$8c2si633H3%E%K!BVTpK55TVMQE9ufjgEA&Nz8p@3EPeQ6Mj^xu6wktYXM
 
 restore file: https://demo.vinyl.aka.cy/demo_backup_20250530_085715_UTC+00_signed.zip
 
+PS: The register new function and change password function are disabled in the demo site.
 ## Tech Stack
 
 - **Backend**: Go lang
