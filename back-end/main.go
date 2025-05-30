@@ -66,6 +66,8 @@ func main() {
 		api.GET("/vinyls/:id", GetVinylByID)
 		api.GET("/album/:filename", ServeAlbumPicture)
 		api.GET("/history/:id", GetPlayHistoryByID)
+		// Version information
+		api.GET("/version", GetVersion)
 
 		// Protected routes group
 		protected := api.Group("/")
@@ -87,6 +89,7 @@ func main() {
 			// System operations
 			protected.GET("/system/backup", Backup)
 			protected.POST("/system/restore", Restore)
+
 		}
 	}
 
